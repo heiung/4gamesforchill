@@ -53,11 +53,11 @@
         .grid-b { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; background: #ecf0f1; border-radius: 8px; padding: 10px; margin: 0 auto 15px; width: 320px; height: 320px; position: relative; }
         .cell-b { background: #bdc3c7; border-radius: 4px; transition: 0.1s; }
         .cell-b.filled { background: var(--primary); }
-        .cell-b.preview { background: rgba(46, 204, 113, 0.4); }
+        .cell-b.preview { background: rgba(46, 204, 113, 0.4); border: 2px dashed var(--primary-dark); box-sizing: border-box; }
         .pieces-area { display: flex; justify-content: space-around; height: 110px; background: #f9f9f9; border-radius: 12px; align-items: center; }
         .piece-slot { width: 95px; height: 95px; display: flex; justify-content: center; align-items: center; }
-        .piece { display: grid; gap: 2px; cursor: grab; }
-        .p-cell { width: 22px; height: 22px; background: var(--primary-dark); border-radius: 3px; }
+        .piece { display: grid; gap: 2px; cursor: grab; touch-action: none; }
+        .p-cell { width: 22px; height: 22px; background: var(--primary-dark); border-radius: 3px; pointer-events: none; }
 
         /* --- TIC TAC TOE --- */
         .grid-ttt { 
@@ -83,13 +83,12 @@
             box-sizing: content-box; 
         }
         .sq { width: 40px; height: 40px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; line-height: 1; cursor: pointer; position: relative; user-select: none; overflow: hidden; }
-        /* Màu sắc ván cờ sinh động chuẩn quốc tế */
+        
         .sq.light { background: #eeeed2; }
         .sq.dark { background: #769656; }
         
         .sq.selected { background: #f6f669 !important; }
         .sq.valid::after { content: ''; width: 14px; height: 14px; background: rgba(0, 0, 0, 0.3); border-radius: 50%; position: absolute; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
-        /* Highlight nước đi trước đó (cả Cờ vua và Cờ tướng) */
         .sq.last-move, .cc-sq.last-move-cc { background-color: rgba(255, 255, 51, 0.5) !important; border-radius: 4px; }
         
         .score-row { display: flex; justify-content: space-between; width: 320px; margin: 0 auto; font-size: 0.9rem; font-weight: bold; padding: 2px 0; }
@@ -239,7 +238,7 @@
     <div id="page-block" class="hidden">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <button onclick="openMode('menu')" style="border:none; background:none; cursor:pointer; font-size:1.5rem;">⬅</button>
-            <div style="font-weight:bold; font-size:1.2rem;">SCORE: <span id="score-b" style="color:var(--primary-dark)">0</span></div>
+            <div style="font-weight:bold; font-size:1.1rem;">SCORE: <span id="score-b" style="color:var(--primary-dark); transition: 0.3s;">0</span></div>
             <div class="timer" id="timer-b">00:00</div>
         </div>
         <div id="board-b" class="grid-b"></div>
@@ -392,8 +391,9 @@
         if(boardGameType === 'cchess') startCChess();
     }
 
-    // --- CỜ VUA (CHESS) ---
-    const chP = { r:'♜', n:'♞', b:'♝', q:'♛', k:'♚', p:'♟', R:'♜', N:'♞', B:'♝', Q:'♛', K:'♚', P:'♟' };
+    // --- CỜ VUA (CHESS) - FIX UNICODE & BỎ 3D ---
+    // Sử dụng Unicode trắng chuẩn (♖♘♗♕♔♙) và đen (♜♞♝♛♚♟)
+    const chP = { r:'♜', n:'♞', b:'♝', q:'♛', k:'♚', p:'♟', R:'♖', N:'♘', B:'♗', Q:'♕', K:'♔', P:'♙' };
     const pieceValues = { p:1, n:3, b:3, r:5, q:9, k:0, P:1, N:3, B:3, R:5, Q:9, K:0 };
     
     let cBoard = [], cTurn = 'W', cSel = null, cMoves = [];
@@ -401,7 +401,7 @@
     let epTarget = null;
     let chessHistory = [];
     let undosLeft = 3;
-    let lastMoveC = {from: null, to: null}; // Highlight mờ nước đi
+    let lastMoveC = {from: null, to: null};
 
     function startChess() {
         cBoard = Array(64).fill(null);
@@ -509,7 +509,6 @@
     }
 
     function executeChessMove(from, to, isAI = false) {
-        // Lưu lịch sử + lưu luôn trạng thái last move của bước trước để khi Undo được chuẩn xác
         chessHistory.push({ b: [...cBoard], turn: cTurn, castling: JSON.parse(JSON.stringify(castling)), ep: epTarget, lastMove: {...lastMoveC} });
         
         lastMoveC = {from: from, to: to};
@@ -589,7 +588,7 @@
         if (undosLeft > 0 && chessHistory.length > 0) {
             let last = chessHistory.pop();
             if (isBoardAi && chessHistory.length > 0) {
-                last = chessHistory.pop(); // Pop lùi cả AI
+                last = chessHistory.pop(); 
             }
             cBoard = last.b;
             cTurn = last.turn;
@@ -614,14 +613,10 @@
             
             let p = cBoard[i];
             if(p) { 
-                sq.innerText = chP[p]; 
-                sq.style.color = p === p.toUpperCase() ? '#ffffff' : '#222222'; 
-                // Tạo hiệu ứng quân cờ 3D lồi
-                if(p === p.toUpperCase()) {
-                    sq.style.textShadow = '0 3px 0 #b3b3b3, 0 6px 8px rgba(0,0,0,0.6)';
-                } else {
-                    sq.style.textShadow = '0 3px 0 #000, 0 6px 8px rgba(0,0,0,0.8), 0 -1px 1px rgba(255,255,255,0.2)';
-                }
+                // Ép hiển thị text thay vì emoji trên đt bằng \uFE0E
+                sq.innerText = chP[p] + '\uFE0E'; 
+                // Vì cả 2 bộ Unicode đã mang đặc điểm rõ ràng (rỗng/đặc), ta chỉ cần set màu viền cho rõ nét
+                sq.style.color = '#000000'; 
             }
             
             sq.onclick = () => {
@@ -649,7 +644,6 @@
     let ccB = [], ccTurn = 'R', ccSelected = null, ccMoves = [];
     let ccTotalMoves = 0, ccProgressMoves = 0;
     
-    // Khai báo Undo Cờ tướng
     let ccHistory = [];
     let undosLeftCC = 3;
     let lastMoveCC = {from: null, to: null};
@@ -739,7 +733,6 @@
     }
 
     function executeCCMove(from, to) {
-        // Lưu lịch sử Cờ tướng
         ccHistory.push({b: [...ccB], turn: ccTurn, totalM: ccTotalMoves, progM: ccProgressMoves, lastMove: {...lastMoveCC}});
         
         lastMoveCC = {from: from, to: to};
@@ -757,7 +750,6 @@
         ccMoves = [];
         renderCChess();
 
-        // Kiểm tra Hết cờ
         let hasMoves = false;
         for(let j=0; j<90; j++) {
             if(ccB[j] && (ccTurn === 'R' ? ccB[j]===ccB[j].toUpperCase() : ccB[j]===ccB[j].toLowerCase())) {
@@ -863,7 +855,7 @@
         }
     }
 
-    // --- SUDOKU & BLOCK BLAST ---
+    // --- SUDOKU ---
     let solutionS = [], selectedIdx = null;
     function startSudoku() {
         startTimer('timer-s'); const g = document.getElementById('grid-s'); g.innerHTML = ''; let b = Array.from({length:9},()=>Array(9).fill(0));
@@ -877,15 +869,131 @@
     function solveByAI(){ document.querySelectorAll('.cell-s').forEach((c,i)=> { if(!c.classList.contains('readonly')) c.innerText=solutionS[Math.floor(i/9)][i%9]; }); saveHistory('Sudoku','AI Solved'); clearInterval(timerInterval); }
     function checkWinS(){ let f=true, cor=true; document.querySelectorAll('.cell-s').forEach((c,i)=>{ let v=parseInt(c.innerText); if(!v) f=false; if(v!==solutionS[Math.floor(i/9)][i%9]) cor=false; }); if(f && cor){ fireWin(i18n[currentLang].win); saveHistory('Sudoku', document.getElementById('timer-s').innerText); } }
 
-    let bState = Array(64).fill(false), bScore = 0;
+    // --- BLOCK BLAST (CẢM ỨNG & COMBO) ---
+    let bState = Array(64).fill(false), bScore = 0, bCombo = 0;
     const bShapes = [ [[0,0]], [[0,0],[0,1]], [[0,0],[1,0]], [[0,0],[0,1],[1,0],[1,1]], [[0,0],[0,1],[0,2]], [[0,0],[1,0],[2,0]], [[0,0],[1,0],[2,0],[2,1]], [[0,1],[1,0],[1,1],[1,2]] ];
-    function startBlockBlast(){ bScore=0; bState.fill(false); document.getElementById('score-b').innerText='0'; startTimer('timer-b'); const board = document.getElementById('board-b'); board.innerHTML=''; for(let i=0; i<64; i++){ let c=document.createElement('div'); c.className='cell-b'; board.appendChild(c); } [0,1,2].forEach(createPiece); setupDrop(); }
-    function createPiece(idx){ const slot = document.getElementById(`slot-${idx}`); slot.innerHTML=''; const sh = bShapes[Math.floor(Math.random()*bShapes.length)]; const piece = document.createElement('div'); piece.className='piece'; piece.draggable=true; piece.dataset.sh=JSON.stringify(sh); let mR=0, mC=0; sh.forEach(([r,c])=>{ mR=Math.max(mR,r); mC=Math.max(mC,c); let pc=document.createElement('div'); pc.className='p-cell'; pc.style.gridRow=r+1; pc.style.gridColumn=c+1; piece.appendChild(pc); }); piece.style.gridTemplateRows=`repeat(${mR+1},1fr)`; piece.style.gridTemplateColumns=`repeat(${mC+1},1fr)`; piece.ondragstart=(e)=>{ e.dataTransfer.setData('text', JSON.stringify({s:sh, i:idx})); piece.style.opacity='0.4'; }; piece.ondragend=()=>{ piece.style.opacity='1'; clearBPreview(); }; slot.appendChild(piece); }
-    function setupDrop(){ const board = document.getElementById('board-b'); board.ondragover = (e) => { e.preventDefault(); const ds=e.dataTransfer.getData('text'); if(!ds) return; const data=JSON.parse(ds); const rect=board.getBoundingClientRect(); const c=Math.floor((e.clientX-rect.left)/(rect.width/8)), r=Math.floor((e.clientY-rect.top)/(rect.height/8)); clearBPreview(); if(canPB(data.s,r,c)){ data.s.forEach(([dr,dc])=>{ let cell = document.querySelectorAll('.cell-b')[(r+dr)*8 + c+dc]; if(cell) cell.classList.add('preview'); }); } }; board.ondrop = (e) => { e.preventDefault(); const ds=e.dataTransfer.getData('text'); if(!ds) return; const data=JSON.parse(ds); const rect=board.getBoundingClientRect(); const c=Math.floor((e.clientX-rect.left)/(rect.width/8)), r=Math.floor((e.clientY-rect.top)/(rect.height/8)); clearBPreview(); if(canPB(data.s,r,c)){ data.s.forEach(([dr,dc])=>{ bState[(r+dr)*8 + c+dc] = true; document.querySelectorAll('.cell-b')[(r+dr)*8 + c+dc].classList.add('filled'); }); bScore += data.s.length*10; document.getElementById('score-b').innerText = bScore; document.getElementById(`slot-${data.i}`).innerHTML=''; checkClearB(); if(Array.from(document.querySelectorAll('.piece-slot')).every(s=>s.innerHTML==='')) [0,1,2].forEach(createPiece); checkGOB(); } }; board.ondragleave = clearBPreview; }
+    
+    let dragP = null, dragOff = {x:0, y:0}, actSh = null, actIdx = -1, isTouch = false;
+
+    function startBlockBlast(){ 
+        bScore=0; bCombo=0; bState.fill(false); document.getElementById('score-b').innerText='0'; 
+        startTimer('timer-b'); const board = document.getElementById('board-b'); board.innerHTML=''; 
+        for(let i=0; i<64; i++){ let c=document.createElement('div'); c.className='cell-b'; board.appendChild(c); } 
+        [0,1,2].forEach(createPiece); 
+    }
+
+    function createPiece(idx){ 
+        const slot = document.getElementById(`slot-${idx}`); slot.innerHTML=''; 
+        const sh = bShapes[Math.floor(Math.random()*bShapes.length)]; 
+        const piece = document.createElement('div'); piece.className='piece'; 
+        piece.dataset.sh=JSON.stringify(sh); 
+        let mR=0, mC=0; 
+        sh.forEach(([r,c])=>{ mR=Math.max(mR,r); mC=Math.max(mC,c); let pc=document.createElement('div'); pc.className='p-cell'; pc.style.gridRow=r+1; pc.style.gridColumn=c+1; piece.appendChild(pc); }); 
+        piece.style.gridTemplateRows=`repeat(${mR+1},1fr)`; piece.style.gridTemplateColumns=`repeat(${mC+1},1fr)`; 
+
+        piece.onpointerdown = (e) => {
+            e.preventDefault(); actSh = sh; actIdx = idx; isTouch = e.pointerType === 'touch';
+            const rect = piece.getBoundingClientRect();
+            dragOff.x = e.clientX - rect.left; dragOff.y = e.clientY - rect.top;
+            dragP = piece.cloneNode(true);
+            dragP.style.position = 'fixed'; dragP.style.zIndex = '1000'; dragP.style.pointerEvents = 'none';
+            dragP.style.transform = 'scale(1.1)';
+            dragP.style.left = (e.clientX - dragOff.x) + 'px';
+            // Đẩy khối lên trên 70px nếu dùng cảm ứng để tránh bị ngón tay che khuất
+            dragP.style.top = (e.clientY - dragOff.y - (isTouch ? 70 : 0)) + 'px'; 
+            document.body.appendChild(dragP);
+            piece.style.opacity = '0.2';
+        };
+        slot.appendChild(piece); 
+    }
+
+    document.addEventListener('pointermove', (e) => {
+        if(!dragP) return;
+        dragP.style.left = (e.clientX - dragOff.x) + 'px';
+        dragP.style.top = (e.clientY - dragOff.y - (isTouch ? 70 : 0)) + 'px';
+
+        const board = document.getElementById('board-b');
+        const rect = board.getBoundingClientRect();
+        const pX = e.clientX - dragOff.x;
+        const pY = e.clientY - dragOff.y - (isTouch ? 70 : 0);
+        
+        const cW = (rect.width - 20) / 8;
+        const c = Math.round((pX - rect.left - 10) / cW);
+        const r = Math.round((pY - rect.top - 10) / cW);
+
+        clearBPreview();
+        if(c>=0 && c<8 && r>=0 && r<8 && canPB(actSh, r, c)){
+            actSh.forEach(([dr,dc])=>{
+                let cell = document.querySelectorAll('.cell-b')[(r+dr)*8 + c+dc];
+                if(cell) cell.classList.add('preview');
+            });
+        }
+    });
+
+    document.addEventListener('pointerup', (e) => {
+        if(!dragP) return;
+        dragP.remove(); dragP = null;
+        let orig = document.getElementById(`slot-${actIdx}`).firstChild;
+        if(orig) orig.style.opacity = '1';
+
+        const board = document.getElementById('board-b');
+        const rect = board.getBoundingClientRect();
+        const pX = e.clientX - dragOff.x;
+        const pY = e.clientY - dragOff.y - (isTouch ? 70 : 0);
+        const cW = (rect.width - 20) / 8;
+        const c = Math.round((pX - rect.left - 10) / cW);
+        const r = Math.round((pY - rect.top - 10) / cW);
+
+        clearBPreview();
+        if(c>=0 && c<8 && r>=0 && r<8 && canPB(actSh, r, c)){
+            actSh.forEach(([dr,dc])=>{
+                bState[(r+dr)*8 + c+dc] = true;
+                document.querySelectorAll('.cell-b')[(r+dr)*8 + c+dc].classList.add('filled');
+            });
+            bScore += actSh.length; // Điểm đặt khối cơ bản
+            document.getElementById(`slot-${actIdx}`).innerHTML='';
+            checkClearB();
+            if(Array.from(document.querySelectorAll('.piece-slot')).every(s=>s.innerHTML==='')) [0,1,2].forEach(createPiece);
+            checkGOB();
+        }
+        actSh = null; actIdx = -1;
+    });
+
     function canPB(sh,r,c){ return sh.every(([dr,dc])=>{ let nr=r+dr, nc=c+dc; return nr>=0 && nr<8 && nc>=0 && nc<8 && !bState[nr*8+nc]; }); }
     function clearBPreview(){ document.querySelectorAll('.cell-b').forEach(c=>c.classList.remove('preview')); }
-    function checkClearB(){ let rs=[], cs=[]; for(let i=0; i<8; i++){ if(Array(8).fill(0).every((_,j)=>bState[i*8+j])) rs.push(i); if(Array(8).fill(0).every((_,j)=>bState[j*8+i])) cs.push(i); } rs.forEach(r=>{ for(let i=0; i<8; i++) bState[r*8+i]=false; }); cs.forEach(c=>{ for(let i=0; i<8; i++) bState[i*8+c]=false; }); if(rs.length||cs.length){ bScore+=(rs.length+cs.length)*100; document.getElementById('score-b').innerText = bScore; setTimeout(()=>{ document.querySelectorAll('.cell-b').forEach((el,i)=>{ if(!bState[i]) el.classList.remove('filled'); }); },200); } }
-    function checkGOB(){ const ps=Array.from(document.querySelectorAll('.piece')).map(p=>JSON.parse(p.dataset.sh)); let pos=false; ps.forEach(sh=>{ for(let r=0; r<8; r++) for(let c=0; c<8; c++) if(canPB(sh,r,c)) pos=true; }); if(!pos && ps.length>0){ fireWin("GAME OVER!"); saveHistory('Block Blast', bScore); } }
+    
+    function checkClearB(){ 
+        let rs=[], cs=[]; 
+        for(let i=0; i<8; i++){ 
+            if(Array(8).fill(0).every((_,j)=>bState[i*8+j])) rs.push(i); 
+            if(Array(8).fill(0).every((_,j)=>bState[j*8+i])) cs.push(i); 
+        } 
+        rs.forEach(r=>{ for(let i=0; i<8; i++) bState[r*8+i]=false; }); 
+        cs.forEach(c=>{ for(let i=0; i<8; i++) bState[i*8+c]=false; }); 
+
+        let cleared = rs.length + cs.length;
+        if(cleared > 0){
+            bCombo++;
+            let pts = (cleared * 10) * bCombo;
+            bScore += pts;
+            let displayScore = bScore + (bCombo > 1 ? ` (+${pts} COMBO x${bCombo}!)` : ` (+${pts})`);
+            document.getElementById('score-b').innerText = displayScore;
+            
+            setTimeout(()=>{ 
+                document.querySelectorAll('.cell-b').forEach((el,i)=>{ if(!bState[i]) el.classList.remove('filled'); }); 
+                document.getElementById('score-b').innerText = bScore; // Trả về hiển thị thường
+            }, 600); 
+        } else {
+            bCombo = 0; // Đứt combo
+            document.getElementById('score-b').innerText = bScore;
+        }
+    }
+
+    function checkGOB(){ 
+        const ps=Array.from(document.querySelectorAll('.piece')).map(p=>JSON.parse(p.dataset.sh)); 
+        let pos=false; ps.forEach(sh=>{ for(let r=0; r<8; r++) for(let c=0; c<8; c++) if(canPB(sh,r,c)) pos=true; }); 
+        if(!pos && ps.length>0){ fireWin("GAME OVER!"); saveHistory('Block Blast', bScore); } 
+    }
 
     // --- UTILS ---
     const memeList = ["https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2pzMWc0emxvdXdvazZvdzVmM2wzczRvMHI1NTh3ZjM5czhtcnN6NyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/J1yCBOPt6Kwlrh0L3j/giphy.gif","https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHdqeGpnZzZuOHhybmg3MWNqaHk5eXYwbjh5a2Q5aDYxZWR1N3J6ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/11sBLVxNs7v6WA/giphy.gif","https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHdqeGpnZzZuOHhybmg3MWNqaHk5eXYwbjh5a2Q5aDYxZWR1N3J6ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/HHzBaXsra2MHciRNQr/giphy.gif","https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHdqeGpnZzZuOHhybmg3MWNqaHk5eXYwbjh5a2Q5aDYxZWR1N3J6ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7yORCExjS87Jk10xSU/giphy.gif","https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3OGpkbDJuOGF3eWRtaGNvNHQ1a2oycDcyYTFiMDF1d3Azb3V0NXN1diZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xUOxfgmXP3EUTK4EPC/giphy.gif"];
