@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Hub Eco - Ultimate Masterpiece</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #2ecc71; --primary-dark: #27ae60;
+            --bg: #f4f7f6; --surface: rgba(255, 255, 255, 0.95);
+            --text: #2c3e50; --border: #dcdde1;
+        }
+
+        body {
+            background: radial-gradient(circle at top, #e8f5e9, #f4f7f6);
+            color: var(--text); font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0; display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden; touch-action: none;
+        }
+
+        .container-box {
+            width: 420px; padding: 25px; background: var(--surface);
+            backdrop-filter: blur(15px); border-radius: 25px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.08); text-align: center;
+            position: relative; transition: all 0.3s ease;
+        }
+
+        .hidden { display: none !important; }
+        h1 { color: var(--primary-dark); font-size: 1.7rem; margin-bottom: 20px; }
+
+        .btn {
+            width: 100%; padding: 14px; margin: 8px 0; border: none;
+            border-radius: 12px; cursor: pointer; font-weight: bold;
+            transition: 0.2s; font-size: 1rem; background: var(--primary); color: white;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); }
+        .btn-outline { background: none; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        
+        .setup-group { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 15px; margin-bottom: 15px; }
+        select.eco-select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--primary); margin: 5px 0; font-size: 1rem; font-weight: bold; color: var(--primary-dark); background: #fff; outline: none; cursor: pointer; }
+
+        /* --- SUDOKU --- */
+        .grid-s { display: grid; grid-template-columns: repeat(9, 1fr); gap: 1px; background: #333; border: 2px solid #333; margin: 15px 0; }
+        .cell-s { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 1.2rem; background: #ffffff; color: var(--primary-dark); }
+        .cell-s.readonly { background: #e0e0e0; color: #333; cursor: default; } 
+        .cell-s.selected { background: #a2d9b5 !important; }
+        .grid-s > div:nth-child(3n):not(:nth-child(9n)) { border-right: 2px solid #333; }
+        .grid-s > div:nth-child(n+19):nth-child(-n+27), .grid-s > div:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid #333; }
+
+        /* --- BLOCK BLAST --- */
+        .grid-b { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; background: #ecf0f1; border-radius: 8px; padding: 10px; margin: 0 auto 15px; width: 320px; height: 320px; position: relative; }
+        .cell-b { background: #bdc3c7; border-radius: 4px; transition: 0.1s; }
+        .cell-b.filled { background: var(--primary); }
+        .cell-b.preview { background: rgba(46, 204, 113, 0.4); }
+        .pieces-area { display: flex; justify-content: space-around; height: 110px; background: #f9f9f9; border-radius: 12px; align-items: center; }
+        .piece-slot { width: 95px; height: 95px; display: flex; justify-content: center; align-items: center; }
+        .piece { display: grid; gap: 2px; cursor: grab; }
+        .p-cell { width: 22px; height: 22px; background: var(--primary-dark); border-radius: 3px; }
+
+        /* --- TIC TAC TOE --- */
+        .grid-ttt { 
+            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); 
+            gap: 5px; background: var(--primary-dark); border: 4px solid var(--primary-dark); 
+            border-radius: 12px; width: 280px; height: 280px; margin: 20px auto; 
+            overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); box-sizing: border-box;
+        }
+        .cell-ttt { 
+            background: #fff; display: flex; align-items: center; justify-content: center; 
+            font-size: 5rem; font-weight: bold; color: var(--text); cursor: pointer; transition: 0.2s; 
+            line-height: 1; margin: 0; padding: 0; box-sizing: border-box;
+        }
+        .cell-ttt:hover { background: #f4f7f6; }
+        .cell-ttt.x { color: #e74c3c; }
+        .cell-ttt.o { color: #3498db; }
+
+        /* --- CHESS BOARDS --- */
+        .board-chess { 
+            display: grid; grid-template-columns: repeat(8, 40px); grid-template-rows: repeat(8, 40px); 
+            margin: 5px auto; width: 320px; height: 320px; 
+            border: 6px solid #4a3018; border-radius: 6px; box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            box-sizing: content-box; 
+        }
+        .sq { width: 40px; height: 40px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; line-height: 1; cursor: pointer; position: relative; user-select: none; overflow: hidden; }
+        /* Màu sắc ván cờ sinh động chuẩn quốc tế */
+        .sq.light { background: #eeeed2; }
+        .sq.dark { background: #769656; }
+        
+        .sq.selected { background: #f6f669 !important; }
+        .sq.valid::after { content: ''; width: 14px; height: 14px; background: rgba(0, 0, 0, 0.3); border-radius: 50%; position: absolute; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
+        /* Highlight nước đi trước đó (cả Cờ vua và Cờ tướng) */
+        .sq.last-move, .cc-sq.last-move-cc { background-color: rgba(255, 255, 51, 0.5) !important; border-radius: 4px; }
+        
+        .score-row { display: flex; justify-content: space-between; width: 320px; margin: 0 auto; font-size: 0.9rem; font-weight: bold; padding: 2px 0; }
+
+        /* --- CỜ TƯỚNG BẢN CHUẨN --- */
+        .board-cchess {
+            display: grid; grid-template-columns: repeat(9, 38px); grid-template-rows: repeat(10, 38px);
+            width: 342px; height: 380px; margin: 15px auto; position: relative; background-color: #fcebb6;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='342' height='380'%3E%3Cstyle%3Eline%7Bstroke:%238b4513;stroke-width:1.5;%7D%3C/style%3E%3Cline x1='19' y1='19' x2='323' y2='19'/%3E%3Cline x1='19' y1='57' x2='323' y2='57'/%3E%3Cline x1='19' y1='95' x2='323' y2='95'/%3E%3Cline x1='19' y1='133' x2='323' y2='133'/%3E%3Cline x1='19' y1='171' x2='323' y2='171'/%3E%3Cline x1='19' y1='209' x2='323' y2='209'/%3E%3Cline x1='19' y1='247' x2='323' y2='247'/%3E%3Cline x1='19' y1='285' x2='323' y2='285'/%3E%3Cline x1='19' y1='323' x2='323' y2='323'/%3E%3Cline x1='19' y1='361' x2='323' y2='361'/%3E%3Cline x1='19' y1='19' x2='19' y2='361'/%3E%3Cline x1='323' y1='19' x2='323' y2='361'/%3E%3Cline x1='57' y1='19' x2='57' y2='171'/%3E%3Cline x1='95' y1='19' x2='95' y2='171'/%3E%3Cline x1='133' y1='19' x2='133' y2='171'/%3E%3Cline x1='171' y1='19' x2='171' y2='171'/%3E%3Cline x1='209' y1='19' x2='209' y2='171'/%3E%3Cline x1='247' y1='19' x2='247' y2='171'/%3E%3Cline x1='285' y1='19' x2='285' y2='171'/%3E%3Cline x1='57' y1='209' x2='57' y2='361'/%3E%3Cline x1='95' y1='209' x2='95' y2='361'/%3E%3Cline x1='133' y1='209' x2='133' y2='361'/%3E%3Cline x1='171' y1='209' x2='171' y2='361'/%3E%3Cline x1='209' y1='209' x2='209' y2='361'/%3E%3Cline x1='247' y1='209' x2='247' y2='361'/%3E%3Cline x1='285' y1='209' x2='285' y2='361'/%3E%3Cline x1='133' y1='19' x2='209' y2='95'/%3E%3Cline x1='209' y1='19' x2='133' y2='95'/%3E%3Cline x1='133' y1='285' x2='209' y2='361'/%3E%3Cline x1='209' y1='285' x2='133' y2='361'/%3E%3C/svg%3E");
+            border: 4px solid #8b4513; border-radius: 4px; box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        .cc-sq { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; z-index: 5; cursor: pointer; position: relative; }
+        .cc-piece { width: 32px; height: 32px; border-radius: 50%; background: radial-gradient(circle at 10px 10px, #fff, #e0e0e0); border: 2px solid #555; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; box-shadow: 2px 3px 5px rgba(0,0,0,0.4), inset -1px -2px 3px rgba(0,0,0,0.2); user-select: none; transition: transform 0.1s; }
+        .cc-piece.red { color: #c0392b; border-color: #922b21; }
+        .cc-piece.black { color: #2c3e50; border-color: #1a252f; }
+        .cc-sq.selected .cc-piece { transform: translateY(-3px) scale(1.1); border-color: #f1c40f; box-shadow: 0 5px 15px rgba(241,196,15,0.6); }
+        .cc-sq.valid::after { content: ''; width: 14px; height: 14px; background: rgba(46, 204, 113, 0.7); border-radius: 50%; position: absolute; z-index: 1; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
+
+        /* --- UI MODALS --- */
+        .timer { font-size: 1.3rem; font-weight: bold; color: var(--primary-dark); }
+        .num-btn { padding: 12px; background: #f1f2f6; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 1.1rem; }
+        #winModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 20px; z-index: 1000; width: 300px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
+        #winModal img { width: 100%; border-radius: 10px; margin: 15px 0; max-height: 250px; object-fit: cover;}
+        .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index: 999; backdrop-filter: blur(5px); }
+    </style>
+</head>
+<body>
+
+<div class="overlay" id="overlay"></div>
+<div id="winModal">
+    <h2 id="modal-title" style="margin:0; color:var(--primary-dark);">KẾT QUẢ!</h2>
+    <img id="memeImg" src="" alt="Meme">
+    <button class="btn" onclick="closeWin()">QUAY LẠI MENU</button>
+</div>
+
+<div class="container-box">
+    <div id="page-menu">
+        <h1 id="ui-title">PUZZLE HUB ECO</h1>
+        <button class="btn btn-outline" onclick="toggleLang()" id="btn-lang">🇺🇸 English</button>
+        <button class="btn" onclick="openMode('sudoku')">SUDOKU</button>
+        <button class="btn" style="background:#3498db" onclick="openMode('block')">BLOCK BLAST</button>
+        <button class="btn" style="background:#e67e22" onclick="openMode('board-menu')">GAME CỜ (Chess & Xiangqi)</button>
+        <button class="btn" style="background:#9b59b6" onclick="openMode('ttt-menu')">TIC TAC TOE</button>
+        <button class="btn btn-outline" id="ui-h-btn" onclick="openMode('history')">LỊCH SỬ</button>
+    </div>
+
+    <div id="page-board-menu" class="hidden">
+        <h2 style="color:var(--primary-dark);">THIẾT LẬP GAME CỜ</h2>
+        <div class="setup-group">
+            <select id="board-type" class="eco-select">
+                <option value="chess">Cờ Vua (Chess)</option>
+                <option value="cchess">Cờ Tướng (Xiangqi)</option>
+            </select>
+            <select id="board-mode" class="eco-select" onchange="document.getElementById('board-diff').style.display = this.value==='pve'?'block':'none'">
+                <option value="pvp">Chơi 2 Người (PvP)</option>
+                <option value="pve">Chơi với AI (PvE)</option>
+            </select>
+            <select id="board-diff" class="eco-select" style="display:none;">
+                <option value="1">AI: Dễ</option>
+                <option value="2">AI: Trung bình</option>
+                <option value="3">AI: Khó</option>
+                <option value="4">AI: Cực khó</option>
+            </select>
+        </div>
+        <button class="btn" onclick="initBoardGame()">BẮT ĐẦU</button>
+        <button class="btn btn-outline" onclick="openMode('menu')">QUAY LẠI</button>
+    </div>
+
+    <div id="page-ttt-menu" class="hidden">
+        <h2 style="color:var(--primary-dark);">TIC TAC TOE</h2>
+        <div class="setup-group">
+            <select id="ttt-mode" class="eco-select" onchange="document.getElementById('ttt-diff').style.display = this.value==='pve'?'block':'none'">
+                <option value="pvp">Chơi 2 Người (PvP)</option>
+                <option value="pve">Chơi với AI (PvE)</option>
+            </select>
+            <select id="ttt-diff" class="eco-select" style="display:none;">
+                <option value="1">AI: Dễ</option>
+                <option value="2">AI: Trung bình</option>
+                <option value="3">AI: Khó</option>
+                <option value="4">AI: Cực khó</option>
+            </select>
+        </div>
+        <button class="btn" onclick="initTTT()">BẮT ĐẦU</button>
+        <button class="btn btn-outline" onclick="openMode('menu')">QUAY LẠI</button>
+    </div>
+
+    <div id="page-ttt" class="hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button onclick="openMode('menu')" style="border:none; background:none; cursor:pointer; font-size:1.5rem;">⬅</button>
+            <div id="turn-ttt" class="timer">Lượt của X</div>
+            <div style="width:20px;"></div>
+        </div>
+        <div id="grid-ttt" class="grid-ttt"></div>
+    </div>
+
+    <div id="page-chess" class="hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button onclick="openMode('menu')" style="border:none; background:none; cursor:pointer; font-size:1.5rem;">⬅</button>
+            <div id="turn-chess" class="timer">White's Turn</div>
+            <button class="btn btn-outline" id="chess-undo-btn" style="width:auto; padding:5px 10px; margin:0;" onclick="undoChess()">Undo (3)</button>
+        </div>
+        
+        <div class="score-row">
+            <span id="chess-score-b" style="color:#2c3e50">Black: +0</span>
+        </div>
+        
+        <div id="board-chess" class="board-chess"></div>
+        
+        <div class="score-row">
+            <span id="chess-score-w" style="color:#27ae60">White: +0</span>
+        </div>
+    </div>
+
+    <div id="page-cchess" class="hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button onclick="openMode('menu')" style="border:none; background:none; cursor:pointer; font-size:1.5rem;">⬅</button>
+            <div id="turn-cchess" class="timer" style="color:#c0392b;">Đỏ đi</div>
+            <button class="btn btn-outline" id="cchess-undo-btn" style="width:auto; padding:5px 10px; margin:0;" onclick="undoCChess()">Undo (3)</button>
+        </div>
+        <div id="board-cchess" class="board-cchess"></div>
+    </div>
+
+    <div id="page-sudoku" class="hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+            <button onclick="openMode('menu')" style="border:none; background:none; cursor:pointer; font-size:1.5rem;">⬅</button>
+            <div style="display:flex; flex-direction:column; align-items:center;">
+                <div class="timer" id="timer-s" style="line-height:1;">00:00</div>
+                <select id="diff-s" onchange="startSudoku()" style="margin-top:5px; padding:2px 5px; border-radius:5px; border:1px solid var(--primary); font-size:0.85rem; color:var(--primary-dark); font-weight:bold; outline:none; cursor:pointer; background:var(--bg);">
+                    <option id="opt-e" value="30">Dễ</option>
+                    <option id="opt-m" value="45" selected>Trung bình</option>
+                    <option id="opt-h" value="55">Khó</option>
+                </select>
+            </div>
+            <div style="width:20px;"></div>
+        </div>
+        <div id="grid-s" class="grid-s"></div>
+        <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:6px;">
+            <button class="num-btn" onclick="inputS(1)">1</button><button class="num-btn" onclick="inputS(2)">2</button><button class="num-btn" onclick="inputS(3)">3</button><button class="num-btn" onclick="inputS(4)">4</button><button class="num-btn" onclick="inputS(5)">5</button>
+            <button class="num-btn" onclick="inputS(6)">6</button><button class="num-btn" onclick="inputS(7)">7</button><button class="num-btn" onclick="inputS(8)">8</button><button class="num-btn" onclick="inputS(9)">9</button><button class="num-btn" onclick="inputS(0)">⌫</button>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn btn-outline" id="btn-hint" onclick="getHint()" style="margin:0; flex:1;">GỢI Ý (+10s)</button>
+            <button class="btn" style="margin:0; flex:1; background:#34495e;" id="btn-ai" onclick="solveByAI()">AI GIẢI</button>
+        </div>
+    </div>
+
+    <div id="page-block" class="hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button onclick="openMode('menu')" style="border:none; background:none; cursor:pointer; font-size:1.5rem;">⬅</button>
+            <div style="font-weight:bold; font-size:1.2rem;">SCORE: <span id="score-b" style="color:var(--primary-dark)">0</span></div>
+            <div class="timer" id="timer-b">00:00</div>
+        </div>
+        <div id="board-b" class="grid-b"></div>
+        <div class="pieces-area">
+            <div class="piece-slot" id="slot-0"></div><div class="piece-slot" id="slot-1"></div><div class="piece-slot" id="slot-2"></div>
+        </div>
+    </div>
+
+    <div id="page-history" class="hidden">
+        <h2 id="ui-h">LỊCH SỬ GIẢI</h2>
+        <div id="history-list" style="text-align:left; max-height:250px; overflow-y:auto; border-top:1px solid #eee; padding-top:10px;"></div>
+        <button class="btn" id="ui-back" onclick="openMode('menu')">QUAY LẠI</button>
+    </div>
+</div>
+
+<script>
+    let timerInterval, startTime, penalty = 0, currentLang = 'vi';
+    let isBoardAi = false, boardAiDiff = 1, isTttAi = false, tttAiDiff = 1;
+    
+    const i18n = {
+        vi: { title: "PUZZLE HUB ECO", h: "LỊCH SỬ GIẢI", back: "QUAY LẠI", lang: "🇺🇸 English", hint: "GỢI Ý (+10s)", ai: "AI GIẢI", win: "CHIẾN THẮNG!", diffE: "Dễ", diffM: "Trung bình", diffH: "Khó" },
+        en: { title: "PUZZLE HUB ECO", h: "HISTORY", back: "BACK", lang: "🇻🇳 Tiếng Việt", hint: "HINT (+10s)", ai: "AI SOLVE", win: "VICTORY!", diffE: "Easy", diffM: "Medium", diffH: "Hard" }
+    };
+
+    function toggleLang() {
+        currentLang = (currentLang === 'vi') ? 'en' : 'vi';
+        const t = i18n[currentLang];
+        document.getElementById('ui-title').innerText = t.title;
+        document.getElementById('btn-lang').innerText = t.lang;
+        document.getElementById('btn-hint').innerText = t.hint;
+        document.getElementById('btn-ai').innerText = t.ai;
+        document.getElementById('ui-h').innerText = t.h;
+        document.getElementById('ui-h-btn').innerText = t.h;
+        document.getElementById('ui-back').innerText = t.back;
+        document.getElementById('opt-e').innerText = t.diffE;
+        document.getElementById('opt-m').innerText = t.diffM;
+        document.getElementById('opt-h').innerText = t.diffH;
+    }
+
+    function openMode(mode) {
+        clearInterval(timerInterval);
+        document.querySelectorAll('.container-box > div').forEach(div => div.classList.add('hidden'));
+        let targetPage = document.getElementById(`page-${mode}`);
+        if(targetPage) targetPage.classList.remove('hidden');
+        
+        if(mode === 'sudoku') startSudoku();
+        if(mode === 'block') startBlockBlast();
+        if(mode === 'history') renderHistory();
+    }
+
+    function startTimer(id) {
+        startTime = Date.now(); penalty = 0;
+        timerInterval = setInterval(() => {
+            let diff = (Date.now() - startTime) + penalty;
+            let m = Math.floor(diff/60000).toString().padStart(2,'0');
+            let s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
+            let el = document.getElementById(id); if(el) el.innerText = `${m}:${s}`;
+        }, 1000);
+    }
+
+    // --- TIC TAC TOE ---
+    let tttBoard = Array(9).fill(null), tttTurn = 'X';
+    const winCombos = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    
+    function initTTT() {
+        isTttAi = document.getElementById('ttt-mode').value === 'pve';
+        tttAiDiff = parseInt(document.getElementById('ttt-diff').value);
+        openMode('ttt');
+        tttBoard = Array(9).fill(null); tttTurn = 'X';
+        renderTTT();
+    }
+    
+    function renderTTT() {
+        const grid = document.getElementById('grid-ttt'); grid.innerHTML = '';
+        tttBoard.forEach((cell, i) => {
+            let div = document.createElement('div'); div.className = `cell-ttt ${cell ? cell.toLowerCase() : ''}`;
+            div.innerText = cell || '';
+            div.onclick = () => {
+                if(!cell && !checkWinTTT(tttBoard)) {
+                    tttBoard[i] = tttTurn;
+                    if(checkWinTTT(tttBoard)){ renderTTT(); fireWin(`${tttTurn} CHIẾN THẮNG!`); return; }
+                    if(!tttBoard.includes(null)){ renderTTT(); fireWin("HÒA NHAU!"); return; }
+                    tttTurn = tttTurn === 'X' ? 'O' : 'X'; renderTTT();
+                    
+                    if(isTttAi && tttTurn === 'O' && !checkWinTTT(tttBoard) && tttBoard.includes(null)) {
+                        setTimeout(() => makeTTTAiMove(), 300);
+                    }
+                }
+            };
+            grid.appendChild(div);
+        });
+        document.getElementById('turn-ttt').innerText = `Lượt của ${tttTurn}`;
+    }
+
+    function checkWinTTT(b) {
+        for(let combo of winCombos) {
+            if(b[combo[0]] && b[combo[0]] === b[combo[1]] && b[combo[0]] === b[combo[2]]) return b[combo[0]];
+        }
+        return null;
+    }
+
+    function makeTTTAiMove() {
+        let empty = tttBoard.map((v,i) => v===null?i:-1).filter(v=>v!==-1);
+        let move = -1;
+        let r = Math.random();
+        let useMinimax = (tttAiDiff===4) || (tttAiDiff===3 && r<0.8) || (tttAiDiff===2 && r<0.5);
+        
+        if(!useMinimax || empty.length === 9) { move = empty[Math.floor(Math.random()*empty.length)]; } 
+        else { move = getBestMoveTTT(tttBoard, 'O').index; }
+        
+        if(move !== -1) {
+            tttBoard[move] = 'O';
+            if(checkWinTTT(tttBoard)){ renderTTT(); fireWin("O CHIẾN THẮNG!"); return; }
+            if(!tttBoard.includes(null)){ renderTTT(); fireWin("HÒA NHAU!"); return; }
+            tttTurn = 'X'; renderTTT();
+        }
+    }
+    
+    function getBestMoveTTT(newBoard, player) {
+        let availSpots = newBoard.map((v,i) => v===null?i:-1).filter(v=>v!==-1);
+        let win = checkWinTTT(newBoard);
+        if (win === 'X') return {score: -10}; else if (win === 'O') return {score: 10}; else if (availSpots.length === 0) return {score: 0};
+        let moves = [];
+        for (let i = 0; i < availSpots.length; i++) {
+            let move = {}; move.index = availSpots[i];
+            newBoard[availSpots[i]] = player;
+            if (player == 'O') move.score = getBestMoveTTT(newBoard, 'X').score;
+            else move.score = getBestMoveTTT(newBoard, 'O').score;
+            newBoard[availSpots[i]] = null; moves.push(move);
+        }
+        let bestMove;
+        if(player === 'O') {
+            let bestScore = -10000;
+            for(let i=0; i<moves.length; i++) if(moves[i].score > bestScore) { bestScore = moves[i].score; bestMove = i; }
+        } else {
+            let bestScore = 10000;
+            for(let i=0; i<moves.length; i++) if(moves[i].score < bestScore) { bestScore = moves[i].score; bestMove = i; }
+        }
+        return moves[bestMove];
+    }
+
+    // --- GAME CỜ: SETUP ---
+    let boardGameType = 'chess';
+    function initBoardGame() {
+        boardGameType = document.getElementById('board-type').value;
+        isBoardAi = document.getElementById('board-mode').value === 'pve';
+        boardAiDiff = parseInt(document.getElementById('board-diff').value);
+        openMode(boardGameType);
+        if(boardGameType === 'chess') startChess();
+        if(boardGameType === 'cchess') startCChess();
+    }
+
+    // --- CỜ VUA (CHESS) ---
+    const chP = { r:'♜', n:'♞', b:'♝', q:'♛', k:'♚', p:'♟', R:'♜', N:'♞', B:'♝', Q:'♛', K:'♚', P:'♟' };
+    const pieceValues = { p:1, n:3, b:3, r:5, q:9, k:0, P:1, N:3, B:3, R:5, Q:9, K:0 };
+    
+    let cBoard = [], cTurn = 'W', cSel = null, cMoves = [];
+    let castling = { wk: true, wq: true, bk: true, bq: true };
+    let epTarget = null;
+    let chessHistory = [];
+    let undosLeft = 3;
+    let lastMoveC = {from: null, to: null}; // Highlight mờ nước đi
+
+    function startChess() {
+        cBoard = Array(64).fill(null);
+        let fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+        let rows = fen.split('/');
+        rows.forEach((row, r) => { let c = 0; for (let i=0; i<row.length; i++) { let char = row[i]; if (isNaN(char)) { cBoard[r*8+c] = char; c++; } else { let empty = parseInt(char); for(let n=0; n<empty; n++) { cBoard[r*8+c] = null; c++; } } } });
+        cTurn = 'W'; cSel = null; cMoves = [];
+        castling = { wk: true, wq: true, bk: true, bq: true };
+        epTarget = null;
+        chessHistory = [];
+        undosLeft = 3;
+        lastMoveC = {from: null, to: null};
+        updateChessScore();
+        renderChess();
+    }
+
+    function updateChessScore() {
+        let wScore = 0, bScore = 0;
+        for(let p of cBoard) {
+            if(p) {
+                if(p === p.toUpperCase()) wScore += pieceValues[p];
+                else bScore += pieceValues[p];
+            }
+        }
+        let diff = wScore - bScore;
+        document.getElementById('chess-score-w').innerText = `White: ${diff>0 ? '+'+diff : 0}`;
+        document.getElementById('chess-score-b').innerText = `Black: ${diff<0 ? '+'+(-diff) : 0}`;
+        document.getElementById('chess-undo-btn').innerText = `Undo (${undosLeft})`;
+    }
+
+    function getPseudoLegal(idx, b) {
+        let ms = []; let p = b[idx]; if (!p) return ms;
+        let isW = p === p.toUpperCase(); let r = Math.floor(idx/8), c = idx%8; let type = p.toLowerCase();
+        const isEn = (nr,nc) => { let t=b[nr*8+nc]; return t && (isW ? t===t.toLowerCase() : t===t.toUpperCase()); };
+        const isEmpty = (nr,nc) => !b[nr*8+nc];
+
+        if (type === 'p') {
+            let dir = isW ? -1 : 1;
+            if (r+dir >= 0 && r+dir < 8 && isEmpty(r+dir, c)) {
+                ms.push((r+dir)*8+c);
+                if ((isW && r === 6 || !isW && r === 1) && isEmpty(r+2*dir, c)) ms.push((r+2*dir)*8+c);
+            }
+            [c-1, c+1].forEach(nc => {
+                if (nc >= 0 && nc < 8) {
+                    if (isEn(r+dir, nc)) ms.push((r+dir)*8+nc);
+                    else if (epTarget === (r+dir)*8+nc) ms.push((r+dir)*8+nc); // Ăn qua đường
+                }
+            });
+        } else if (type === 'r' || type === 'q') {
+            [[0,1],[0,-1],[1,0],[-1,0]].forEach(d => { for(let i=1; i<8; i++) { let nr=r+d[0]*i, nc=c+d[1]*i; if(nr<0||nr>7||nc<0||nc>7) break; if(isEmpty(nr,nc)) ms.push(nr*8+nc); else { if(isEn(nr,nc)) ms.push(nr*8+nc); break; } } });
+        }
+        if (type === 'b' || type === 'q') {
+            [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(d => { for(let i=1; i<8; i++) { let nr=r+d[0]*i, nc=c+d[1]*i; if(nr<0||nr>7||nc<0||nc>7) break; if(isEmpty(nr,nc)) ms.push(nr*8+nc); else { if(isEn(nr,nc)) ms.push(nr*8+nc); break; } } });
+        } else if (type === 'n') {
+            [[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]].forEach(d => { let nr=r+d[0], nc=c+d[1]; if(nr>=0&&nr<8&&nc>=0&&nc<8&&(isEmpty(nr,nc)||isEn(nr,nc))) ms.push(nr*8+nc); });
+        } else if (type === 'k') {
+            [[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]].forEach(d => { let nr=r+d[0], nc=c+d[1]; if(nr>=0&&nr<8&&nc>=0&&nc<8&&(isEmpty(nr,nc)||isEn(nr,nc))) ms.push(nr*8+nc); });
+        }
+        return ms;
+    }
+
+    function isSquareAttacked(idx, attackerIsW, b) {
+        for(let i=0; i<64; i++) {
+            let p = b[i];
+            if (p && (attackerIsW ? p === p.toUpperCase() : p === p.toLowerCase())) {
+                let moves = getPseudoLegal(i, b);
+                if (moves.includes(idx)) return true;
+            }
+        }
+        return false;
+    }
+
+    function getLegalMoves(idx, b, currCastling, currEp) {
+        let pseudo = getPseudoLegal(idx, b);
+        let p = b[idx]; let isW = p === p.toUpperCase();
+        let legal = [];
+
+        for (let m of pseudo) {
+            let tempB = [...b];
+            tempB[m] = tempB[idx]; tempB[idx] = null;
+            if (p.toLowerCase() === 'p' && m === currEp) {
+                let dir = isW ? 1 : -1;
+                tempB[m + dir*8] = null;
+            }
+            let kIdx = tempB.findIndex(x => x === (isW ? 'K' : 'k'));
+            if (kIdx !== -1 && !isSquareAttacked(kIdx, !isW, tempB)) {
+                legal.push(m);
+            }
+        }
+
+        // Castling
+        if (p === 'K' && currCastling.wk) {
+            if (!b[61] && !b[62] && !isSquareAttacked(60, false, b) && !isSquareAttacked(61, false, b) && !isSquareAttacked(62, false, b)) legal.push(62);
+        }
+        if (p === 'K' && currCastling.wq) {
+            if (!b[59] && !b[58] && !b[57] && !isSquareAttacked(60, false, b) && !isSquareAttacked(59, false, b) && !isSquareAttacked(58, false, b)) legal.push(58);
+        }
+        if (p === 'k' && currCastling.bk) {
+            if (!b[5] && !b[6] && !isSquareAttacked(4, true, b) && !isSquareAttacked(5, true, b) && !isSquareAttacked(6, true, b)) legal.push(6);
+        }
+        if (p === 'k' && currCastling.bq) {
+            if (!b[3] && !b[2] && !b[1] && !isSquareAttacked(4, true, b) && !isSquareAttacked(3, true, b) && !isSquareAttacked(2, true, b)) legal.push(2);
+        }
+        return legal;
+    }
+
+    function executeChessMove(from, to, isAI = false) {
+        // Lưu lịch sử + lưu luôn trạng thái last move của bước trước để khi Undo được chuẩn xác
+        chessHistory.push({ b: [...cBoard], turn: cTurn, castling: JSON.parse(JSON.stringify(castling)), ep: epTarget, lastMove: {...lastMoveC} });
+        
+        lastMoveC = {from: from, to: to};
+        let p = cBoard[from];
+        let isW = p === p.toUpperCase();
+        
+        // Bắt tốt qua đường
+        if (p.toLowerCase() === 'p' && to === epTarget) {
+            cBoard[to + (isW ? 8 : -8)] = null;
+        }
+
+        cBoard[to] = p;
+        cBoard[from] = null;
+
+        // Nhập thành
+        if (p === 'K') {
+            if (from === 60 && to === 62) { cBoard[61] = cBoard[63]; cBoard[63] = null; }
+            if (from === 60 && to === 58) { cBoard[59] = cBoard[56]; cBoard[56] = null; }
+            castling.wk = false; castling.wq = false;
+        }
+        if (p === 'k') {
+            if (from === 4 && to === 6) { cBoard[5] = cBoard[7]; cBoard[7] = null; }
+            if (from === 4 && to === 2) { cBoard[3] = cBoard[0]; cBoard[0] = null; }
+            castling.bk = false; castling.bq = false;
+        }
+
+        if (from === 63 || to === 63) castling.wk = false;
+        if (from === 56 || to === 56) castling.wq = false;
+        if (from === 7 || to === 7) castling.bk = false;
+        if (from === 0 || to === 0) castling.bq = false;
+
+        // Cập nhật mốc En Passant
+        epTarget = null;
+        if (p.toLowerCase() === 'p' && Math.abs(to - from) === 16) {
+            epTarget = from + (isW ? -8 : 8);
+        }
+
+        // Phong cấp
+        if (p.toLowerCase() === 'p' && (Math.floor(to/8) === 0 || Math.floor(to/8) === 7)) {
+            if(isAI) {
+                cBoard[to] = isW ? 'Q' : 'q';
+            } else {
+                let promo = prompt("Phong cấp (q: Hậu, r: Xe, b: Tượng, n: Mã):", "q");
+                if (!['q','r','b','n'].includes(promo?.toLowerCase())) promo = 'q';
+                cBoard[to] = isW ? promo.toUpperCase() : promo.toLowerCase();
+            }
+        }
+
+        cTurn = cTurn === 'W' ? 'B' : 'W';
+        cSel = null; cMoves = [];
+        updateChessScore();
+        renderChess();
+
+        // Kiểm tra Hết cờ
+        let nextMoves = [];
+        for(let i=0; i<64; i++) {
+            if (cBoard[i] && (cTurn==='W' ? cBoard[i]===cBoard[i].toUpperCase() : cBoard[i]===cBoard[i].toLowerCase())) {
+                nextMoves.push(...getLegalMoves(i, cBoard, castling, epTarget));
+            }
+        }
+        if (nextMoves.length === 0) {
+            let kIdx = cBoard.findIndex(x => x === (cTurn==='W' ? 'K' : 'k'));
+            if (isSquareAttacked(kIdx, cTurn==='B', cBoard)) {
+                fireWin((cTurn==='W'?'Black':'White') + " THẮNG!");
+            } else {
+                fireWin("HÒA!");
+            }
+            return;
+        }
+
+        if (isBoardAi && cTurn === 'B') {
+            setTimeout(() => makeAiBoardMove('chess'), 400);
+        }
+    }
+
+    function undoChess() {
+        if (undosLeft > 0 && chessHistory.length > 0) {
+            let last = chessHistory.pop();
+            if (isBoardAi && chessHistory.length > 0) {
+                last = chessHistory.pop(); // Pop lùi cả AI
+            }
+            cBoard = last.b;
+            cTurn = last.turn;
+            castling = last.castling;
+            epTarget = last.ep;
+            lastMoveC = last.lastMove;
+            cSel = null; cMoves = [];
+            undosLeft--;
+            updateChessScore();
+            renderChess();
+        }
+    }
+
+    function renderChess() {
+        const board = document.getElementById('board-chess'); board.innerHTML = '';
+        for(let i=0; i<64; i++) {
+            let r = Math.floor(i/8), c = i%8; let sq = document.createElement('div');
+            sq.className = `sq ${(r + c) % 2 === 0 ? 'light' : 'dark'}`;
+            if(cSel === i) sq.classList.add('selected'); 
+            if(cMoves.includes(i)) sq.classList.add('valid');
+            if(lastMoveC.from === i || lastMoveC.to === i) sq.classList.add('last-move');
+            
+            let p = cBoard[i];
+            if(p) { 
+                sq.innerText = chP[p]; 
+                sq.style.color = p === p.toUpperCase() ? '#ffffff' : '#222222'; 
+                // Tạo hiệu ứng quân cờ 3D lồi
+                if(p === p.toUpperCase()) {
+                    sq.style.textShadow = '0 3px 0 #b3b3b3, 0 6px 8px rgba(0,0,0,0.6)';
+                } else {
+                    sq.style.textShadow = '0 3px 0 #000, 0 6px 8px rgba(0,0,0,0.8), 0 -1px 1px rgba(255,255,255,0.2)';
+                }
+            }
+            
+            sq.onclick = () => {
+                if(cTurn !== 'W' && isBoardAi) return;
+                if(cSel === null) {
+                    if (p && ((cTurn === 'W' && p === p.toUpperCase()) || (cTurn === 'B' && p === p.toLowerCase()))) { 
+                        cSel = i; cMoves = getLegalMoves(i, cBoard, castling, epTarget); renderChess(); 
+                    }
+                } else {
+                    if (cMoves.includes(i)) {
+                        executeChessMove(cSel, i, false);
+                    } else { 
+                        if (p && ((cTurn === 'W' && p === p.toUpperCase()) || (cTurn === 'B' && p === p.toLowerCase()))) { cSel = i; cMoves = getLegalMoves(i, cBoard, castling, epTarget); renderChess(); }
+                        else { cSel = null; cMoves = []; renderChess(); }
+                    }
+                }
+            };
+            board.appendChild(sq);
+        }
+        document.getElementById('turn-chess').innerText = (cTurn === 'W') ? "Lượt Trắng" : "Lượt Đen";
+    }
+
+    // --- CỜ TƯỚNG (XIANGQI) ---
+    const ccPieces = { r:'車', n:'馬', b:'象', a:'士', k:'將', c:'砲', p:'卒', R:'俥', N:'傌', B:'相', A:'仕', K:'帥', C:'炮', P:'兵' };
+    let ccB = [], ccTurn = 'R', ccSelected = null, ccMoves = [];
+    let ccTotalMoves = 0, ccProgressMoves = 0;
+    
+    // Khai báo Undo Cờ tướng
+    let ccHistory = [];
+    let undosLeftCC = 3;
+    let lastMoveCC = {from: null, to: null};
+
+    function startCChess() {
+        ccB = Array(90).fill(null);
+        let fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR";
+        fen.split('/').forEach((row, r) => { let c = 0; for (let i = 0; i < row.length; i++) { let char = row[i]; if (!isNaN(char)) { let emptyCount = parseInt(char); for (let n = 0; n < emptyCount; n++) { ccB[r*9 + c] = null; c++; } } else { ccB[r*9 + c] = char; c++; } } });
+        ccTurn = 'R'; ccSelected = null; ccMoves = []; 
+        ccTotalMoves = 0; ccProgressMoves = 0;
+        ccHistory = []; undosLeftCC = 3; lastMoveCC = {from: null, to: null};
+        renderCChess();
+    }
+
+    function getCCMovesSim(idx, board) {
+        let ms = []; let p = board[idx]; if (!p) return [];
+        let isR = p === p.toUpperCase(); let r = Math.floor(idx/9), c = idx%9; let type = p.toLowerCase();
+        const isEn = (t) => t && (isR ? t === t.toLowerCase() : t === t.toUpperCase());
+        const isEmpty = (t) => !t;
+
+        if (type === 'r') {
+            [[0,1],[0,-1],[1,0],[-1,0]].forEach(d => { let nr = r + d[0], nc = c + d[1]; while (nr >= 0 && nr <= 9 && nc >= 0 && nc <= 8) { let t = board[nr*9+nc]; if (!t) ms.push(nr*9+nc); else { if (isEn(t)) ms.push(nr*9+nc); break; } nr += d[0]; nc += d[1]; } });
+        } else if (type === 'c') {
+            [[0,1], [0,-1], [1,0], [-1,0]].forEach(d => { let jumped = false; let nr = r + d[0], nc = c + d[1]; while (nr >= 0 && nr <= 9 && nc >= 0 && nc <= 8) { let t = board[nr * 9 + nc]; if (!jumped) { if (!t) ms.push(nr * 9 + nc); else jumped = true; } else { if (t) { if (isEn(t)) ms.push(nr * 9 + nc); break; } } nr += d[0]; nc += d[1]; } });
+        } else if (type === 'n') {
+            [[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]].forEach(d => { let legR = r + (Math.abs(d[0])===2 ? d[0]/2 : 0), legC = c + (Math.abs(d[1])===2 ? d[1]/2 : 0); if(legR>=0&&legR<10&&legC>=0&&legC<9&&!board[legR*9+legC]){ let nr=r+d[0], nc=c+d[1]; if(nr>=0&&nr<10&&nc>=0&&nc<9&&(!board[nr*9+nc]||isEn(board[nr*9+nc]))) ms.push(nr*9+nc); } });
+        } else if (type === 'b') { 
+            [[2,2],[2,-2],[-2,2],[-2,-2]].forEach(d => { let nr=r+d[0], nc=c+d[1], legR=r+d[0]/2, legC=c+d[1]/2; if(nr>=0&&nr<10&&nc>=0&&nc<9&&!board[legR*9+legC]){ if((isR && nr>4) || (!isR && nr<5)) { if(!board[nr*9+nc]||isEn(board[nr*9+nc])) ms.push(nr*9+nc); } } });
+        } else if (type === 'a') { 
+            [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(d => { let nr=r+d[0], nc=c+d[1]; if(nc>=3 && nc<=5 && ((isR && nr>=7 && nr<=9) || (!isR && nr>=0 && nr<=2))) { if(!board[nr*9+nc]||isEn(board[nr*9+nc])) ms.push(nr*9+nc); } });
+        } else if (type === 'k') { 
+            [[0,1],[0,-1],[1,0],[-1,0]].forEach(d => { let nr=r+d[0], nc=c+d[1]; if(nc>=3 && nc<=5 && ((isR && nr>=7 && nr<=9) || (!isR && nr>=0 && nr<=2))) { if(!board[nr*9+nc]||isEn(board[nr*9+nc])) ms.push(nr*9+nc); } });
+        } else if (type === 'p') { 
+            let dir = isR ? -1 : 1; let nr = r + dir; if(nr>=0 && nr<10 && (!board[nr*9+c]||isEn(board[nr*9+c]))) ms.push(nr*9+c); if((isR && r<5) || (!isR && r>4)) { [c-1, c+1].forEach(nc => { if(nc>=0 && nc<9 && (!board[r*9+nc]||isEn(board[r*9+nc]))) ms.push(r*9+nc); }); }
+        }
+        return ms;
+    }
+
+    function isCCFlyingGeneral(board) {
+        let kR = -1, kC = -1, kBlackR = -1, kBlackC = -1;
+        for (let i = 0; i < 90; i++) {
+            if (board[i] === 'K') { kR = Math.floor(i/9); kC = i%9; }
+            if (board[i] === 'k') { kBlackR = Math.floor(i/9); kBlackC = i%9; }
+        }
+        if (kC !== -1 && kC === kBlackC) {
+            let count = 0;
+            let minR = Math.min(kR, kBlackR);
+            let maxR = Math.max(kR, kBlackR);
+            for (let r = minR + 1; r < maxR; r++) {
+                if (board[r*9 + kC]) count++;
+            }
+            if (count === 0) return true;
+        }
+        return false;
+    }
+
+    function isCCKingInDanger(board, isRed) {
+        let kingChar = isRed ? 'K' : 'k';
+        let kIdx = board.indexOf(kingChar);
+        if(kIdx === -1) return false;
+        for (let i = 0; i < 90; i++) {
+            let p = board[i];
+            if (p && (isRed ? p === p.toLowerCase() : p === p.toUpperCase())) {
+                let mvs = getCCMovesSim(i, board);
+                if (mvs.includes(kIdx)) return true;
+            }
+        }
+        return false;
+    }
+
+    function getCCLegalMoves(idx, board) {
+        let pseudo = getCCMovesSim(idx, board);
+        let legal = [];
+        let p = board[idx];
+        if (!p) return [];
+        let isRed = p === p.toUpperCase();
+
+        for (let to of pseudo) {
+            let tempB = [...board];
+            tempB[to] = tempB[idx];
+            tempB[idx] = null;
+            if (isCCFlyingGeneral(tempB)) continue;
+            if (isCCKingInDanger(tempB, isRed)) continue;
+            legal.push(to);
+        }
+        return legal;
+    }
+
+    function executeCCMove(from, to) {
+        // Lưu lịch sử Cờ tướng
+        ccHistory.push({b: [...ccB], turn: ccTurn, totalM: ccTotalMoves, progM: ccProgressMoves, lastMove: {...lastMoveCC}});
+        
+        lastMoveCC = {from: from, to: to};
+        let p = ccB[from];
+        let captured = ccB[to];
+        
+        if (captured || p.toLowerCase() === 'p') ccProgressMoves = 0;
+        else ccProgressMoves++;
+        ccTotalMoves++;
+
+        ccB[to] = p;
+        ccB[from] = null;
+        ccTurn = (ccTurn === 'R') ? 'B' : 'R';
+        ccSelected = null;
+        ccMoves = [];
+        renderCChess();
+
+        // Kiểm tra Hết cờ
+        let hasMoves = false;
+        for(let j=0; j<90; j++) {
+            if(ccB[j] && (ccTurn === 'R' ? ccB[j]===ccB[j].toUpperCase() : ccB[j]===ccB[j].toLowerCase())) {
+                if(getCCLegalMoves(j, ccB).length > 0) { hasMoves = true; break; }
+            }
+        }
+
+        if(!hasMoves) {
+            let inCheck = isCCKingInDanger(ccB, ccTurn === 'R');
+            if (inCheck) fireWin((ccTurn === 'R' ? "ĐEN" : "ĐỎ") + " CHIẾU BÍ THẮNG!");
+            else fireWin((ccTurn === 'R' ? "ĐEN" : "ĐỎ") + " THẮNG (ĐỐI PHƯƠNG HẾT NƯỚC ĐI)!");
+            return;
+        }
+
+        if (ccProgressMoves >= 60 || ccTotalMoves >= 600) {
+            fireWin("HÒA THEO LUẬT CHUẨN!");
+            return;
+        }
+
+        if(isBoardAi && ccTurn === 'B') setTimeout(() => makeAiBoardMove('cchess'), 500);
+    }
+
+    function undoCChess() {
+        if (undosLeftCC > 0 && ccHistory.length > 0) {
+            let last = ccHistory.pop();
+            if (isBoardAi && ccHistory.length > 0) last = ccHistory.pop();
+            
+            ccB = last.b; 
+            ccTurn = last.turn;
+            ccTotalMoves = last.totalM; 
+            ccProgressMoves = last.progM;
+            lastMoveCC = last.lastMove;
+            ccSelected = null; 
+            ccMoves = [];
+            undosLeftCC--;
+            renderCChess();
+        }
+    }
+
+    function renderCChess() {
+        const board = document.getElementById('board-cchess'); board.innerHTML = '';
+        for (let i = 0; i < 90; i++) {
+            const sq = document.createElement('div'); sq.className = 'cc-sq';
+            if (ccMoves.includes(i)) sq.classList.add('valid');
+            if (lastMoveCC.from === i || lastMoveCC.to === i) sq.classList.add('last-move-cc');
+
+            let p = ccB[i];
+            if (p) { 
+                const pDiv = document.createElement('div'); 
+                pDiv.className = 'cc-piece ' + (p === p.toUpperCase() ? 'red' : 'black'); 
+                pDiv.innerText = ccPieces[p]; 
+                if (ccSelected === i) sq.classList.add('selected'); 
+                sq.appendChild(pDiv); 
+            }
+            
+            sq.onclick = () => {
+                if(ccTurn !== 'R' && isBoardAi) return;
+                if (ccSelected === null) {
+                    if (p && ((ccTurn === 'R' && p === p.toUpperCase()) || (ccTurn === 'B' && p === p.toLowerCase()))) { 
+                        ccSelected = i; ccMoves = getCCLegalMoves(i, ccB); renderCChess(); 
+                    }
+                } else {
+                    if (ccMoves.includes(i)) {
+                        executeCCMove(ccSelected, i);
+                    } else { 
+                        if (p && ((ccTurn === 'R' && p === p.toUpperCase()) || (ccTurn === 'B' && p === p.toLowerCase()))) { 
+                            ccSelected = i; ccMoves = getCCLegalMoves(i, ccB); renderCChess(); 
+                        }
+                        else { ccSelected = null; ccMoves = []; renderCChess(); }
+                    }
+                }
+            };
+            board.appendChild(sq);
+        }
+        document.getElementById('turn-cchess').innerText = (ccTurn === 'R') ? 'Lượt Đỏ' : 'Lượt Đen';
+        document.getElementById('cchess-undo-btn').innerText = `Undo (${undosLeftCC})`;
+    }
+
+    // --- HỆ THỐNG AI TỔNG HỢP ---
+    function makeAiBoardMove(type) {
+        if(type === 'chess') {
+            let moves = [];
+            for(let i=0; i<64; i++) {
+                if(cBoard[i] && cBoard[i] === cBoard[i].toLowerCase()) {
+                    let mvs = getLegalMoves(i, cBoard, castling, epTarget);
+                    mvs.forEach(to => moves.push({from: i, to: to}));
+                }
+            }
+            if(moves.length === 0) return;
+            let bestMove = moves[Math.floor(Math.random()*moves.length)];
+            executeChessMove(bestMove.from, bestMove.to, true);
+        } else {
+            let moves = [];
+            for(let i=0; i<90; i++) {
+                if(ccB[i] && ccB[i] === ccB[i].toLowerCase()) {
+                    let mvs = getCCLegalMoves(i, ccB);
+                    mvs.forEach(to => moves.push({from: i, to: to}));
+                }
+            }
+            if(moves.length === 0) return;
+            let bestMove = moves[Math.floor(Math.random()*moves.length)];
+            executeCCMove(bestMove.from, bestMove.to);
+        }
+    }
+
+    // --- SUDOKU & BLOCK BLAST ---
+    let solutionS = [], selectedIdx = null;
+    function startSudoku() {
+        startTimer('timer-s'); const g = document.getElementById('grid-s'); g.innerHTML = ''; let b = Array.from({length:9},()=>Array(9).fill(0));
+        const solveS = (bd) => { for(let r=0; r<9; r++) { for(let c=0; c<9; c++) { if(bd[r][c]===0) { let ns = [1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5); for(let n of ns) { if(isValidS(bd,r,c,n)) { bd[r][c]=n; if(solveS(bd)) return true; bd[r][c]=0; } } return false; } } } return true; };
+        solveS(b); solutionS = b.map(r=>[...r]); let h = parseInt(document.getElementById('diff-s').value) || 45; while(h>0){ let r=Math.floor(Math.random()*9), c=Math.floor(Math.random()*9); if(b[r][c]!==0){ b[r][c]=0; h--; } }
+        for(let i=0; i<81; i++) { let c = document.createElement('div'); c.className = 'cell-s'; let v = b[Math.floor(i/9)][i%9]; c.innerText = v || ''; if(v) c.classList.add('readonly'); c.onclick = () => { if(!c.classList.contains('readonly')) { document.querySelectorAll('.cell-s').forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); selectedIdx = i; } }; g.appendChild(c); }
+    }
+    function isValidS(b,r,c,n){ for(let i=0; i<9; i++) if(b[r][i]===n || b[i][c]===n) return false; let sR=Math.floor(r/3)*3, sC=Math.floor(c/3)*3; for(let i=0; i<3; i++) for(let j=0; j<3; j++) if(b[sR+i][sC+j]===n) return false; return true; }
+    function inputS(n){ if(selectedIdx!==null){ document.querySelectorAll('.cell-s')[selectedIdx].innerText = n===0?'':n; checkWinS(); } }
+    function getHint(){ let em=[]; document.querySelectorAll('.cell-s').forEach((c,i)=>{ if(c.innerText==='' && !c.classList.contains('readonly')) em.push(i); }); if(em.length>0){ let idx=em[Math.floor(Math.random()*em.length)]; document.querySelectorAll('.cell-s')[idx].innerText=solutionS[Math.floor(idx/9)][idx%9]; penalty+=10000; checkWinS(); } }
+    function solveByAI(){ document.querySelectorAll('.cell-s').forEach((c,i)=> { if(!c.classList.contains('readonly')) c.innerText=solutionS[Math.floor(i/9)][i%9]; }); saveHistory('Sudoku','AI Solved'); clearInterval(timerInterval); }
+    function checkWinS(){ let f=true, cor=true; document.querySelectorAll('.cell-s').forEach((c,i)=>{ let v=parseInt(c.innerText); if(!v) f=false; if(v!==solutionS[Math.floor(i/9)][i%9]) cor=false; }); if(f && cor){ fireWin(i18n[currentLang].win); saveHistory('Sudoku', document.getElementById('timer-s').innerText); } }
+
+    let bState = Array(64).fill(false), bScore = 0;
+    const bShapes = [ [[0,0]], [[0,0],[0,1]], [[0,0],[1,0]], [[0,0],[0,1],[1,0],[1,1]], [[0,0],[0,1],[0,2]], [[0,0],[1,0],[2,0]], [[0,0],[1,0],[2,0],[2,1]], [[0,1],[1,0],[1,1],[1,2]] ];
+    function startBlockBlast(){ bScore=0; bState.fill(false); document.getElementById('score-b').innerText='0'; startTimer('timer-b'); const board = document.getElementById('board-b'); board.innerHTML=''; for(let i=0; i<64; i++){ let c=document.createElement('div'); c.className='cell-b'; board.appendChild(c); } [0,1,2].forEach(createPiece); setupDrop(); }
+    function createPiece(idx){ const slot = document.getElementById(`slot-${idx}`); slot.innerHTML=''; const sh = bShapes[Math.floor(Math.random()*bShapes.length)]; const piece = document.createElement('div'); piece.className='piece'; piece.draggable=true; piece.dataset.sh=JSON.stringify(sh); let mR=0, mC=0; sh.forEach(([r,c])=>{ mR=Math.max(mR,r); mC=Math.max(mC,c); let pc=document.createElement('div'); pc.className='p-cell'; pc.style.gridRow=r+1; pc.style.gridColumn=c+1; piece.appendChild(pc); }); piece.style.gridTemplateRows=`repeat(${mR+1},1fr)`; piece.style.gridTemplateColumns=`repeat(${mC+1},1fr)`; piece.ondragstart=(e)=>{ e.dataTransfer.setData('text', JSON.stringify({s:sh, i:idx})); piece.style.opacity='0.4'; }; piece.ondragend=()=>{ piece.style.opacity='1'; clearBPreview(); }; slot.appendChild(piece); }
+    function setupDrop(){ const board = document.getElementById('board-b'); board.ondragover = (e) => { e.preventDefault(); const ds=e.dataTransfer.getData('text'); if(!ds) return; const data=JSON.parse(ds); const rect=board.getBoundingClientRect(); const c=Math.floor((e.clientX-rect.left)/(rect.width/8)), r=Math.floor((e.clientY-rect.top)/(rect.height/8)); clearBPreview(); if(canPB(data.s,r,c)){ data.s.forEach(([dr,dc])=>{ let cell = document.querySelectorAll('.cell-b')[(r+dr)*8 + c+dc]; if(cell) cell.classList.add('preview'); }); } }; board.ondrop = (e) => { e.preventDefault(); const ds=e.dataTransfer.getData('text'); if(!ds) return; const data=JSON.parse(ds); const rect=board.getBoundingClientRect(); const c=Math.floor((e.clientX-rect.left)/(rect.width/8)), r=Math.floor((e.clientY-rect.top)/(rect.height/8)); clearBPreview(); if(canPB(data.s,r,c)){ data.s.forEach(([dr,dc])=>{ bState[(r+dr)*8 + c+dc] = true; document.querySelectorAll('.cell-b')[(r+dr)*8 + c+dc].classList.add('filled'); }); bScore += data.s.length*10; document.getElementById('score-b').innerText = bScore; document.getElementById(`slot-${data.i}`).innerHTML=''; checkClearB(); if(Array.from(document.querySelectorAll('.piece-slot')).every(s=>s.innerHTML==='')) [0,1,2].forEach(createPiece); checkGOB(); } }; board.ondragleave = clearBPreview; }
+    function canPB(sh,r,c){ return sh.every(([dr,dc])=>{ let nr=r+dr, nc=c+dc; return nr>=0 && nr<8 && nc>=0 && nc<8 && !bState[nr*8+nc]; }); }
+    function clearBPreview(){ document.querySelectorAll('.cell-b').forEach(c=>c.classList.remove('preview')); }
+    function checkClearB(){ let rs=[], cs=[]; for(let i=0; i<8; i++){ if(Array(8).fill(0).every((_,j)=>bState[i*8+j])) rs.push(i); if(Array(8).fill(0).every((_,j)=>bState[j*8+i])) cs.push(i); } rs.forEach(r=>{ for(let i=0; i<8; i++) bState[r*8+i]=false; }); cs.forEach(c=>{ for(let i=0; i<8; i++) bState[i*8+c]=false; }); if(rs.length||cs.length){ bScore+=(rs.length+cs.length)*100; document.getElementById('score-b').innerText = bScore; setTimeout(()=>{ document.querySelectorAll('.cell-b').forEach((el,i)=>{ if(!bState[i]) el.classList.remove('filled'); }); },200); } }
+    function checkGOB(){ const ps=Array.from(document.querySelectorAll('.piece')).map(p=>JSON.parse(p.dataset.sh)); let pos=false; ps.forEach(sh=>{ for(let r=0; r<8; r++) for(let c=0; c<8; c++) if(canPB(sh,r,c)) pos=true; }); if(!pos && ps.length>0){ fireWin("GAME OVER!"); saveHistory('Block Blast', bScore); } }
+
+    // --- UTILS ---
+    const memeList = ["https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2pzMWc0emxvdXdvazZvdzVmM2wzczRvMHI1NTh3ZjM5czhtcnN6NyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/J1yCBOPt6Kwlrh0L3j/giphy.gif","https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHdqeGpnZzZuOHhybmg3MWNqaHk5eXYwbjh5a2Q5aDYxZWR1N3J6ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/11sBLVxNs7v6WA/giphy.gif","https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHdqeGpnZzZuOHhybmg3MWNqaHk5eXYwbjh5a2Q5aDYxZWR1N3J6ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/HHzBaXsra2MHciRNQr/giphy.gif","https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHdqeGpnZzZuOHhybmg3MWNqaHk5eXYwbjh5a2Q5aDYxZWR1N3J6ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7yORCExjS87Jk10xSU/giphy.gif","https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3OGpkbDJuOGF3eWRtaGNvNHQ1a2oycDcyYTFiMDF1d3Azb3V0NXN1diZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xUOxfgmXP3EUTK4EPC/giphy.gif"];
+    function fireWin(t) { clearInterval(timerInterval); confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } }); document.getElementById('modal-title').innerText = t; document.getElementById('memeImg').src = memeList[Math.floor(Math.random() * memeList.length)]; document.getElementById('winModal').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; }
+    function saveHistory(m,r){ let h=JSON.parse(localStorage.getItem('ecoHub')||'[]'); h.unshift({d:new Date().toLocaleString(), m, r}); localStorage.setItem('ecoHub', JSON.stringify(h.slice(0,15))); }
+    function renderHistory(){ let h=JSON.parse(localStorage.getItem('ecoHub')||'[]'); document.getElementById('history-list').innerHTML=h.map(x=>`<div style="padding:10px; border-bottom:1px solid #eee; font-size:0.85rem;"><b>${x.d}</b><br>${x.m} | Result: ${x.r}</div>`).join('')||"No data."; }
+    function closeWin(){ document.getElementById('winModal').style.display='none'; document.getElementById('overlay').style.display='none'; openMode('menu'); }
+
+    openMode('menu');
+</script>
+</body>
+</html>
