@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4games4chill - Ultimate Masterpiece</title>
-    <link rel="icon" type="image/png" href="logo.png">
+    <title>4games4chill - Created by HeiuNG</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -38,7 +37,7 @@
 
         .hidden { display: none !important; }
         h1 { color: var(--primary-dark); font-size: 1.7rem; margin-bottom: 5px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
-        p.subtitle { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 20px; margin-top: 0; }
+        p.subtitle { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 20px; margin-top: 0; font-weight: bold;}
 
         .btn {
             width: 100%; padding: 14px; margin: 8px 0; border: none;
@@ -59,7 +58,17 @@
         }
         .btn-back:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateX(-3px); }
 
-        /* Giao diện Menu Chính (Dạng Grid) */
+        /* Nút Xem Lại Bàn Cờ Nổi */
+        #btn-show-result {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 998; padding: 12px 25px; background: var(--primary-dark); color: white;
+            border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            font-weight: bold; border: none; cursor: pointer; transition: 0.2s;
+            white-space: nowrap;
+        }
+        #btn-show-result:hover { background: var(--primary); transform: translateX(-50%) scale(1.05); }
+
+        /* Giao diện Menu Chính (Dạng Grid Ảnh) */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; margin-bottom: 15px; }
         .menu-card {
             background: #fff; border: 2px solid var(--border); border-radius: 15px;
@@ -70,8 +79,8 @@
         .menu-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 25px rgba(46, 204, 113, 0.2); }
         .menu-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 60%); opacity: 0; transition: 0.5s; pointer-events: none; }
         .menu-card:hover::before { opacity: 1; transform: scale(1.2); }
-        .menu-card .icon { font-size: 3rem; margin-bottom: 10px; transition: 0.3s; line-height: 1; }
-        .menu-card:hover .icon { transform: scale(1.1); }
+        .menu-img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 10px; transition: 0.3s; }
+        .menu-card:hover .menu-img { transform: scale(1.15) rotate(-5deg); }
         .menu-card h3 { margin: 0; font-size: 0.95rem; color: var(--text); font-weight: bold; }
 
         .setup-group { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 15px; margin-bottom: 15px; }
@@ -86,15 +95,31 @@
         .custom-radio:hover { background: #e8f5e9; }
         .custom-radio.active { background: var(--primary); color: white; transform: scale(1.05); box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); border-color: var(--primary-dark); }
 
-        /* Bảng Điểm 2 Người Chơi (PvP) */
+        /* Bảng Điểm 2 Người Chơi / AI */
         .pvp-scoreboard {
             display: flex; justify-content: space-between; align-items: center;
-            background: linear-gradient(135deg, #3498db, #9b59b6); padding: 10px 20px;
+            background: linear-gradient(135deg, #3498db, #9b59b6); padding: 10px 15px;
             border-radius: 15px; color: white; font-weight: bold; margin-bottom: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15); font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15); font-size: 1rem;
         }
         .pvp-scoreboard .vs { font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 8px; }
-        .score-badge { background: white; color: var(--text); padding: 2px 10px; border-radius: 8px; margin-left: 5px; color: #d35400; }
+        .score-badge { background: white; padding: 2px 10px; border-radius: 8px; margin: 0 5px; color: #d35400; font-size: 1.1rem; }
+
+        /* UI Hành Trình Mới (Block Blast Journey) */
+        .journey-map-container { height: 400px; overflow-y: auto; padding: 20px 0; position: relative; scroll-behavior: smooth; border-radius: 15px; background: rgba(0,0,0,0.02); border: 2px solid var(--border);}
+        .journey-map-container::-webkit-scrollbar { width: 5px; }
+        .journey-map-container::-webkit-scrollbar-thumb { background: #bdc3c7; border-radius: 10px; }
+        .j-path-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; padding: 40px 0;}
+        .j-path-line { position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 8px; background: var(--border); z-index: 0; border-radius: 10px;}
+        .j-node { width: 60px; height: 60px; border-radius: 50%; background: #fff; border: 6px solid var(--border); color: #95a5a6; font-weight: 900; font-size: 1.3rem; display: flex; justify-content: center; align-items: center; z-index: 1; margin: 18px 0; cursor: pointer; transition: 0.3s; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+        .j-node:nth-child(odd) { transform: translateX(-45px); }
+        .j-node:nth-child(even) { transform: translateX(45px); }
+        .j-node.completed { background: var(--primary); border-color: var(--primary-dark); color: white; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);}
+        .j-node.current { background: #f1c40f; border-color: #f39c12; color: white; box-shadow: 0 0 20px rgba(241,196,15,0.7); z-index: 3; }
+        .j-node.current:nth-child(odd) { transform: translateX(-45px) scale(1.15); }
+        .j-node.current:nth-child(even) { transform: translateX(45px) scale(1.15); }
+        .j-boy { position: absolute; top: -38px; font-size: 2.5rem; animation: bounce 0.6s infinite alternate; filter: drop-shadow(0 4px 5px rgba(0,0,0,0.3));}
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-12px); } }
 
         /* --- SUDOKU --- */
         .grid-s { display: grid; grid-template-columns: repeat(9, 1fr); gap: 1px; background: #333; border: 2px solid #333; margin: 15px 0; }
@@ -113,7 +138,7 @@
         .piece { display: grid; gap: 4px; cursor: grab; touch-action: none; width: max-content; height: max-content; }
         .p-cell { width: 34px; height: 34px; border-radius: 4px; pointer-events: none; box-shadow: inset 0 0 6px rgba(0,0,0,0.2); }
 
-        /* --- TIC TAC TOE (Đã cập nhật co giãn Dynamic Size) --- */
+        /* --- TIC TAC TOE --- */
         .grid-ttt { 
             display: grid; gap: 4px; background: var(--primary-dark); border: 4px solid var(--primary-dark); 
             border-radius: 12px; width: 300px; height: 300px; margin: 15px auto; 
@@ -142,7 +167,7 @@
         .sq.last-move, .cc-sq.last-move-cc { background-color: rgba(255, 255, 51, 0.5) !important; border-radius: 4px; }
         .score-row { display: flex; justify-content: space-between; width: 320px; margin: 0 auto; font-size: 0.9rem; font-weight: bold; padding: 2px 0; }
 
-        /* --- CỜ TƯỚNG BẢN CHUẨN --- */
+        /* --- CỜ TƯỚNG --- */
         .board-cchess {
             display: grid; grid-template-columns: repeat(9, 38px); grid-template-rows: repeat(10, 38px);
             width: 342px; height: 380px; margin: 15px auto; position: relative; background-color: #fcebb6;
@@ -168,44 +193,134 @@
 
 <div class="overlay" id="overlay"></div>
 <div id="winModal">
-    <h2 id="modal-title" style="margin:0; color:var(--primary-dark);">KẾT QUẢ!</h2>
+    <h2 id="modal-title" style="margin:0; color:var(--primary-dark); font-size:1.8rem; text-transform:uppercase;">KẾT QUẢ!</h2>
     <img id="memeImg" src="" alt="Meme">
-    <div style="display:flex; gap:10px; margin-top:10px;">
-        <button class="btn btn-outline" style="flex:1; padding:10px;" onclick="closeWin(false)">MENU</button>
-        <button class="btn" id="btn-play-again" style="flex:1; padding:10px; background:#3498db; display:none;" onclick="closeWin(true)">CHƠI TIẾP</button>
+    <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+        <button class="btn" style="padding:12px; background:#3498db; font-size:1.1rem;" onclick="closeWin(true)">🔄 CHƠI LẠI</button>
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-outline" style="flex:1; padding:10px; margin:0;" onclick="hideModalForReview()">👁️ XEM LẠI</button>
+            <button class="btn btn-outline" style="flex:1; padding:10px; margin:0; border-color:#e74c3c; color:#e74c3c;" onclick="closeWin(false)">🏠 MENU</button>
+        </div>
     </div>
 </div>
 
 <div class="container-box">
+    
+    <button id="btn-show-result" class="hidden" onclick="showResultModal()">🔙 Mở Bảng Kết Quả</button>
+
     <div id="page-menu">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-            <div>
+            <div style="text-align: left;">
                 <h1 id="ui-title">4GAMES4CHILL</h1>
-                <p class="subtitle">Ultimate Masterpiece Edition</p>
+                <p class="subtitle">Created by HeiuNG</p>
             </div>
             <button class="btn-outline" onclick="toggleLang()" id="btn-lang" style="padding:5px 10px; border-radius:10px; font-size:0.8rem; cursor:pointer; font-weight:bold; border-width:2px; height:max-content; white-space:nowrap;">🇺🇸 EN</button>
         </div>
         
         <div class="menu-grid">
-            <div class="menu-card" onclick="openMode('sudoku')">
-                <div class="icon">🔢</div>
+            <div class="menu-card" style="border-color: #2ecc71;" onclick="openMode('sudoku')">
+                <svg viewBox="0 0 100 100" class="menu-img">
+                    <rect x="10" y="10" width="80" height="80" rx="8" fill="#fff" stroke="#333" stroke-width="4"/>
+                    <line x1="36" y1="10" x2="36" y2="90" stroke="#333" stroke-width="2"/>
+                    <line x1="63" y1="10" x2="63" y2="90" stroke="#333" stroke-width="2"/>
+                    <line x1="10" y1="36" x2="90" y2="36" stroke="#333" stroke-width="2"/>
+                    <line x1="10" y1="63" x2="90" y2="63" stroke="#333" stroke-width="2"/>
+                    <rect x="10" y="10" width="80" height="80" rx="8" fill="none" stroke="#333" stroke-width="5"/>
+                    <text x="23" y="28" font-size="18" font-family="sans-serif" font-weight="bold" fill="#27ae60" text-anchor="middle" dominant-baseline="central">5</text>
+                    <text x="50" y="50" font-size="18" font-family="sans-serif" font-weight="bold" fill="#2c3e50" text-anchor="middle" dominant-baseline="central">8</text>
+                    <text x="76" y="76" font-size="18" font-family="sans-serif" font-weight="bold" fill="#27ae60" text-anchor="middle" dominant-baseline="central">1</text>
+                    <text x="76" y="28" font-size="18" font-family="sans-serif" font-weight="bold" fill="#2c3e50" text-anchor="middle" dominant-baseline="central">3</text>
+                    <rect x="40" y="15" width="20" height="20" fill="#a2d9b5" opacity="0.5" rx="3"/>
+                </svg>
                 <h3>SUDOKU</h3>
             </div>
-            <div class="menu-card" style="border-color: #3498db;" onclick="openMode('block')">
-                <div class="icon">🟪</div>
+            <div class="menu-card" style="border-color: #3498db;" onclick="openMode('block-menu')">
+                <svg viewBox="0 0 100 100" class="menu-img">
+                    <defs>
+                        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feDropShadow dx="2" dy="4" stdDeviation="2" flood-opacity="0.2"/>
+                        </filter>
+                    </defs>
+                    <g filter="url(#shadow)">
+                        <rect x="15" y="45" width="20" height="20" rx="4" fill="#3498db"/>
+                        <rect x="37" y="45" width="20" height="20" rx="4" fill="#3498db"/>
+                        <rect x="15" y="67" width="20" height="20" rx="4" fill="#3498db"/>
+                        <rect x="37" y="67" width="20" height="20" rx="4" fill="#3498db"/>
+                    </g>
+                    <g filter="url(#shadow)">
+                        <rect x="59" y="23" width="20" height="20" rx="4" fill="#e67e22"/>
+                        <rect x="59" y="45" width="20" height="20" rx="4" fill="#e67e22"/>
+                        <rect x="59" y="67" width="20" height="20" rx="4" fill="#e67e22"/>
+                        <rect x="81" y="67" width="20" height="20" rx="4" fill="#e67e22"/>
+                    </g>
+                    <g filter="url(#shadow)">
+                        <rect x="15" y="23" width="20" height="20" rx="4" fill="#e74c3c"/>
+                        <rect x="37" y="23" width="20" height="20" rx="4" fill="#e74c3c"/>
+                    </g>
+                </svg>
                 <h3>BLOCK BLAST</h3>
             </div>
             <div class="menu-card" style="border-color: #e67e22;" onclick="openMode('board-menu')">
-                <div class="icon">♟️</div>
+                <svg viewBox="0 0 100 100" class="menu-img">
+                    <defs>
+                        <filter id="c-shadow">
+                            <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.3"/>
+                        </filter>
+                    </defs>
+                    <g transform="translate(10,10)">
+                        <rect width="80" height="80" rx="8" fill="#eeeed2" stroke="#4a3018" stroke-width="4"/>
+                        <rect x="0" y="0" width="40" height="40" fill="#769656" rx="4"/>
+                        <rect x="40" y="40" width="40" height="40" fill="#769656" rx="4"/>
+                    </g>
+                    <text x="30" y="48" font-size="40" fill="#fff" stroke="#000" stroke-width="1" text-anchor="middle" filter="url(#c-shadow)">♙</text>
+                    <g filter="url(#c-shadow)">
+                        <circle cx="70" cy="70" r="22" fill="#fcebb6" stroke="#8b4513" stroke-width="3"/>
+                        <circle cx="70" cy="70" r="16" fill="none" stroke="#c0392b" stroke-width="1"/>
+                        <text x="70" y="77" font-size="20" font-family="sans-serif" font-weight="900" fill="#c0392b" text-anchor="middle">砲</text>
+                    </g>
+                </svg>
                 <h3>GAME CỜ</h3>
             </div>
             <div class="menu-card" style="border-color: #9b59b6;" onclick="openMode('ttt-menu')">
-                <div class="icon">❌</div>
+                <svg viewBox="0 0 100 100" class="menu-img">
+                    <rect x="10" y="10" width="80" height="80" rx="12" fill="#27ae60"/>
+                    <line x1="36" y1="15" x2="36" y2="85" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="63" y1="15" x2="63" y2="85" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="15" y1="36" x2="85" y2="36" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="15" y1="63" x2="85" y2="63" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+                    <g stroke-width="7" stroke-linecap="round">
+                        <line x1="20" y1="20" x2="30" y2="30" stroke="#e74c3c"/>
+                        <line x1="30" y1="20" x2="20" y2="30" stroke="#e74c3c"/>
+                        <circle cx="50" cy="50" r="9" fill="none" stroke="#3498db"/>
+                        <line x1="68" y1="68" x2="78" y2="78" stroke="#e74c3c"/>
+                        <line x1="78" y1="68" x2="68" y2="78" stroke="#e74c3c"/>
+                    </g>
+                </svg>
                 <h3>TIC TAC TOE</h3>
             </div>
         </div>
 
         <button class="btn btn-outline" id="ui-h-btn" onclick="openMode('history')" style="margin-top: 5px;">LỊCH SỬ THÀNH TÍCH</button>
+    </div>
+
+    <div id="page-block-menu" class="hidden">
+        <div style="display:flex; align-items:center; margin-bottom:20px; gap:15px;">
+            <button class="btn-back" onclick="openMode('menu')">❮</button>
+            <h2 style="color:var(--primary-dark); margin:0;">BLOCK BLAST</h2>
+        </div>
+        <button class="btn" style="background:#3498db; padding:20px; font-size:1.2rem; margin-bottom:15px;" onclick="openMode('block')">🟦 CHẾ ĐỘ CỔ ĐIỂN</button>
+        <button class="btn" style="background:#e67e22; padding:20px; font-size:1.2rem;" onclick="openMode('block-journey')">🏆 CHẾ ĐỘ THỬ THÁCH</button>
+    </div>
+
+    <div id="page-block-journey" class="hidden">
+        <div style="display:flex; align-items:center; margin-bottom:10px; gap:15px;">
+            <button class="btn-back" onclick="openMode('block-menu')">❮</button>
+            <h2 style="color:var(--primary-dark); margin:0;">HÀNH TRÌNH 200 MỐC</h2>
+        </div>
+        <div class="journey-map-container" id="journey-scroll">
+            <div class="j-path-wrapper" id="journey-map">
+                </div>
+        </div>
     </div>
 
     <div id="page-board-menu" class="hidden">
@@ -277,10 +392,10 @@
             <div id="turn-ttt" class="timer">Lượt của X</div>
             <div style="width:45px;"></div>
         </div>
-        <div id="ttt-pvp-score" class="pvp-scoreboard hidden">
-            <div style="color:#e74c3c;">X (P1) <span class="score-badge" id="ttt-score-x">0</span></div>
+        <div id="ttt-score" class="pvp-scoreboard">
+            <div style="color:#e74c3c;"><span id="ttt-p1-name">X (P1)</span> <span class="score-badge" id="ttt-score-x">0</span></div>
             <div class="vs">VS</div>
-            <div style="color:#2ecc71;"><span class="score-badge" id="ttt-score-o">0</span> O (P2)</div>
+            <div style="color:#2ecc71;"><span class="score-badge" id="ttt-score-o">0</span> <span id="ttt-p2-name">O (P2)</span></div>
         </div>
         <div id="grid-ttt" class="grid-ttt"></div>
     </div>
@@ -291,17 +406,17 @@
             <div id="turn-chess" class="timer">White's Turn</div>
             <button class="btn btn-outline" id="chess-undo-btn" style="width:auto; padding:5px 10px; margin:0; border-radius:10px;" onclick="undoChess()">Undo (3)</button>
         </div>
-        <div id="chess-pvp-score" class="pvp-scoreboard hidden">
-            <div>Trắng <span class="score-badge" id="c-score-w">0</span></div>
+        <div id="chess-score" class="pvp-scoreboard">
+            <div><span id="c-p1-name">Trắng</span> <span class="score-badge" id="c-score-w">0</span></div>
             <div class="vs">VS</div>
-            <div><span class="score-badge" id="c-score-b">0</span> Đen</div>
+            <div style="color:#2c3e50;"><span class="score-badge" id="c-score-b">0</span> <span id="c-p2-name">Đen</span></div>
         </div>
         <div class="score-row" style="margin-top:5px;">
-            <span id="chess-score-b" style="color:#2c3e50">Black Eval: +0</span>
+            <span id="chess-eval-b" style="color:#2c3e50">Black Eval: +0</span>
         </div>
         <div id="board-chess" class="board-chess"></div>
         <div class="score-row">
-            <span id="chess-score-w" style="color:#27ae60">White Eval: +0</span>
+            <span id="chess-eval-w" style="color:#27ae60">White Eval: +0</span>
         </div>
     </div>
 
@@ -311,10 +426,10 @@
             <div id="turn-cchess" class="timer" style="color:#c0392b;">Đỏ đi</div>
             <button class="btn btn-outline" id="cchess-undo-btn" style="width:auto; padding:5px 10px; margin:0; border-radius:10px;" onclick="undoCChess()">Undo (3)</button>
         </div>
-        <div id="cchess-pvp-score" class="pvp-scoreboard hidden" style="background: linear-gradient(135deg, #e74c3c, #f39c12);">
-            <div>Đỏ <span class="score-badge" id="cc-score-r">0</span></div>
+        <div id="cchess-score" class="pvp-scoreboard" style="background: linear-gradient(135deg, #e74c3c, #f39c12);">
+            <div><span id="cc-p1-name">Đỏ</span> <span class="score-badge" id="cc-score-r">0</span></div>
             <div class="vs">VS</div>
-            <div style="color:#2c3e50;"><span class="score-badge" id="cc-score-b">0</span> Đen</div>
+            <div style="color:#2c3e50;"><span class="score-badge" id="cc-score-b">0</span> <span id="cc-p2-name">Đen</span></div>
         </div>
         <div id="board-cchess" class="board-cchess"></div>
     </div>
@@ -345,10 +460,15 @@
 
     <div id="page-block" class="hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <button class="btn-back" onclick="openMode('menu')">❮</button>
+            <button class="btn-back" onclick="openMode('block-menu')">❮</button>
             <div style="font-weight:bold; font-size:1.1rem; flex:1; text-align:center;">SCORE: <span id="score-b" style="color:var(--primary-dark); transition: 0.3s;">0</span></div>
             <div class="timer" id="timer-b" style="width:50px; text-align:right;">00:00</div>
         </div>
+        
+        <div id="target-container" class="hidden" style="background:#e67e22; color:white; padding:8px 15px; border-radius:10px; font-weight:bold; margin-bottom:10px; text-align:center; font-size:1.1rem; box-shadow:0 3px 10px rgba(230,126,34,0.3);">
+            🎯 MỤC TIÊU MỐC <span id="current-j-level"></span>: <span id="target-b">0</span>
+        </div>
+
         <div id="board-b" class="grid-b"></div>
         <div class="pieces-area">
             <div class="piece-slot" id="slot-0"></div><div class="piece-slot" id="slot-1"></div><div class="piece-slot" id="slot-2"></div>
@@ -383,14 +503,15 @@
     let isBoardAi = false, boardAiDiff = 1, isTttAi = false, tttAiDiff = 1;
     
     const i18n = {
-        vi: { title: "4GAMES4CHILL", h: "LỊCH SỬ GIẢI", lang: "🇺🇸 EN", hint: "GỢI Ý (+10s)", ai: "AI GIẢI", win: "CHIẾN THẮNG!" },
-        en: { title: "4GAMES4CHILL", h: "HISTORY", lang: "🇻🇳 VN", hint: "HINT (+10s)", ai: "AI SOLVE", win: "VICTORY!" }
+        vi: { title: "4GAMES4CHILL", subtitle: "Created by HeiuNG", h: "LỊCH SỬ GIẢI", lang: "🇺🇸 EN", hint: "GỢI Ý (+10s)", ai: "AI GIẢI", win: "CHIẾN THẮNG!" },
+        en: { title: "4GAMES4CHILL", subtitle: "Created by HeiuNG", h: "HISTORY", lang: "🇻🇳 VN", hint: "HINT (+10s)", ai: "AI SOLVE", win: "VICTORY!" }
     };
 
     function toggleLang() {
         currentLang = (currentLang === 'vi') ? 'en' : 'vi';
         const t = i18n[currentLang];
         document.getElementById('ui-title').innerText = t.title;
+        document.querySelector('.subtitle').innerText = t.subtitle;
         document.getElementById('btn-lang').innerText = t.lang;
         document.getElementById('btn-hint').innerText = t.hint;
         document.getElementById('btn-ai').innerText = t.ai;
@@ -401,12 +522,23 @@
     function openMode(mode) {
         clearInterval(timerInterval);
         document.querySelectorAll('.container-box > div').forEach(div => div.classList.add('hidden'));
+        document.getElementById('btn-show-result').classList.add('hidden'); 
+        
         let targetPage = document.getElementById(`page-${mode}`);
         if(targetPage) targetPage.classList.remove('hidden');
         
         if(mode === 'menu') currentActiveGame = null;
+        if(mode === 'block-menu') currentActiveGame = null;
+        if(mode === 'block-journey') { renderJourneyMap(); }
         if(mode === 'sudoku') { currentActiveGame = 'sudoku'; startSudoku(); }
-        if(mode === 'block') { currentActiveGame = 'block'; startBlockBlast(); }
+        if(mode === 'block') { 
+            currentActiveGame = 'block'; 
+            if(!isJourneyMode) {
+                document.getElementById('target-container').classList.add('hidden');
+                resetBlockBoard();
+                refillPieces(); 
+            }
+        }
         if(mode === 'history') renderHistory();
     }
 
@@ -420,15 +552,31 @@
         }, 1000);
     }
 
+    function updateScoreBoard(game) {
+        if(game === 'ttt') {
+            document.getElementById('ttt-p1-name').innerText = isTttAi ? 'Bạn (X)' : 'X (P1)';
+            document.getElementById('ttt-p2-name').innerText = isTttAi ? 'Máy (O)' : 'O (P2)';
+            document.getElementById('ttt-score-x').innerText = matchScores.ttt_x;
+            document.getElementById('ttt-score-o').innerText = matchScores.ttt_o;
+        } else if (game === 'chess') {
+            document.getElementById('c-p1-name').innerText = isBoardAi ? 'Bạn (Trắng)' : 'Trắng (P1)';
+            document.getElementById('c-p2-name').innerText = isBoardAi ? 'Máy (Đen)' : 'Đen (P2)';
+            document.getElementById('c-score-w').innerText = matchScores.chess_w;
+            document.getElementById('c-score-b').innerText = matchScores.chess_b;
+        } else if (game === 'cchess') {
+            document.getElementById('cc-p1-name').innerText = isBoardAi ? 'Bạn (Đỏ)' : 'Đỏ (P1)';
+            document.getElementById('cc-p2-name').innerText = isBoardAi ? 'Máy (Đen)' : 'Đen (P2)';
+            document.getElementById('cc-score-r').innerText = matchScores.cchess_r;
+            document.getElementById('cc-score-b').innerText = matchScores.cchess_b;
+        }
+    }
+
     // --- TIC TAC TOE (BẢN MỞ RỘNG CARO) ---
     let tttBoard = [], tttTurn = 'X';
     let tttSize = 3, tttWinLen = 3;
     
     function initTTT(isNewMatch = false) {
-        if(isNewMatch) {
-            matchScores.ttt_x = 0; matchScores.ttt_o = 0;
-            updatePvpScore('ttt');
-        }
+        if(isNewMatch) { matchScores.ttt_x = 0; matchScores.ttt_o = 0; }
         
         tttSize = parseInt(globalOptions.tttSize);
         tttWinLen = (tttSize === 3) ? 3 : (tttSize === 7 ? 4 : 5);
@@ -436,7 +584,7 @@
         tttAiDiff = parseInt(globalOptions.tttAiDiff);
         currentActiveGame = 'ttt';
         
-        document.getElementById('ttt-pvp-score').style.display = isTttAi ? 'none' : 'flex';
+        updateScoreBoard('ttt');
         openMode('ttt');
         
         tttBoard = Array(tttSize * tttSize).fill(null); 
@@ -444,26 +592,12 @@
         renderTTT();
     }
     
-    function updatePvpScore(game) {
-        if(game === 'ttt') {
-            document.getElementById('ttt-score-x').innerText = matchScores.ttt_x;
-            document.getElementById('ttt-score-o').innerText = matchScores.ttt_o;
-        } else if (game === 'chess') {
-            document.getElementById('c-score-w').innerText = matchScores.chess_w;
-            document.getElementById('c-score-b').innerText = matchScores.chess_b;
-        } else if (game === 'cchess') {
-            document.getElementById('cc-score-r').innerText = matchScores.cchess_r;
-            document.getElementById('cc-score-b').innerText = matchScores.cchess_b;
-        }
-    }
-
     function renderTTT() {
         const grid = document.getElementById('grid-ttt'); 
         grid.innerHTML = '';
         grid.style.gridTemplateColumns = `repeat(${tttSize}, 1fr)`;
         grid.style.gridTemplateRows = `repeat(${tttSize}, 1fr)`;
 
-        // Điều chỉnh font-size cho vừa bàn cờ lớn
         let fontSize = tttSize === 3 ? '4.5rem' : (tttSize === 7 ? '2rem' : '1.5rem');
 
         tttBoard.forEach((cell, i) => {
@@ -477,10 +611,11 @@
                     if(winner){ 
                         renderTTT(); 
                         if(winner === 'X') matchScores.ttt_x++; else matchScores.ttt_o++;
-                        updatePvpScore('ttt');
-                        fireWin(`${winner} CHIẾN THẮNG!`, !isTttAi); return; 
+                        updateScoreBoard('ttt');
+                        let gameStatus = (isTttAi && winner === 'O') ? 'lose' : 'win';
+                        fireWin(`${winner} CHIẾN THẮNG!`, gameStatus); return; 
                     }
-                    if(!tttBoard.includes(null)){ renderTTT(); fireWin("HÒA NHAU!", !isTttAi); return; }
+                    if(!tttBoard.includes(null)){ renderTTT(); fireWin("HÒA NHAU!", 'draw'); return; }
                     tttTurn = tttTurn === 'X' ? 'O' : 'X'; renderTTT();
                     
                     if(isTttAi && tttTurn === 'O' && !checkWinCaro(tttBoard, tttSize, tttWinLen) && tttBoard.includes(null)) {
@@ -498,30 +633,10 @@
             for(let c=0; c<size; c++){
                 let p = b[r*size+c];
                 if(!p) continue;
-                // Ngang
-                if(c <= size - winLen) {
-                    let win = true;
-                    for(let i=1; i<winLen; i++) if(b[r*size+(c+i)] !== p) { win = false; break; }
-                    if(win) return p;
-                }
-                // Dọc
-                if(r <= size - winLen) {
-                    let win = true;
-                    for(let i=1; i<winLen; i++) if(b[(r+i)*size+c] !== p) { win = false; break; }
-                    if(win) return p;
-                }
-                // Chéo Xuống
-                if(r <= size - winLen && c <= size - winLen) {
-                    let win = true;
-                    for(let i=1; i<winLen; i++) if(b[(r+i)*size+(c+i)] !== p) { win = false; break; }
-                    if(win) return p;
-                }
-                // Chéo Lên
-                if(r <= size - winLen && c >= winLen - 1) {
-                    let win = true;
-                    for(let i=1; i<winLen; i++) if(b[(r+i)*size+(c-i)] !== p) { win = false; break; }
-                    if(win) return p;
-                }
+                if(c <= size - winLen) { let win = true; for(let i=1; i<winLen; i++) if(b[r*size+(c+i)] !== p) { win = false; break; } if(win) return p; }
+                if(r <= size - winLen) { let win = true; for(let i=1; i<winLen; i++) if(b[(r+i)*size+c] !== p) { win = false; break; } if(win) return p; }
+                if(r <= size - winLen && c <= size - winLen) { let win = true; for(let i=1; i<winLen; i++) if(b[(r+i)*size+(c+i)] !== p) { win = false; break; } if(win) return p; }
+                if(r <= size - winLen && c >= winLen - 1) { let win = true; for(let i=1; i<winLen; i++) if(b[(r+i)*size+(c-i)] !== p) { win = false; break; } if(win) return p; }
             }
         }
         return null;
@@ -529,15 +644,11 @@
 
     function makeTTTAiMove() {
         let empty = tttBoard.map((v,i) => v===null?i:-1).filter(v=>v!==-1);
-        let move = -1;
-        let r = Math.random();
-        
+        let move = -1; let r = Math.random();
         let useSmart = (tttAiDiff===4) || (tttAiDiff===3 && r<0.95) || (tttAiDiff===2 && r<0.5);
         
         if(!useSmart || empty.length === tttSize*tttSize) { 
-            // Nước đi ngẫu nhiên
             move = empty[Math.floor(Math.random()*empty.length)]; 
-            // Ưu tiên đánh giữa nếu là turn đầu của bot
             if (empty.length >= tttSize*tttSize - 1) {
                 let center = Math.floor(tttSize/2) * tttSize + Math.floor(tttSize/2);
                 if (tttBoard[center] === null) move = center;
@@ -550,22 +661,23 @@
         if(move !== -1) {
             tttBoard[move] = 'O';
             let winner = checkWinCaro(tttBoard, tttSize, tttWinLen);
-            if(winner){ renderTTT(); fireWin("O CHIẾN THẮNG!", !isTttAi); return; }
-            if(!tttBoard.includes(null)){ renderTTT(); fireWin("HÒA NHAU!", !isTttAi); return; }
+            if(winner){ 
+                renderTTT(); 
+                matchScores.ttt_o++; updateScoreBoard('ttt');
+                fireWin("O CHIẾN THẮNG!", 'lose'); return; 
+            }
+            if(!tttBoard.includes(null)){ renderTTT(); fireWin("HÒA NHAU!", 'draw'); return; }
             tttTurn = 'X'; renderTTT();
         }
     }
     
-    // AI cho bàn cờ Caro lớn (Heuristic)
     function getCaroHeuristicMove(b, size, winLen, player) {
         let empty = b.map((v,i) => v===null?i:-1).filter(v=>v!==-1);
-        let bestScore = -1; let bestMoves = [];
-        let opp = player === 'X' ? 'O' : 'X';
+        let bestScore = -1; let bestMoves = []; let opp = player === 'X' ? 'O' : 'X';
 
         empty.forEach(idx => {
-            // Chấm điểm tấn công và phòng thủ
             let score = evalCaroCell(b, idx, size, winLen, player) * 1.1 + evalCaroCell(b, idx, size, winLen, opp);
-            score += Math.random(); // random nhẹ để mượt
+            score += Math.random(); 
             if(score > bestScore) { bestScore = score; bestMoves = [idx]; }
             else if (score === bestScore) { bestMoves.push(idx); }
         });
@@ -577,21 +689,15 @@
         let score = 0; const dirs = [[0,1], [1,0], [1,1], [1,-1]];
         dirs.forEach(d => {
             let count = 1; let open = 0;
-            // Tiến
             for(let i=1; i<winLen; i++) {
                 let nr = r + d[0]*i, nc = c + d[1]*i;
                 if(nr<0 || nr>=size || nc<0 || nc>=size) break;
-                if(b[nr*size+nc] === p) count++;
-                else if(b[nr*size+nc] === null) { open++; break; }
-                else break;
+                if(b[nr*size+nc] === p) count++; else if(b[nr*size+nc] === null) { open++; break; } else break;
             }
-            // Lùi
             for(let i=1; i<winLen; i++) {
                 let nr = r - d[0]*i, nc = c - d[1]*i;
                 if(nr<0 || nr>=size || nc<0 || nc>=size) break;
-                if(b[nr*size+nc] === p) count++;
-                else if(b[nr*size+nc] === null) { open++; break; }
-                else break;
+                if(b[nr*size+nc] === p) count++; else if(b[nr*size+nc] === null) { open++; break; } else break;
             }
             if (count >= winLen) score += 10000;
             else if (count === winLen - 1 && open > 0) score += 1000;
@@ -601,7 +707,6 @@
         return score;
     }
 
-    // Minimax chuẩn cho 3x3
     function getBestMoveTTT(newBoard, player) {
         let availSpots = newBoard.map((v,i) => v===null?i:-1).filter(v=>v!==-1);
         let win = checkWinCaro(newBoard, 3, 3);
@@ -616,11 +721,9 @@
         }
         let bestMove;
         if(player === 'O') {
-            let bestScore = -10000;
-            for(let i=0; i<moves.length; i++) if(moves[i].score > bestScore) { bestScore = moves[i].score; bestMove = i; }
+            let bestScore = -10000; for(let i=0; i<moves.length; i++) if(moves[i].score > bestScore) { bestScore = moves[i].score; bestMove = i; }
         } else {
-            let bestScore = 10000;
-            for(let i=0; i<moves.length; i++) if(moves[i].score < bestScore) { bestScore = moves[i].score; bestMove = i; }
+            let bestScore = 10000; for(let i=0; i<moves.length; i++) if(moves[i].score < bestScore) { bestScore = moves[i].score; bestMove = i; }
         }
         return moves[bestMove];
     }
@@ -628,11 +731,7 @@
     // --- GAME CỜ: SETUP ---
     let boardGameType = 'chess';
     function initBoardGame(isNewMatch = false) {
-        if(isNewMatch) {
-            matchScores.chess_w = 0; matchScores.chess_b = 0;
-            matchScores.cchess_r = 0; matchScores.cchess_b = 0;
-            updatePvpScore('chess'); updatePvpScore('cchess');
-        }
+        if(isNewMatch) { matchScores.chess_w = 0; matchScores.chess_b = 0; matchScores.cchess_r = 0; matchScores.cchess_b = 0; }
 
         boardGameType = globalOptions.boardGameType;
         isBoardAi = globalOptions.boardMode === 'pve';
@@ -641,14 +740,8 @@
         currentActiveGame = boardGameType;
         openMode(boardGameType);
 
-        if(boardGameType === 'chess') {
-            document.getElementById('chess-pvp-score').style.display = isBoardAi ? 'none' : 'flex';
-            startChess();
-        }
-        if(boardGameType === 'cchess') {
-            document.getElementById('cchess-pvp-score').style.display = isBoardAi ? 'none' : 'flex';
-            startCChess();
-        }
+        if(boardGameType === 'chess') { updateScoreBoard('chess'); startChess(); }
+        if(boardGameType === 'cchess') { updateScoreBoard('cchess'); startCChess(); }
     }
 
     // --- CỜ VUA (CHESS) ---
@@ -676,8 +769,8 @@
             }
         }
         let diff = wScore - bScore;
-        document.getElementById('chess-score-w').innerText = `White Eval: ${diff>0 ? '+'+diff : 0}`;
-        document.getElementById('chess-score-b').innerText = `Black Eval: ${diff<0 ? '+'+(-diff) : 0}`;
+        document.getElementById('chess-eval-w').innerText = `White Eval: ${diff>0 ? '+'+diff : 0}`;
+        document.getElementById('chess-eval-b').innerText = `Black Eval: ${diff<0 ? '+'+(-diff) : 0}`;
         document.getElementById('chess-undo-btn').innerText = `Undo (${undosLeft})`;
     }
 
@@ -713,27 +806,15 @@
     }
 
     function isSquareAttacked(idx, attackerIsW, b) {
-        for(let i=0; i<64; i++) {
-            let p = b[i];
-            if (p && (attackerIsW ? p === p.toUpperCase() : p === p.toLowerCase())) {
-                let moves = getPseudoLegal(i, b);
-                if (moves.includes(idx)) return true;
-            }
-        }
+        for(let i=0; i<64; i++) { let p = b[i]; if (p && (attackerIsW ? p === p.toUpperCase() : p === p.toLowerCase())) { if (getPseudoLegal(i, b).includes(idx)) return true; } }
         return false;
     }
 
     function getLegalMoves(idx, b, currCastling, currEp) {
-        let pseudo = getPseudoLegal(idx, b);
-        let p = b[idx]; let isW = p === p.toUpperCase();
-        let legal = [];
-
+        let pseudo = getPseudoLegal(idx, b); let p = b[idx]; let isW = p === p.toUpperCase(); let legal = [];
         for (let m of pseudo) {
-            let tempB = [...b];
-            tempB[m] = tempB[idx]; tempB[idx] = null;
-            if (p.toLowerCase() === 'p' && m === currEp) {
-                let dir = isW ? 1 : -1; tempB[m + dir*8] = null;
-            }
+            let tempB = [...b]; tempB[m] = tempB[idx]; tempB[idx] = null;
+            if (p.toLowerCase() === 'p' && m === currEp) tempB[m + (isW ? 1 : -1)*8] = null;
             let kIdx = tempB.findIndex(x => x === (isW ? 'K' : 'k'));
             if (kIdx !== -1 && !isSquareAttacked(kIdx, !isW, tempB)) legal.push(m);
         }
@@ -747,8 +828,7 @@
 
     function executeChessMove(from, to, isAI = false) {
         chessHistory.push({ b: [...cBoard], turn: cTurn, castling: JSON.parse(JSON.stringify(castling)), ep: epTarget, lastMove: {...lastMoveC} });
-        lastMoveC = {from: from, to: to};
-        let p = cBoard[from]; let isW = p === p.toUpperCase();
+        lastMoveC = {from: from, to: to}; let p = cBoard[from]; let isW = p === p.toUpperCase();
         
         if (p.toLowerCase() === 'p' && to === epTarget) cBoard[to + (isW ? 8 : -8)] = null;
         cBoard[to] = p; cBoard[from] = null;
@@ -763,10 +843,8 @@
             if (from === 4 && to === 2) { cBoard[3] = cBoard[0]; cBoard[0] = null; }
             castling.bk = false; castling.bq = false;
         }
-        if (from === 63 || to === 63) castling.wk = false;
-        if (from === 56 || to === 56) castling.wq = false;
-        if (from === 7 || to === 7) castling.bk = false;
-        if (from === 0 || to === 0) castling.bq = false;
+        if (from === 63 || to === 63) castling.wk = false; if (from === 56 || to === 56) castling.wq = false;
+        if (from === 7 || to === 7) castling.bk = false; if (from === 0 || to === 0) castling.bq = false;
 
         epTarget = null;
         if (p.toLowerCase() === 'p' && Math.abs(to - from) === 16) epTarget = from + (isW ? -8 : 8);
@@ -780,8 +858,7 @@
             }
         }
 
-        cTurn = cTurn === 'W' ? 'B' : 'W'; cSel = null; cMoves = [];
-        updateChessScore(); renderChess();
+        cTurn = cTurn === 'W' ? 'B' : 'W'; cSel = null; cMoves = []; updateChessScore(); renderChess();
 
         let nextMoves = [];
         for(let i=0; i<64; i++) {
@@ -793,14 +870,14 @@
             let kIdx = cBoard.findIndex(x => x === (cTurn==='W' ? 'K' : 'k'));
             if (isSquareAttacked(kIdx, cTurn==='B', cBoard)) {
                 if(cTurn === 'B') matchScores.chess_w++; else matchScores.chess_b++;
-                updatePvpScore('chess');
-                fireWin((cTurn==='W'?'Black':'White') + " THẮNG!", !isBoardAi);
+                updateScoreBoard('chess');
+                let status = (isBoardAi && cTurn === 'W') ? 'lose' : 'win';
+                fireWin((cTurn==='W'?'Đen':'Trắng') + " THẮNG!", status);
             } else {
-                fireWin("HÒA!", !isBoardAi);
+                fireWin("HÒA!", 'draw');
             }
             return;
         }
-
         if (isBoardAi && cTurn === 'B') setTimeout(() => makeAiBoardMove('chess'), 400);
     }
 
@@ -808,10 +885,8 @@
         if (undosLeft > 0 && chessHistory.length > 0) {
             let last = chessHistory.pop();
             if (isBoardAi && chessHistory.length > 0) { last = chessHistory.pop(); }
-            cBoard = last.b; cTurn = last.turn; castling = last.castling;
-            epTarget = last.ep; lastMoveC = last.lastMove;
-            cSel = null; cMoves = []; undosLeft--;
-            updateChessScore(); renderChess();
+            cBoard = last.b; cTurn = last.turn; castling = last.castling; epTarget = last.ep; lastMoveC = last.lastMove;
+            cSel = null; cMoves = []; undosLeft--; updateChessScore(); renderChess();
         }
     }
 
@@ -857,8 +932,7 @@
         let fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR";
         fen.split('/').forEach((row, r) => { let c = 0; for (let i = 0; i < row.length; i++) { let char = row[i]; if (!isNaN(char)) { let emptyCount = parseInt(char); for (let n = 0; n < emptyCount; n++) { ccB[r*9 + c] = null; c++; } } else { ccB[r*9 + c] = char; c++; } } });
         ccTurn = 'R'; ccSelected = null; ccMoves = []; ccTotalMoves = 0; ccProgressMoves = 0;
-        ccHistory = []; undosLeftCC = 3; lastMoveCC = {from: null, to: null};
-        renderCChess();
+        ccHistory = []; undosLeftCC = 3; lastMoveCC = {from: null, to: null}; renderCChess();
     }
 
     function getCCMovesSim(idx, board) {
@@ -866,21 +940,13 @@
         let isR = p === p.toUpperCase(); let r = Math.floor(idx/9), c = idx%9; let type = p.toLowerCase();
         const isEn = (t) => t && (isR ? t === t.toLowerCase() : t === t.toUpperCase());
 
-        if (type === 'r') {
-            [[0,1],[0,-1],[1,0],[-1,0]].forEach(d => { let nr = r + d[0], nc = c + d[1]; while (nr >= 0 && nr <= 9 && nc >= 0 && nc <= 8) { let t = board[nr*9+nc]; if (!t) ms.push(nr*9+nc); else { if (isEn(t)) ms.push(nr*9+nc); break; } nr += d[0]; nc += d[1]; } });
-        } else if (type === 'c') {
-            [[0,1], [0,-1], [1,0], [-1,0]].forEach(d => { let jumped = false; let nr = r + d[0], nc = c + d[1]; while (nr >= 0 && nr <= 9 && nc >= 0 && nc <= 8) { let t = board[nr * 9 + nc]; if (!jumped) { if (!t) ms.push(nr * 9 + nc); else jumped = true; } else { if (t) { if (isEn(t)) ms.push(nr * 9 + nc); break; } } nr += d[0]; nc += d[1]; } });
-        } else if (type === 'n') {
-            [[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]].forEach(d => { let legR = r + (Math.abs(d[0])===2 ? d[0]/2 : 0), legC = c + (Math.abs(d[1])===2 ? d[1]/2 : 0); if(legR>=0&&legR<10&&legC>=0&&legC<9&&!board[legR*9+legC]){ let nr=r+d[0], nc=c+d[1]; if(nr>=0&&nr<10&&nc>=0&&nc<9&&(!board[nr*9+nc]||isEn(board[nr*9+nc]))) ms.push(nr*9+nc); } });
-        } else if (type === 'b') { 
-            [[2,2],[2,-2],[-2,2],[-2,-2]].forEach(d => { let nr=r+d[0], nc=c+d[1], legR=r+d[0]/2, legC=c+d[1]/2; if(nr>=0&&nr<10&&nc>=0&&nc<9&&!board[legR*9+legC]){ if((isR && nr>4) || (!isR && nr<5)) { if(!board[nr*9+nc]||isEn(board[nr*9+nc])) ms.push(nr*9+nc); } } });
-        } else if (type === 'a') { 
-            [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(d => { let nr=r+d[0], nc=c+d[1]; if(nc>=3 && nc<=5 && ((isR && nr>=7 && nr<=9) || (!isR && nr>=0 && nr<=2))) { if(!board[nr*9+nc]||isEn(board[nr*9+nc])) ms.push(nr*9+nc); } });
-        } else if (type === 'k') { 
-            [[0,1],[0,-1],[1,0],[-1,0]].forEach(d => { let nr=r+d[0], nc=c+d[1]; if(nc>=3 && nc<=5 && ((isR && nr>=7 && nr<=9) || (!isR && nr>=0 && nr<=2))) { if(!board[nr*9+nc]||isEn(board[nr*9+nc])) ms.push(nr*9+nc); } });
-        } else if (type === 'p') { 
-            let dir = isR ? -1 : 1; let nr = r + dir; if(nr>=0 && nr<10 && (!board[nr*9+c]||isEn(board[nr*9+c]))) ms.push(nr*9+c); if((isR && r<5) || (!isR && r>4)) { [c-1, c+1].forEach(nc => { if(nc>=0 && nc<9 && (!board[r*9+nc]||isEn(board[r*9+nc]))) ms.push(r*9+nc); }); }
-        }
+        if (type === 'r') { [[0,1],[0,-1],[1,0],[-1,0]].forEach(d => { let nr = r + d[0], nc = c + d[1]; while (nr >= 0 && nr <= 9 && nc >= 0 && nc <= 8) { let t = board[nr*9+nc]; if (!t) ms.push(nr*9+nc); else { if (isEn(t)) ms.push(nr*9+nc); break; } nr += d[0]; nc += d[1]; } }); } 
+        else if (type === 'c') { [[0,1], [0,-1], [1,0], [-1,0]].forEach(d => { let jumped = false; let nr = r + d[0], nc = c + d[1]; while (nr >= 0 && nr <= 9 && nc >= 0 && nc <= 8) { let t = board[nr * 9 + nc]; if (!jumped) { if (!t) ms.push(nr * 9 + nc); else jumped = true; } else { if (t) { if (isEn(t)) ms.push(nr * 9 + nc); break; } } nr += d[0]; nc += d[1]; } }); } 
+        else if (type === 'n') { [[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]].forEach(d => { let legR = r + (Math.abs(d[0])===2 ? d[0]/2 : 0), legC = c + (Math.abs(d[1])===2 ? d[1]/2 : 0); if(legR>=0&&legR<10&&legC>=0&&legC<9&&!board[legR*9+legC]){ let nr=r+d[0], nc=c+d[1]; if(nr>=0&&nr<10&&nc>=0&&nc<9&&(!board[nr*9+nc]||isEn(board[nr*9+nc]))) ms.push(nr*9+nc); } }); } 
+        else if (type === 'b') { [[2,2],[2,-2],[-2,2],[-2,-2]].forEach(d => { let nr=r+d[0], nc=c+d[1], legR=r+d[0]/2, legC=c+d[1]/2; if(nr>=0&&nr<10&&nc>=0&&nc<9&&!board[legR*9+legC]){ if((isR && nr>4) || (!isR && nr<5)) { if(!board[nr*9+nc]||isEn(board[nr*9+nc])) ms.push(nr*9+nc); } } }); } 
+        else if (type === 'a') { [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(d => { let nr=r+d[0], nc=c+d[1]; if(nc>=3 && nc<=5 && ((isR && nr>=7 && nr<=9) || (!isR && nr>=0 && nr<=2))) { if(!board[nr*9+nc]||isEn(board[nr*9+nc])) ms.push(nr*9+nc); } }); } 
+        else if (type === 'k') { [[0,1],[0,-1],[1,0],[-1,0]].forEach(d => { let nr=r+d[0], nc=c+d[1]; if(nc>=3 && nc<=5 && ((isR && nr>=7 && nr<=9) || (!isR && nr>=0 && nr<=2))) { if(!board[nr*9+nc]||isEn(board[nr*9+nc])) ms.push(nr*9+nc); } }); } 
+        else if (type === 'p') { let dir = isR ? -1 : 1; let nr = r + dir; if(nr>=0 && nr<10 && (!board[nr*9+c]||isEn(board[nr*9+c]))) ms.push(nr*9+c); if((isR && r<5) || (!isR && r>4)) { [c-1, c+1].forEach(nc => { if(nc>=0 && nc<9 && (!board[r*9+nc]||isEn(board[r*9+nc]))) ms.push(r*9+nc); }); } }
         return ms;
     }
 
@@ -903,10 +969,7 @@
         if(kIdx === -1) return false;
         for (let i = 0; i < 90; i++) {
             let p = board[i];
-            if (p && (isRed ? p === p.toLowerCase() : p === p.toUpperCase())) {
-                let mvs = getCCMovesSim(i, board);
-                if (mvs.includes(kIdx)) return true;
-            }
+            if (p && (isRed ? p === p.toLowerCase() : p === p.toUpperCase())) { if (getCCMovesSim(i, board).includes(kIdx)) return true; }
         }
         return false;
     }
@@ -944,14 +1007,15 @@
         if(!hasMoves) {
             let inCheck = isCCKingInDanger(ccB, ccTurn === 'R');
             if(ccTurn === 'B') matchScores.cchess_r++; else matchScores.cchess_b++;
-            updatePvpScore('cchess');
-            
-            if (inCheck) fireWin((ccTurn === 'R' ? "ĐEN" : "ĐỎ") + " CHIẾU BÍ!", !isBoardAi);
-            else fireWin((ccTurn === 'R' ? "ĐEN" : "ĐỎ") + " THẮNG (HẾT NƯỚC ĐI)!", !isBoardAi);
+            updateScoreBoard('cchess');
+            let status = (isBoardAi && ccTurn === 'R') ? 'lose' : 'win';
+
+            if (inCheck) fireWin((ccTurn === 'R' ? "ĐEN" : "ĐỎ") + " CHIẾU BÍ!", status);
+            else fireWin((ccTurn === 'R' ? "ĐEN" : "ĐỎ") + " THẮNG (HẾT NƯỚC ĐI)!", status);
             return;
         }
 
-        if (ccProgressMoves >= 60 || ccTotalMoves >= 600) { fireWin("HÒA THEO LUẬT CHUẨN!", !isBoardAi); return; }
+        if (ccProgressMoves >= 60 || ccTotalMoves >= 600) { fireWin("HÒA THEO LUẬT CHUẨN!", 'draw'); return; }
         if(isBoardAi && ccTurn === 'B') setTimeout(() => makeAiBoardMove('cchess'), 500);
     }
 
@@ -1002,40 +1066,6 @@
         document.getElementById('cchess-undo-btn').innerText = `Undo (${undosLeftCC})`;
     }
 
-    // --- HỆ THỐNG AI GAME CỜ ---
-    function evalMoveC(from, to, board) {
-        let score = 0; let target = board[to];
-        if (target) score += pieceValues[target] * 10;
-        if (boardAiDiff >= 3) {
-            let tempB = [...board]; tempB[to] = tempB[from]; tempB[from] = null;
-            if (isSquareAttacked(to, true, tempB)) { score -= pieceValues[board[from].toLowerCase()] * 10; }
-        }
-        if (boardAiDiff === 4) {
-            let r = Math.floor(to/8), c = to%8;
-            if((r===3||r===4) && (c===3||c===4)) score += 2;
-            if(board[from].toLowerCase() === 'n' || board[from].toLowerCase() === 'b') score += 1.5;
-        }
-        return score + Math.random();
-    }
-
-    function evalMoveCC(from, to, board) {
-        let score = 0; let target = board[to];
-        if (target) score += ccVals[target.toLowerCase()] * 10;
-        if (boardAiDiff >= 3) {
-            let tempB = [...board]; tempB[to] = tempB[from]; tempB[from] = null;
-            for(let i=0; i<90; i++) {
-                if(tempB[i] && tempB[i] === tempB[i].toUpperCase()) {
-                    if(getCCMovesSim(i, tempB).includes(to)) { score -= ccVals[board[from].toLowerCase()] * 10; break; }
-                }
-            }
-        }
-        if (boardAiDiff === 4) {
-            if(board[from].toLowerCase() === 'p') score += 2;
-            if(to%9===4) score += 1.5;
-        }
-        return score + Math.random();
-    }
-
     function makeAiBoardMove(type) {
         let moves = [];
         if(type === 'chess') {
@@ -1045,9 +1075,7 @@
                     mvs.forEach(to => moves.push({from: i, to: to, score: (boardAiDiff >= 2 ? evalMoveC(i, to, cBoard) : Math.random())}));
                 }
             }
-            if(moves.length === 0) return;
-            moves.sort((a,b) => b.score - a.score);
-            executeChessMove(moves[0].from, moves[0].to, true);
+            if(moves.length === 0) return; moves.sort((a,b) => b.score - a.score); executeChessMove(moves[0].from, moves[0].to, true);
         } else {
             for(let i=0; i<90; i++) {
                 if(ccB[i] && ccB[i] === ccB[i].toLowerCase()) {
@@ -1055,9 +1083,7 @@
                     mvs.forEach(to => moves.push({from: i, to: to, score: (boardAiDiff >= 2 ? evalMoveCC(i, to, ccB) : Math.random())}));
                 }
             }
-            if(moves.length === 0) return;
-            moves.sort((a,b) => b.score - a.score);
-            executeCCMove(moves[0].from, moves[0].to);
+            if(moves.length === 0) return; moves.sort((a,b) => b.score - a.score); executeCCMove(moves[0].from, moves[0].to);
         }
     }
 
@@ -1073,25 +1099,137 @@
     function inputS(n){ if(selectedIdx!==null){ document.querySelectorAll('.cell-s')[selectedIdx].innerText = n===0?'':n; checkWinS(); } }
     function getHint(){ let em=[]; document.querySelectorAll('.cell-s').forEach((c,i)=>{ if(c.innerText==='' && !c.classList.contains('readonly')) em.push(i); }); if(em.length>0){ let idx=em[Math.floor(Math.random()*em.length)]; document.querySelectorAll('.cell-s')[idx].innerText=solutionS[Math.floor(idx/9)][idx%9]; penalty+=10000; checkWinS(); } }
     function solveByAI(){ document.querySelectorAll('.cell-s').forEach((c,i)=> { if(!c.classList.contains('readonly')) c.innerText=solutionS[Math.floor(i/9)][i%9]; }); saveHistory('Sudoku','AI Solved'); clearInterval(timerInterval); }
-    function checkWinS(){ let f=true, cor=true; document.querySelectorAll('.cell-s').forEach((c,i)=>{ let v=parseInt(c.innerText); if(!v) f=false; if(v!==solutionS[Math.floor(i/9)][i%9]) cor=false; }); if(f && cor){ fireWin(i18n[currentLang].win, false); saveHistory('Sudoku', document.getElementById('timer-s').innerText); } }
+    function checkWinS(){ let f=true, cor=true; document.querySelectorAll('.cell-s').forEach((c,i)=>{ let v=parseInt(c.innerText); if(!v) f=false; if(v!==solutionS[Math.floor(i/9)][i%9]) cor=false; }); if(f && cor){ fireWin(i18n[currentLang].win, 'win'); saveHistory('Sudoku', document.getElementById('timer-s').innerText); } }
 
-    // --- BLOCK BLAST ---
+    // --- BLOCK BLAST (CỔ ĐIỂN & THỬ THÁCH HÀNH TRÌNH 200 MỐC) ---
     let bState = Array(64).fill(false), bScore = 0, bCombo = 0;
     const bShapes = [ [[0,0]], [[0,0],[0,1]], [[0,0],[1,0]], [[0,0],[0,1],[0,2]], [[0,0],[1,0],[2,0]], [[0,0],[0,1],[0,2],[0,3]], [[0,0],[1,0],[2,0],[3,0]], [[0,0],[0,1],[1,0],[1,1]], [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2],[2,0],[2,1],[2,2]], [[0,0],[1,0],[1,1]], [[0,1],[1,0],[1,1]], [[0,0],[0,1],[1,0]], [[0,0],[0,1],[1,1]], [[0,0],[1,0],[2,0],[2,1],[2,2]], [[2,0],[2,1],[2,2],[1,2],[0,2]], [[0,0],[0,1],[0,2],[1,0],[2,0]], [[0,0],[0,1],[0,2],[1,2],[2,2]], [[0,1],[1,0],[1,1],[1,2]], [[0,0],[0,1],[0,2],[1,1]], [[0,0],[1,0],[2,0],[1,1]], [[1,0],[0,1],[1,1],[2,1]], [[0,0],[0,1],[1,1],[1,2]], [[0,1],[0,2],[1,0],[1,1]] ];
     const bColors = ['#e74c3c', '#f1c40f', '#9b59b6', '#2ecc71', '#3498db', '#e67e22', '#1abc9c', '#e84393'];
     let dragP = null, dragOff = {x:0, y:0}, dragStartPt = {x:0, y:0};
     let actSh = null, actIdx = -1, actColor = null, isTouch = false;
 
-    function startBlockBlast(){ 
-        bScore=0; bCombo=0; bState.fill(false); document.getElementById('score-b').innerText='0'; 
-        startTimer('timer-b'); const board = document.getElementById('board-b'); board.innerHTML=''; 
-        for(let i=0; i<64; i++){ let c=document.createElement('div'); c.className='cell-b'; board.appendChild(c); } 
-        [0,1,2].forEach(createPiece); 
+    // Biến cho Hành Trình
+    let isJourneyMode = false;
+    let currentJourneyLevel = 1;
+    let maxUnlockedLevel = parseInt(localStorage.getItem('ecoHub_journeyLevel') || '1');
+    let blockTargetScore = 0;
+
+    function renderJourneyMap() {
+        const mapDiv = document.getElementById('journey-map');
+        mapDiv.innerHTML = '<div class="j-path-line"></div>'; 
+        
+        for(let i = 200; i >= 1; i--) {
+            let node = document.createElement('div');
+            node.className = 'j-node';
+            
+            if (i < maxUnlockedLevel) {
+                node.classList.add('completed');
+                node.innerHTML = '⭐';
+                node.onclick = () => startJourneyLevel(i);
+            } else if (i === maxUnlockedLevel) {
+                node.classList.add('current');
+                node.innerHTML = i + '<div class="j-boy">👦</div>';
+                node.onclick = () => startJourneyLevel(i);
+            } else {
+                node.innerText = i;
+                node.onclick = () => alert(`Bạn cần vượt qua mốc ${i-1} trước!`);
+            }
+            mapDiv.appendChild(node);
+        }
+        
+        setTimeout(() => {
+            let currentEl = document.querySelector('.j-node.current');
+            if(currentEl) currentEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+        }, 150);
     }
 
-    function createPiece(idx){ 
+    function resetBlockBoard() {
+        bScore = 0; bCombo = 0; bState.fill(false); document.getElementById('score-b').innerText = '0'; 
+        startTimer('timer-b'); const board = document.getElementById('board-b'); board.innerHTML = ''; 
+        for(let i=0; i<64; i++){ let c=document.createElement('div'); c.className='cell-b'; board.appendChild(c); } 
+    }
+
+    function startBlockBlast(){ 
+        isJourneyMode = false;
+        document.getElementById('target-container').classList.add('hidden');
+        resetBlockBoard();
+        refillPieces(); 
+    }
+
+    function startJourneyLevel(level) {
+        isJourneyMode = true;
+        currentJourneyLevel = level;
+        blockTargetScore = 50 + (level * 20); // Mốc điểm: Mốc 1 cần 70, mốc 2 cần 90...
+        
+        resetBlockBoard();
+        document.getElementById('target-container').classList.remove('hidden');
+        document.getElementById('current-j-level').innerText = level;
+        document.getElementById('target-b').innerText = blockTargetScore;
+        
+        // Tạo lưới có sẵn vật cản
+        let obsCount = Math.min(Math.floor(level / 5) + 3, 15); // Tối đa 15 vật cản
+        for(let i=0; i<obsCount; i++) {
+            let r, c;
+            // Tránh khu vực trung tâm để khối to dễ thở lúc đầu
+            do {
+                r = Math.floor(Math.random()*8); c = Math.floor(Math.random()*8);
+            } while(bState[r*8+c] || (r>=3&&r<=4 && c>=3&&c<=4));
+            
+            bState[r*8+c] = true;
+            let cell = document.querySelectorAll('.cell-b')[r*8+c];
+            cell.classList.add('filled');
+            cell.style.backgroundColor = '#7f8c8d'; // Màu xám cho vật cản
+            cell.style.boxShadow = 'inset 0 0 6px rgba(0,0,0,0.4)';
+        }
+        
+        refillPieces();
+        openMode('block'); // Hiển thị màn hình game
+    }
+
+    // Thuật toán Đảm Bảo Khối Luôn Có Đường Giải (Tránh Game Over do xui xẻo)
+    function canPBTemp(sh, r, c, boardArr) {
+        return sh.every(([dr,dc]) => {
+            let nr = r + dr, nc = c + dc;
+            return nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && !boardArr[nr * 8 + nc];
+        });
+    }
+
+    function generateSafePieces() {
+        let tempBoard = [...bState];
+        let pieces = [];
+        for(let k=0; k<3; k++) {
+            let valid = [];
+            for(let i=0; i<bShapes.length; i++) {
+                let s = bShapes[i];
+                let spots = [];
+                for(let r=0; r<8; r++) {
+                    for(let c=0; c<8; c++) {
+                        if(canPBTemp(s, r, c, tempBoard)) spots.push({r,c});
+                    }
+                }
+                if(spots.length > 0) valid.push({shape: s, spots: spots});
+            }
+            
+            if(valid.length > 0) {
+                let chosen = valid[Math.floor(Math.random() * valid.length)];
+                pieces.push(chosen.shape);
+                let spot = chosen.spots[Math.floor(Math.random() * chosen.spots.length)];
+                chosen.shape.forEach(([dr,dc]) => { tempBoard[(spot.r+dr)*8 + (spot.c+dc)] = true; });
+            } else {
+                pieces.push(bShapes[0]); // 1x1 fallback nếu thật sự tắc nghẽn
+            }
+        }
+        return pieces;
+    }
+
+    function refillPieces() {
+        // Trong chế độ thử thách (hoặc luôn dùng cũng được), sinh 3 khối an toàn
+        let safeShapes = generateSafePieces();
+        safeShapes.forEach((sh, idx) => createPiece(idx, sh));
+    }
+
+    function createPiece(idx, sh){ 
         const slot = document.getElementById(`slot-${idx}`); slot.innerHTML=''; 
-        const sh = bShapes[Math.floor(Math.random()*bShapes.length)]; 
         const shapeColor = bColors[Math.floor(Math.random()*bColors.length)];
         
         const piece = document.createElement('div'); piece.className='piece'; 
@@ -1125,8 +1263,7 @@
 
     document.addEventListener('pointermove', (e) => {
         if(!dragP) return;
-        let dy = dragStartPt.y - e.clientY;
-        let progress = Math.max(0, Math.min(dy / 80, 1)); 
+        let dy = dragStartPt.y - e.clientY; let progress = Math.max(0, Math.min(dy / 80, 1)); 
         let scale = 0.45 + (0.55 * progress);
         
         let scaledOffsetX = dragOff.x * (scale / 0.45); let scaledOffsetY = dragOff.y * (scale / 0.45);
@@ -1170,7 +1307,7 @@
                 cell.classList.add('filled'); cell.style.backgroundColor = actColor; cell.style.boxShadow = 'inset 0 0 6px rgba(0,0,0,0.2)';
             });
             bScore += actSh.length; document.getElementById(`slot-${actIdx}`).innerHTML=''; checkClearB();
-            if(Array.from(document.querySelectorAll('.piece-slot')).every(s=>s.innerHTML==='')) { [0,1,2].forEach(createPiece); }
+            if(Array.from(document.querySelectorAll('.piece-slot')).every(s=>s.innerHTML==='')) { refillPieces(); }
             checkGOB();
         } else {
             let orig = document.getElementById(`slot-${actIdx}`).firstChild; if(orig) orig.style.opacity = '1';
@@ -1200,36 +1337,109 @@
                     if(!bState[i]) { el.classList.remove('filled'); el.style.backgroundColor = ''; el.style.boxShadow = ''; }
                 }); 
                 document.getElementById('score-b').innerText = bScore; 
+
+                // Check Win Journey
+                if(isJourneyMode && bScore >= blockTargetScore) {
+                    if (currentJourneyLevel === maxUnlockedLevel && currentJourneyLevel < 200) {
+                        maxUnlockedLevel++;
+                        localStorage.setItem('ecoHub_journeyLevel', maxUnlockedLevel);
+                    }
+                    setTimeout(() => {
+                        saveHistory('Journey Mốc ' + currentJourneyLevel, 'Thắng (' + bScore + 'đ)');
+                        fireWin(`HOÀN THÀNH MỐC ${currentJourneyLevel}!`, 'win');
+                    }, 400); 
+                }
             }, 600); 
         } else { bCombo = 0; document.getElementById('score-b').innerText = bScore; }
     }
 
     function checkGOB(){ 
+        // Trong Journey mode, nếu vừa đủ điểm qua vòng, checkClearB setTimeout chưa kịp chạy thì ta ko nên GOB
+        if(isJourneyMode && bScore >= blockTargetScore) return;
+
         const ps=Array.from(document.querySelectorAll('.piece')).map(p=>JSON.parse(p.dataset.sh)); 
         let pos=false; ps.forEach(sh=>{ for(let r=0; r<8; r++) for(let c=0; c<8; c++) if(canPB(sh,r,c)) pos=true; }); 
-        if(!pos && ps.length>0){ fireWin("GAME OVER!", false); saveHistory('Block Blast', bScore); } 
+        
+        if(!pos && ps.length>0){ 
+            if(isJourneyMode) {
+                saveHistory('Journey Mốc ' + currentJourneyLevel, 'Thua');
+                fireWin("THỬ LẠI MỐC " + currentJourneyLevel, 'lose');
+            } else {
+                saveHistory('Block Blast', bScore);
+                fireWin("GAME OVER!", 'lose'); 
+            }
+        } 
     }
 
-    // --- UTILS ---
-    const memeList = ["https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2pzMWc0emxvdXdvazZvdzVmM2wzczRvMHI1NTh3ZjM5czhtcnN6NyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/J1yCBOPt6Kwlrh0L3j/giphy.gif","https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHdqeGpnZzZuOHhybmg3MWNqaHk5eXYwbjh5a2Q5aDYxZWR1N3J6ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/11sBLVxNs7v6WA/giphy.gif","https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHdqeGpnZzZuOHhybmg3MWNqaHk5eXYwbjh5a2Q5aDYxZWR1N3J6ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/HHzBaXsra2MHciRNQr/giphy.gif","https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHdqeGpnZzZuOHhybmg3MWNqaHk5eXYwbjh5a2Q5aDYxZWR1N3J6ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7yORCExjS87Jk10xSU/giphy.gif","https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3OGpkbDJuOGF3eWRtaGNvNHQ1a2oycDcyYTFiMDF1d3Azb3V0NXN1diZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xUOxfgmXP3EUTK4EPC/giphy.gif"];
-    function fireWin(t, isPvp) { 
-        clearInterval(timerInterval); confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } }); 
+    // --- HỆ THỐNG XỬ LÝ MEME VÀ KẾT QUẢ ---
+    const winMemes = [
+        "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjJreHludXhxdmRkbjNkYTgwanhmemc0d2JnNm45YXd5ajV4MWRiZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/lnlAifQdenMxW/giphy.gif",
+        "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjJreHludXhxdmRkbjNkYTgwanhmemc0d2JnNm45YXd5ajV4MWRiZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/GxIdtANXpn3qL1FG25/giphy.gif",
+        "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjJreHludXhxdmRkbjNkYTgwanhmemc0d2JnNm45YXd5ajV4MWRiZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3kD720zFVu22rfIA0s/giphy.gif"
+    ];
+    
+    const loseMemes = [
+        "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExemNrMzFmeXoxbm1paTZlampzZzNzd2ZubTJkNGJjcGtnZ2ZvNG00MSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/cr9vIO7NsP5cY/giphy.gif",
+        "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2pqbzJ4YW5jaTA3NHlwbnFoNGRsbGhyNWtuY3o3M28xbGVucjVyciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ej2dS4FUCNRJK/giphy.gif",
+        "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2pqbzJ4YW5jaTA3NHlwbnFoNGRsbGhyNWtuY3o3M28xbGVucjVyciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/RgZNLvoDJxsOW0m2Jj/giphy.gif",
+        "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXp0ZW9pMHluN3BiZzJrNTB3ZHJwaXMzdzE4YWpoeHI2emNuMXo4eCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/eJ4j2VnYOZU8qJU3Py/giphy.gif"
+    ];
+
+    function fireWin(t, status) { 
+        clearInterval(timerInterval); 
         document.getElementById('modal-title').innerText = t; 
-        document.getElementById('memeImg').src = memeList[Math.floor(Math.random() * memeList.length)]; 
-        document.getElementById('btn-play-again').style.display = isPvp ? 'block' : 'none'; // Chỉ hiện nút chơi tiếp khi là game PvP
-        document.getElementById('winModal').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; 
+        
+        let memeArr = (status === 'win') ? winMemes : loseMemes; 
+        document.getElementById('memeImg').src = memeArr[Math.floor(Math.random() * memeArr.length)]; 
+
+        if (status === 'win') {
+            confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } }); 
+        }
+
+        document.getElementById('btn-show-result').classList.add('hidden');
+        document.getElementById('winModal').style.display = 'block'; 
+        document.getElementById('overlay').style.display = 'block'; 
     }
+
     function saveHistory(m,r){ let h=JSON.parse(localStorage.getItem('ecoHub')||'[]'); h.unshift({d:new Date().toLocaleString(), m, r}); localStorage.setItem('ecoHub', JSON.stringify(h.slice(0,15))); }
     function renderHistory(){ let h=JSON.parse(localStorage.getItem('ecoHub')||'[]'); document.getElementById('history-list').innerHTML=h.map(x=>`<div style="padding:10px; border-bottom:1px solid #eee; font-size:0.85rem;"><b>${x.d}</b><br>${x.m} | Result: ${x.r}</div>`).join('')||"No data."; }
     
-    function closeWin(playAgain){ 
+    // Logic Ẩn Bảng kết quả để xem lại bàn cờ
+    function hideModalForReview() {
+        document.getElementById('winModal').style.display = 'none'; 
+        document.getElementById('overlay').style.display = 'none'; 
+        document.getElementById('btn-show-result').classList.remove('hidden'); 
+    }
+
+    // Logic Bật lại bảng Kết quả
+    function showResultModal() {
+        document.getElementById('winModal').style.display = 'block'; 
+        document.getElementById('overlay').style.display = 'block'; 
+        document.getElementById('btn-show-result').classList.add('hidden'); 
+    }
+
+    // Logic Đóng hoặc Chơi Lại
+    function closeWin(playAgain) { 
         document.getElementById('winModal').style.display='none'; 
         document.getElementById('overlay').style.display='none'; 
+        document.getElementById('btn-show-result').classList.add('hidden');
+
         if (playAgain) {
-            if (currentActiveGame === 'ttt') initTTT(false); // Play again không reset match score
+            if (currentActiveGame === 'ttt') initTTT(false); 
             else if (currentActiveGame === 'chess' || currentActiveGame === 'cchess') initBoardGame(false);
+            else if (currentActiveGame === 'sudoku') startSudoku();
+            else if (currentActiveGame === 'block') {
+                if(isJourneyMode) startJourneyLevel(currentJourneyLevel);
+                else startBlockBlast();
+            }
         } else {
-            openMode('menu'); 
+            // Về menu tuỳ theo chế độ
+            if(currentActiveGame === 'block') {
+                if (isJourneyMode) openMode('block-journey');
+                else openMode('block-menu');
+            } else {
+                openMode('menu'); 
+            }
         }
     }
 
