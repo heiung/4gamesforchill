@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puzzle Hub Eco - Ultimate Masterpiece</title>
+    <title>4games4chill - Ultimate Masterpiece</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -15,15 +15,20 @@
         body {
             background: radial-gradient(circle at top, #e8f5e9, #f4f7f6);
             color: var(--text); font-family: 'Segoe UI', Tahoma, sans-serif;
-            margin: 0; display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; overflow: hidden; touch-action: none;
+            margin: 0; padding: 0; display: block;
+            width: 100vw; height: 100vh; overflow: hidden; touch-action: none;
+            position: relative; /* Setup cho việc căn giữa tuyệt đối */
         }
 
         .container-box {
-            width: 420px; padding: 25px; background: var(--surface);
+            width: 420px; max-width: 95vw; max-height: 95vh; overflow-y: auto;
+            padding: 25px; background: var(--surface);
             backdrop-filter: blur(15px); border-radius: 25px;
             box-shadow: 0 15px 50px rgba(0,0,0,0.08); text-align: center;
-            position: relative; transition: all 0.3s ease;
+            /* Code căn giữa luôn nằm giữa màn hình mọi nền tảng */
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease; box-sizing: border-box;
         }
 
         .hidden { display: none !important; }
@@ -39,7 +44,16 @@
         .btn-outline:hover { background: var(--primary); color: white; }
         
         .setup-group { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 15px; margin-bottom: 15px; }
-        select.eco-select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--primary); margin: 5px 0; font-size: 1rem; font-weight: bold; color: var(--primary-dark); background: #fff; outline: none; cursor: pointer; }
+        
+        /* Custom UI mode buttons */
+        .custom-radio-group { display: flex; gap: 8px; flex-wrap: wrap; margin: 5px 0 15px 0; }
+        .custom-radio { 
+            flex: 1; padding: 10px; border: 2px solid var(--primary); 
+            border-radius: 12px; cursor: pointer; font-weight: bold; color: var(--primary-dark);
+            transition: 0.2s; text-align: center; font-size: 0.9rem; background: #fff; box-sizing: border-box;
+        }
+        .custom-radio:hover { background: #e8f5e9; }
+        .custom-radio.active { background: var(--primary); color: white; transform: scale(1.05); box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); }
 
         /* --- SUDOKU --- */
         .grid-s { display: grid; grid-template-columns: repeat(9, 1fr); gap: 1px; background: #333; border: 2px solid #333; margin: 15px 0; }
@@ -126,7 +140,7 @@
 
 <div class="container-box">
     <div id="page-menu">
-        <h1 id="ui-title">PUZZLE HUB ECO</h1>
+        <h1 id="ui-title">4GAMES4CHILL</h1>
         <button class="btn btn-outline" onclick="toggleLang()" id="btn-lang">🇺🇸 English</button>
         <button class="btn" onclick="openMode('sudoku')">SUDOKU</button>
         <button class="btn" style="background:#3498db" onclick="openMode('block')">BLOCK BLAST</button>
@@ -138,20 +152,27 @@
     <div id="page-board-menu" class="hidden">
         <h2 style="color:var(--primary-dark);">THIẾT LẬP GAME CỜ</h2>
         <div class="setup-group">
-            <select id="board-type" class="eco-select">
-                <option value="chess">Cờ Vua (Chess)</option>
-                <option value="cchess">Cờ Tướng (Xiangqi)</option>
-            </select>
-            <select id="board-mode" class="eco-select" onchange="document.getElementById('board-diff').style.display = this.value==='pve'?'block':'none'">
-                <option value="pvp">Chơi 2 Người (PvP)</option>
-                <option value="pve">Chơi với AI (PvE)</option>
-            </select>
-            <select id="board-diff" class="eco-select" style="display:none;">
-                <option value="1">AI: Dễ</option>
-                <option value="2">AI: Trung bình</option>
-                <option value="3">AI: Khó</option>
-                <option value="4">AI: Cực khó</option>
-            </select>
+            <div style="font-weight:bold; text-align:left; color:var(--text);">Loại Cờ:</div>
+            <div class="custom-radio-group" id="c-type-group">
+                <div class="custom-radio active" onclick="setOption('boardGameType', 'chess', this, 'c-type-group')">Cờ Vua</div>
+                <div class="custom-radio" onclick="setOption('boardGameType', 'cchess', this, 'c-type-group')">Cờ Tướng</div>
+            </div>
+
+            <div style="font-weight:bold; text-align:left; color:var(--text);">Chế độ:</div>
+            <div class="custom-radio-group" id="c-mode-group">
+                <div class="custom-radio active" onclick="setOption('boardMode', 'pvp', this, 'c-mode-group')">2 Người (PvP)</div>
+                <div class="custom-radio" onclick="setOption('boardMode', 'pve', this, 'c-mode-group')">Đấu AI (PvE)</div>
+            </div>
+
+            <div id="board-diff-container" style="display:none;">
+                <div style="font-weight:bold; text-align:left; color:var(--text);">Độ khó AI:</div>
+                <div class="custom-radio-group" id="c-diff-group">
+                    <div class="custom-radio active" onclick="setOption('boardAiDiff', 1, this, 'c-diff-group')">Dễ</div>
+                    <div class="custom-radio" onclick="setOption('boardAiDiff', 2, this, 'c-diff-group')">TB</div>
+                    <div class="custom-radio" onclick="setOption('boardAiDiff', 3, this, 'c-diff-group')">Khó</div>
+                    <div class="custom-radio" onclick="setOption('boardAiDiff', 4, this, 'c-diff-group')">Cực Khó</div>
+                </div>
+            </div>
         </div>
         <button class="btn" onclick="initBoardGame()">BẮT ĐẦU</button>
         <button class="btn btn-outline" onclick="openMode('menu')">QUAY LẠI</button>
@@ -160,16 +181,21 @@
     <div id="page-ttt-menu" class="hidden">
         <h2 style="color:var(--primary-dark);">TIC TAC TOE</h2>
         <div class="setup-group">
-            <select id="ttt-mode" class="eco-select" onchange="document.getElementById('ttt-diff').style.display = this.value==='pve'?'block':'none'">
-                <option value="pvp">Chơi 2 Người (PvP)</option>
-                <option value="pve">Chơi với AI (PvE)</option>
-            </select>
-            <select id="ttt-diff" class="eco-select" style="display:none;">
-                <option value="1">AI: Dễ</option>
-                <option value="2">AI: Trung bình</option>
-                <option value="3">AI: Khó</option>
-                <option value="4">AI: Cực khó</option>
-            </select>
+            <div style="font-weight:bold; text-align:left; color:var(--text);">Chế độ:</div>
+            <div class="custom-radio-group" id="t-mode-group">
+                <div class="custom-radio active" onclick="setOption('tttMode', 'pvp', this, 't-mode-group')">2 Người (PvP)</div>
+                <div class="custom-radio" onclick="setOption('tttMode', 'pve', this, 't-mode-group')">Đấu AI (PvE)</div>
+            </div>
+
+            <div id="ttt-diff-container" style="display:none;">
+                <div style="font-weight:bold; text-align:left; color:var(--text);">Độ khó AI:</div>
+                <div class="custom-radio-group" id="t-diff-group">
+                    <div class="custom-radio active" onclick="setOption('tttAiDiff', 1, this, 't-diff-group')">Dễ</div>
+                    <div class="custom-radio" onclick="setOption('tttAiDiff', 2, this, 't-diff-group')">TB</div>
+                    <div class="custom-radio" onclick="setOption('tttAiDiff', 3, this, 't-diff-group')">Khó</div>
+                    <div class="custom-radio" onclick="setOption('tttAiDiff', 4, this, 't-diff-group')">Cực Khó</div>
+                </div>
+            </div>
         </div>
         <button class="btn" onclick="initTTT()">BẮT ĐẦU</button>
         <button class="btn btn-outline" onclick="openMode('menu')">QUAY LẠI</button>
@@ -216,11 +242,11 @@
             <button onclick="openMode('menu')" style="border:none; background:none; cursor:pointer; font-size:1.5rem;">⬅</button>
             <div style="display:flex; flex-direction:column; align-items:center;">
                 <div class="timer" id="timer-s" style="line-height:1;">00:00</div>
-                <select id="diff-s" onchange="startSudoku()" style="margin-top:5px; padding:2px 5px; border-radius:5px; border:1px solid var(--primary); font-size:0.85rem; color:var(--primary-dark); font-weight:bold; outline:none; cursor:pointer; background:var(--bg);">
-                    <option id="opt-e" value="30">Dễ</option>
-                    <option id="opt-m" value="45" selected>Trung bình</option>
-                    <option id="opt-h" value="55">Khó</option>
-                </select>
+                <div style="display:flex; justify-content:center; gap:5px; margin-top:5px;" id="s-diff-group">
+                    <div id="opt-e" class="custom-radio" style="padding:4px 10px; font-size:0.8rem; flex:none;" onclick="setOption('sudokuDiff', 30, this, 's-diff-group')">Dễ</div>
+                    <div id="opt-m" class="custom-radio active" style="padding:4px 10px; font-size:0.8rem; flex:none;" onclick="setOption('sudokuDiff', 45, this, 's-diff-group')">Trung bình</div>
+                    <div id="opt-h" class="custom-radio" style="padding:4px 10px; font-size:0.8rem; flex:none;" onclick="setOption('sudokuDiff', 55, this, 's-diff-group')">Khó</div>
+                </div>
             </div>
             <div style="width:20px;"></div>
         </div>
@@ -255,12 +281,23 @@
 </div>
 
 <script>
+    // State quản lý custom UI
+    let globalOptions = { boardGameType: 'chess', boardMode: 'pvp', boardAiDiff: 1, tttMode: 'pvp', tttAiDiff: 1, sudokuDiff: 45 };
+    function setOption(key, val, el, group) {
+        globalOptions[key] = val;
+        document.querySelectorAll(`#${group} .custom-radio`).forEach(btn => btn.classList.remove('active'));
+        el.classList.add('active');
+        if(key === 'boardMode') document.getElementById('board-diff-container').style.display = (val === 'pve') ? 'block' : 'none';
+        if(key === 'tttMode') document.getElementById('ttt-diff-container').style.display = (val === 'pve') ? 'block' : 'none';
+        if(key === 'sudokuDiff') { startSudoku(); }
+    }
+
     let timerInterval, startTime, penalty = 0, currentLang = 'vi';
     let isBoardAi = false, boardAiDiff = 1, isTttAi = false, tttAiDiff = 1;
     
     const i18n = {
-        vi: { title: "PUZZLE HUB ECO", h: "LỊCH SỬ GIẢI", back: "QUAY LẠI", lang: "🇺🇸 English", hint: "GỢI Ý (+10s)", ai: "AI GIẢI", win: "CHIẾN THẮNG!", diffE: "Dễ", diffM: "Trung bình", diffH: "Khó" },
-        en: { title: "PUZZLE HUB ECO", h: "HISTORY", back: "BACK", lang: "🇻🇳 Tiếng Việt", hint: "HINT (+10s)", ai: "AI SOLVE", win: "VICTORY!", diffE: "Easy", diffM: "Medium", diffH: "Hard" }
+        vi: { title: "4GAMES4CHILL", h: "LỊCH SỬ GIẢI", back: "QUAY LẠI", lang: "🇺🇸 English", hint: "GỢI Ý (+10s)", ai: "AI GIẢI", win: "CHIẾN THẮNG!", diffE: "Dễ", diffM: "Trung bình", diffH: "Khó" },
+        en: { title: "4GAMES4CHILL", h: "HISTORY", back: "BACK", lang: "🇻🇳 Tiếng Việt", hint: "HINT (+10s)", ai: "AI SOLVE", win: "VICTORY!", diffE: "Easy", diffM: "Medium", diffH: "Hard" }
     };
 
     function toggleLang() {
@@ -304,8 +341,8 @@
     const winCombos = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
     
     function initTTT() {
-        isTttAi = document.getElementById('ttt-mode').value === 'pve';
-        tttAiDiff = parseInt(document.getElementById('ttt-diff').value);
+        isTttAi = globalOptions.tttMode === 'pve';
+        tttAiDiff = parseInt(globalOptions.tttAiDiff);
         openMode('ttt');
         tttBoard = Array(9).fill(null); tttTurn = 'X';
         renderTTT();
@@ -344,7 +381,9 @@
         let empty = tttBoard.map((v,i) => v===null?i:-1).filter(v=>v!==-1);
         let move = -1;
         let r = Math.random();
-        let useMinimax = (tttAiDiff===4) || (tttAiDiff===3 && r<0.8) || (tttAiDiff===2 && r<0.5);
+        
+        // AI thông minh hơn: Cực khó (100% Minimax), Khó (95% Minimax), TB (50%), Dễ (0%)
+        let useMinimax = (tttAiDiff===4) || (tttAiDiff===3 && r<0.95) || (tttAiDiff===2 && r<0.5);
         
         if(!useMinimax || empty.length === 9) { move = empty[Math.floor(Math.random()*empty.length)]; } 
         else { move = getBestMoveTTT(tttBoard, 'O').index; }
@@ -383,18 +422,17 @@
     // --- GAME CỜ: SETUP ---
     let boardGameType = 'chess';
     function initBoardGame() {
-        boardGameType = document.getElementById('board-type').value;
-        isBoardAi = document.getElementById('board-mode').value === 'pve';
-        boardAiDiff = parseInt(document.getElementById('board-diff').value);
+        boardGameType = globalOptions.boardGameType;
+        isBoardAi = globalOptions.boardMode === 'pve';
+        boardAiDiff = parseInt(globalOptions.boardAiDiff);
         openMode(boardGameType);
         if(boardGameType === 'chess') startChess();
         if(boardGameType === 'cchess') startCChess();
     }
 
-    // --- CỜ VUA (CHESS) - FIX UNICODE & BỎ 3D ---
-    // Sử dụng Unicode trắng chuẩn (♖♘♗♕♔♙) và đen (♜♞♝♛♚♟)
+    // --- CỜ VUA (CHESS) ---
     const chP = { r:'♜', n:'♞', b:'♝', q:'♛', k:'♚', p:'♟', R:'♖', N:'♘', B:'♗', Q:'♕', K:'♔', P:'♙' };
-    const pieceValues = { p:1, n:3, b:3, r:5, q:9, k:0, P:1, N:3, B:3, R:5, Q:9, K:0 };
+    const pieceValues = { p:1, n:3, b:3, r:5, q:9, k:1000, P:1, N:3, B:3, R:5, Q:9, K:1000 };
     
     let cBoard = [], cTurn = 'W', cSel = null, cMoves = [];
     let castling = { wk: true, wq: true, bk: true, bq: true };
@@ -411,19 +449,16 @@
         cTurn = 'W'; cSel = null; cMoves = [];
         castling = { wk: true, wq: true, bk: true, bq: true };
         epTarget = null;
-        chessHistory = [];
-        undosLeft = 3;
-        lastMoveC = {from: null, to: null};
-        updateChessScore();
-        renderChess();
+        chessHistory = []; undosLeft = 3; lastMoveC = {from: null, to: null};
+        updateChessScore(); renderChess();
     }
 
     function updateChessScore() {
         let wScore = 0, bScore = 0;
         for(let p of cBoard) {
             if(p) {
-                if(p === p.toUpperCase()) wScore += pieceValues[p];
-                else bScore += pieceValues[p];
+                if(p === p.toUpperCase() && p!=='K') wScore += pieceValues[p];
+                else if(p!=='k') bScore += pieceValues[p];
             }
         }
         let diff = wScore - bScore;
@@ -447,7 +482,7 @@
             [c-1, c+1].forEach(nc => {
                 if (nc >= 0 && nc < 8) {
                     if (isEn(r+dir, nc)) ms.push((r+dir)*8+nc);
-                    else if (epTarget === (r+dir)*8+nc) ms.push((r+dir)*8+nc); // Ăn qua đường
+                    else if (epTarget === (r+dir)*8+nc) ms.push((r+dir)*8+nc); 
                 }
             });
         } else if (type === 'r' || type === 'q') {
@@ -515,7 +550,6 @@
         let p = cBoard[from];
         let isW = p === p.toUpperCase();
         
-        // Bắt tốt qua đường
         if (p.toLowerCase() === 'p' && to === epTarget) {
             cBoard[to + (isW ? 8 : -8)] = null;
         }
@@ -523,7 +557,6 @@
         cBoard[to] = p;
         cBoard[from] = null;
 
-        // Nhập thành
         if (p === 'K') {
             if (from === 60 && to === 62) { cBoard[61] = cBoard[63]; cBoard[63] = null; }
             if (from === 60 && to === 58) { cBoard[59] = cBoard[56]; cBoard[56] = null; }
@@ -540,13 +573,11 @@
         if (from === 7 || to === 7) castling.bk = false;
         if (from === 0 || to === 0) castling.bq = false;
 
-        // Cập nhật mốc En Passant
         epTarget = null;
         if (p.toLowerCase() === 'p' && Math.abs(to - from) === 16) {
             epTarget = from + (isW ? -8 : 8);
         }
 
-        // Phong cấp
         if (p.toLowerCase() === 'p' && (Math.floor(to/8) === 0 || Math.floor(to/8) === 7)) {
             if(isAI) {
                 cBoard[to] = isW ? 'Q' : 'q';
@@ -562,7 +593,6 @@
         updateChessScore();
         renderChess();
 
-        // Kiểm tra Hết cờ
         let nextMoves = [];
         for(let i=0; i<64; i++) {
             if (cBoard[i] && (cTurn==='W' ? cBoard[i]===cBoard[i].toUpperCase() : cBoard[i]===cBoard[i].toLowerCase())) {
@@ -587,18 +617,11 @@
     function undoChess() {
         if (undosLeft > 0 && chessHistory.length > 0) {
             let last = chessHistory.pop();
-            if (isBoardAi && chessHistory.length > 0) {
-                last = chessHistory.pop(); 
-            }
-            cBoard = last.b;
-            cTurn = last.turn;
-            castling = last.castling;
-            epTarget = last.ep;
-            lastMoveC = last.lastMove;
-            cSel = null; cMoves = [];
-            undosLeft--;
-            updateChessScore();
-            renderChess();
+            if (isBoardAi && chessHistory.length > 0) { last = chessHistory.pop(); }
+            cBoard = last.b; cTurn = last.turn; castling = last.castling;
+            epTarget = last.ep; lastMoveC = last.lastMove;
+            cSel = null; cMoves = []; undosLeft--;
+            updateChessScore(); renderChess();
         }
     }
 
@@ -612,12 +635,7 @@
             if(lastMoveC.from === i || lastMoveC.to === i) sq.classList.add('last-move');
             
             let p = cBoard[i];
-            if(p) { 
-                // Ép hiển thị text thay vì emoji trên đt bằng \uFE0E
-                sq.innerText = chP[p] + '\uFE0E'; 
-                // Vì cả 2 bộ Unicode đã mang đặc điểm rõ ràng (rỗng/đặc), ta chỉ cần set màu viền cho rõ nét
-                sq.style.color = '#000000'; 
-            }
+            if(p) { sq.innerText = chP[p] + '\uFE0E'; sq.style.color = '#000000'; }
             
             sq.onclick = () => {
                 if(cTurn !== 'W' && isBoardAi) return;
@@ -641,6 +659,7 @@
 
     // --- CỜ TƯỚNG (XIANGQI) ---
     const ccPieces = { r:'車', n:'馬', b:'象', a:'士', k:'將', c:'砲', p:'卒', R:'俥', N:'傌', B:'相', A:'仕', K:'帥', C:'炮', P:'兵' };
+    const ccVals = { p:1, a:2, b:2, n:4, c:4.5, r:9, k:1000, P:1, A:2, B:2, N:4, C:4.5, R:9, K:1000 };
     let ccB = [], ccTurn = 'R', ccSelected = null, ccMoves = [];
     let ccTotalMoves = 0, ccProgressMoves = 0;
     
@@ -662,7 +681,6 @@
         let ms = []; let p = board[idx]; if (!p) return [];
         let isR = p === p.toUpperCase(); let r = Math.floor(idx/9), c = idx%9; let type = p.toLowerCase();
         const isEn = (t) => t && (isR ? t === t.toLowerCase() : t === t.toUpperCase());
-        const isEmpty = (t) => !t;
 
         if (type === 'r') {
             [[0,1],[0,-1],[1,0],[-1,0]].forEach(d => { let nr = r + d[0], nc = c + d[1]; while (nr >= 0 && nr <= 9 && nc >= 0 && nc <= 8) { let t = board[nr*9+nc]; if (!t) ms.push(nr*9+nc); else { if (isEn(t)) ms.push(nr*9+nc); break; } nr += d[0]; nc += d[1]; } });
@@ -764,11 +782,7 @@
             return;
         }
 
-        if (ccProgressMoves >= 60 || ccTotalMoves >= 600) {
-            fireWin("HÒA THEO LUẬT CHUẨN!");
-            return;
-        }
-
+        if (ccProgressMoves >= 60 || ccTotalMoves >= 600) { fireWin("HÒA THEO LUẬT CHUẨN!"); return; }
         if(isBoardAi && ccTurn === 'B') setTimeout(() => makeAiBoardMove('cchess'), 500);
     }
 
@@ -776,16 +790,9 @@
         if (undosLeftCC > 0 && ccHistory.length > 0) {
             let last = ccHistory.pop();
             if (isBoardAi && ccHistory.length > 0) last = ccHistory.pop();
-            
-            ccB = last.b; 
-            ccTurn = last.turn;
-            ccTotalMoves = last.totalM; 
-            ccProgressMoves = last.progM;
-            lastMoveCC = last.lastMove;
-            ccSelected = null; 
-            ccMoves = [];
-            undosLeftCC--;
-            renderCChess();
+            ccB = last.b; ccTurn = last.turn; ccTotalMoves = last.totalM; ccProgressMoves = last.progM;
+            lastMoveCC = last.lastMove; ccSelected = null; ccMoves = [];
+            undosLeftCC--; renderCChess();
         }
     }
 
@@ -812,13 +819,11 @@
                         ccSelected = i; ccMoves = getCCLegalMoves(i, ccB); renderCChess(); 
                     }
                 } else {
-                    if (ccMoves.includes(i)) {
-                        executeCCMove(ccSelected, i);
-                    } else { 
+                    if (ccMoves.includes(i)) { executeCCMove(ccSelected, i); } 
+                    else { 
                         if (p && ((ccTurn === 'R' && p === p.toUpperCase()) || (ccTurn === 'B' && p === p.toLowerCase()))) { 
                             ccSelected = i; ccMoves = getCCLegalMoves(i, ccB); renderCChess(); 
-                        }
-                        else { ccSelected = null; ccMoves = []; renderCChess(); }
+                        } else { ccSelected = null; ccMoves = []; renderCChess(); }
                     }
                 }
             };
@@ -828,30 +833,62 @@
         document.getElementById('cchess-undo-btn').innerText = `Undo (${undosLeftCC})`;
     }
 
-    // --- HỆ THỐNG AI TỔNG HỢP ---
+    // --- HỆ THỐNG AI TỔNG HỢP & NÂNG CẤP THÔNG MINH ---
+    function evalMoveC(from, to, board) {
+        let score = 0; let target = board[to];
+        if (target) score += pieceValues[target] * 10;
+        if (boardAiDiff >= 3) {
+            let tempB = [...board]; tempB[to] = tempB[from]; tempB[from] = null;
+            if (isSquareAttacked(to, true, tempB)) { score -= pieceValues[board[from].toLowerCase()] * 10; }
+        }
+        if (boardAiDiff === 4) {
+            let r = Math.floor(to/8), c = to%8;
+            if((r===3||r===4) && (c===3||c===4)) score += 2;
+            if(board[from].toLowerCase() === 'n' || board[from].toLowerCase() === 'b') score += 1.5;
+        }
+        return score + Math.random();
+    }
+
+    function evalMoveCC(from, to, board) {
+        let score = 0; let target = board[to];
+        if (target) score += ccVals[target.toLowerCase()] * 10;
+        if (boardAiDiff >= 3) {
+            let tempB = [...board]; tempB[to] = tempB[from]; tempB[from] = null;
+            for(let i=0; i<90; i++) {
+                if(tempB[i] && tempB[i] === tempB[i].toUpperCase()) {
+                    if(getCCMovesSim(i, tempB).includes(to)) { score -= ccVals[board[from].toLowerCase()] * 10; break; }
+                }
+            }
+        }
+        if (boardAiDiff === 4) {
+            if(board[from].toLowerCase() === 'p') score += 2;
+            if(to%9===4) score += 1.5;
+        }
+        return score + Math.random();
+    }
+
     function makeAiBoardMove(type) {
+        let moves = [];
         if(type === 'chess') {
-            let moves = [];
             for(let i=0; i<64; i++) {
                 if(cBoard[i] && cBoard[i] === cBoard[i].toLowerCase()) {
                     let mvs = getLegalMoves(i, cBoard, castling, epTarget);
-                    mvs.forEach(to => moves.push({from: i, to: to}));
+                    mvs.forEach(to => moves.push({from: i, to: to, score: (boardAiDiff >= 2 ? evalMoveC(i, to, cBoard) : Math.random())}));
                 }
             }
             if(moves.length === 0) return;
-            let bestMove = moves[Math.floor(Math.random()*moves.length)];
-            executeChessMove(bestMove.from, bestMove.to, true);
+            moves.sort((a,b) => b.score - a.score);
+            executeChessMove(moves[0].from, moves[0].to, true);
         } else {
-            let moves = [];
             for(let i=0; i<90; i++) {
                 if(ccB[i] && ccB[i] === ccB[i].toLowerCase()) {
                     let mvs = getCCLegalMoves(i, ccB);
-                    mvs.forEach(to => moves.push({from: i, to: to}));
+                    mvs.forEach(to => moves.push({from: i, to: to, score: (boardAiDiff >= 2 ? evalMoveCC(i, to, ccB) : Math.random())}));
                 }
             }
             if(moves.length === 0) return;
-            let bestMove = moves[Math.floor(Math.random()*moves.length)];
-            executeCCMove(bestMove.from, bestMove.to);
+            moves.sort((a,b) => b.score - a.score);
+            executeCCMove(moves[0].from, moves[0].to);
         }
     }
 
@@ -860,7 +897,7 @@
     function startSudoku() {
         startTimer('timer-s'); const g = document.getElementById('grid-s'); g.innerHTML = ''; let b = Array.from({length:9},()=>Array(9).fill(0));
         const solveS = (bd) => { for(let r=0; r<9; r++) { for(let c=0; c<9; c++) { if(bd[r][c]===0) { let ns = [1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5); for(let n of ns) { if(isValidS(bd,r,c,n)) { bd[r][c]=n; if(solveS(bd)) return true; bd[r][c]=0; } } return false; } } } return true; };
-        solveS(b); solutionS = b.map(r=>[...r]); let h = parseInt(document.getElementById('diff-s').value) || 45; while(h>0){ let r=Math.floor(Math.random()*9), c=Math.floor(Math.random()*9); if(b[r][c]!==0){ b[r][c]=0; h--; } }
+        solveS(b); solutionS = b.map(r=>[...r]); let h = globalOptions.sudokuDiff || 45; while(h>0){ let r=Math.floor(Math.random()*9), c=Math.floor(Math.random()*9); if(b[r][c]!==0){ b[r][c]=0; h--; } }
         for(let i=0; i<81; i++) { let c = document.createElement('div'); c.className = 'cell-s'; let v = b[Math.floor(i/9)][i%9]; c.innerText = v || ''; if(v) c.classList.add('readonly'); c.onclick = () => { if(!c.classList.contains('readonly')) { document.querySelectorAll('.cell-s').forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); selectedIdx = i; } }; g.appendChild(c); }
     }
     function isValidS(b,r,c,n){ for(let i=0; i<9; i++) if(b[r][i]===n || b[i][c]===n) return false; let sR=Math.floor(r/3)*3, sC=Math.floor(c/3)*3; for(let i=0; i<3; i++) for(let j=0; j<3; j++) if(b[sR+i][sC+j]===n) return false; return true; }
@@ -869,10 +906,9 @@
     function solveByAI(){ document.querySelectorAll('.cell-s').forEach((c,i)=> { if(!c.classList.contains('readonly')) c.innerText=solutionS[Math.floor(i/9)][i%9]; }); saveHistory('Sudoku','AI Solved'); clearInterval(timerInterval); }
     function checkWinS(){ let f=true, cor=true; document.querySelectorAll('.cell-s').forEach((c,i)=>{ let v=parseInt(c.innerText); if(!v) f=false; if(v!==solutionS[Math.floor(i/9)][i%9]) cor=false; }); if(f && cor){ fireWin(i18n[currentLang].win); saveHistory('Sudoku', document.getElementById('timer-s').innerText); } }
 
-    // --- BLOCK BLAST (CẢM ỨNG & COMBO) ---
+    // --- BLOCK BLAST ---
     let bState = Array(64).fill(false), bScore = 0, bCombo = 0;
     const bShapes = [ [[0,0]], [[0,0],[0,1]], [[0,0],[1,0]], [[0,0],[0,1],[1,0],[1,1]], [[0,0],[0,1],[0,2]], [[0,0],[1,0],[2,0]], [[0,0],[1,0],[2,0],[2,1]], [[0,1],[1,0],[1,1],[1,2]] ];
-    
     let dragP = null, dragOff = {x:0, y:0}, actSh = null, actIdx = -1, isTouch = false;
 
     function startBlockBlast(){ 
@@ -899,7 +935,6 @@
             dragP.style.position = 'fixed'; dragP.style.zIndex = '1000'; dragP.style.pointerEvents = 'none';
             dragP.style.transform = 'scale(1.1)';
             dragP.style.left = (e.clientX - dragOff.x) + 'px';
-            // Đẩy khối lên trên 70px nếu dùng cảm ứng để tránh bị ngón tay che khuất
             dragP.style.top = (e.clientY - dragOff.y - (isTouch ? 70 : 0)) + 'px'; 
             document.body.appendChild(dragP);
             piece.style.opacity = '0.2';
@@ -914,19 +949,13 @@
 
         const board = document.getElementById('board-b');
         const rect = board.getBoundingClientRect();
-        const pX = e.clientX - dragOff.x;
-        const pY = e.clientY - dragOff.y - (isTouch ? 70 : 0);
-        
+        const pX = e.clientX - dragOff.x; const pY = e.clientY - dragOff.y - (isTouch ? 70 : 0);
         const cW = (rect.width - 20) / 8;
-        const c = Math.round((pX - rect.left - 10) / cW);
-        const r = Math.round((pY - rect.top - 10) / cW);
+        const c = Math.round((pX - rect.left - 10) / cW); const r = Math.round((pY - rect.top - 10) / cW);
 
         clearBPreview();
         if(c>=0 && c<8 && r>=0 && r<8 && canPB(actSh, r, c)){
-            actSh.forEach(([dr,dc])=>{
-                let cell = document.querySelectorAll('.cell-b')[(r+dr)*8 + c+dc];
-                if(cell) cell.classList.add('preview');
-            });
+            actSh.forEach(([dr,dc])=>{ let cell = document.querySelectorAll('.cell-b')[(r+dr)*8 + c+dc]; if(cell) cell.classList.add('preview'); });
         }
     });
 
@@ -938,19 +967,14 @@
 
         const board = document.getElementById('board-b');
         const rect = board.getBoundingClientRect();
-        const pX = e.clientX - dragOff.x;
-        const pY = e.clientY - dragOff.y - (isTouch ? 70 : 0);
+        const pX = e.clientX - dragOff.x; const pY = e.clientY - dragOff.y - (isTouch ? 70 : 0);
         const cW = (rect.width - 20) / 8;
-        const c = Math.round((pX - rect.left - 10) / cW);
-        const r = Math.round((pY - rect.top - 10) / cW);
+        const c = Math.round((pX - rect.left - 10) / cW); const r = Math.round((pY - rect.top - 10) / cW);
 
         clearBPreview();
         if(c>=0 && c<8 && r>=0 && r<8 && canPB(actSh, r, c)){
-            actSh.forEach(([dr,dc])=>{
-                bState[(r+dr)*8 + c+dc] = true;
-                document.querySelectorAll('.cell-b')[(r+dr)*8 + c+dc].classList.add('filled');
-            });
-            bScore += actSh.length; // Điểm đặt khối cơ bản
+            actSh.forEach(([dr,dc])=>{ bState[(r+dr)*8 + c+dc] = true; document.querySelectorAll('.cell-b')[(r+dr)*8 + c+dc].classList.add('filled'); });
+            bScore += actSh.length; 
             document.getElementById(`slot-${actIdx}`).innerHTML='';
             checkClearB();
             if(Array.from(document.querySelectorAll('.piece-slot')).every(s=>s.innerHTML==='')) [0,1,2].forEach(createPiece);
@@ -973,20 +997,15 @@
 
         let cleared = rs.length + cs.length;
         if(cleared > 0){
-            bCombo++;
-            let pts = (cleared * 10) * bCombo;
-            bScore += pts;
+            bCombo++; let pts = (cleared * 10) * bCombo; bScore += pts;
             let displayScore = bScore + (bCombo > 1 ? ` (+${pts} COMBO x${bCombo}!)` : ` (+${pts})`);
             document.getElementById('score-b').innerText = displayScore;
             
             setTimeout(()=>{ 
                 document.querySelectorAll('.cell-b').forEach((el,i)=>{ if(!bState[i]) el.classList.remove('filled'); }); 
-                document.getElementById('score-b').innerText = bScore; // Trả về hiển thị thường
+                document.getElementById('score-b').innerText = bScore; 
             }, 600); 
-        } else {
-            bCombo = 0; // Đứt combo
-            document.getElementById('score-b').innerText = bScore;
-        }
+        } else { bCombo = 0; document.getElementById('score-b').innerText = bScore; }
     }
 
     function checkGOB(){ 
