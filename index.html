@@ -18,9 +18,9 @@
 
         /* Chống bôi đen, bôi xanh văn bản khi chạm giữ trên điện thoại */
         * {
-            -webkit-user-select: none; /* Safari */
-            -ms-user-select: none; /* IE 10 and IE 11 */
-            user-select: none; /* Standard syntax */
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
             -webkit-touch-callout: none;
         }
 
@@ -33,15 +33,27 @@
             z-index: 0;
         }
 
-        /* Hình nền phong cảnh chìm */
+        /* Hình nền mờ đằng sau (Desktop - Khổ ngang) */
         body::before {
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            /* Thay link ảnh phong cảnh Việt Nam của bạn vào đây nếu cần */
-            background: url('https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
-            opacity: 0.12; /* Độ mờ chìm để không chói mắt */
+            background: url('ChatGPT%20Image%2011_25_19%2012%20thg%205%2C%202026.png') center/cover no-repeat;
+            opacity: 0.15; /* Giữ mờ để không làm chói mắt */
             z-index: -1;
+        }
+
+        /* Hình nền mờ đằng sau (Mobile - Khổ dọc) */
+        @media (max-width: 768px) {
+            body::before {
+                background: url('ChatGPT%20Image%2011_26_57%2012%20thg%205%2C%202026.png') center/cover no-repeat;
+            }
+        }
+
+        /* Animation cho Splash Screen */
+        @keyframes floatSplash {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
         }
 
         .container-box {
@@ -59,8 +71,7 @@
         .container-box::-webkit-scrollbar-thumb { background: #bdc3c7; border-radius: 10px; }
 
         .hidden { display: none !important; }
-        h1 { color: var(--primary-dark); font-size: 1.7rem; margin-bottom: 5px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
-        p.subtitle { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 20px; margin-top: 0; font-weight: bold;}
+        p.subtitle { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 20px; margin-top: 5px; font-weight: bold;}
 
         .btn {
             width: 100%; padding: 14px; margin: 8px 0; border: none;
@@ -92,17 +103,17 @@
 
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; margin-bottom: 15px; }
         .menu-card {
-            background: #fff; border: 2px solid var(--border); border-radius: 15px;
+            background: #fff; border: 2px solid var(--border); border-radius: 18px;
             padding: 20px 10px; cursor: pointer; transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.03); display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;
             position: relative; overflow: hidden;
         }
         .menu-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 25px rgba(46, 204, 113, 0.2); }
         .menu-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 60%); opacity: 0; transition: 0.5s; pointer-events: none; }
         .menu-card:hover::before { opacity: 1; transform: scale(1.2); }
-        .menu-img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 10px; transition: 0.3s; }
-        .menu-card:hover .menu-img { transform: scale(1.15) rotate(-5deg); }
-        .menu-card h3 { margin: 0; font-size: 0.95rem; color: var(--text); font-weight: bold; }
+        .menu-img { width: 75px; height: 75px; object-fit: contain; margin-bottom: 12px; transition: 0.3s; }
+        .menu-card:hover .menu-img { transform: scale(1.1) rotate(-3deg); }
+        .menu-card h3 { margin: 0; font-size: 0.95rem; color: var(--text); font-weight: 800; }
 
         .setup-group { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 15px; margin-bottom: 15px; }
         .custom-radio-group { display: flex; gap: 8px; flex-wrap: wrap; margin: 5px 0 15px 0; }
@@ -208,6 +219,11 @@
 </head>
 <body>
 
+<div id="splash-screen" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:var(--bg); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+    <img src="logo.png" alt="Logo" style="max-width:85%; max-height:50vh; object-fit:contain; margin-bottom:40px; animation: floatSplash 3s ease-in-out infinite; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));">
+    <button class="btn" style="width:220px; font-size:1.5rem; padding:15px; border-radius:50px; background:linear-gradient(135deg, #2ecc71, #27ae60); box-shadow:0 10px 20px rgba(46,204,113,0.4);" onclick="startFromSplash()">PLAY NOW</button>
+</div>
+
 <div class="overlay" id="overlay"></div>
 <div id="winModal">
     <h2 id="modal-title" style="margin:0; color:var(--primary-dark); font-size:1.8rem; text-transform:uppercase;">KẾT QUẢ!</h2>
@@ -226,68 +242,182 @@
     <button id="btn-show-result" class="hidden" data-i18n="show_result" onclick="showResultModal()">🔙 Mở Bảng Kết Quả</button>
 
     <div id="page-menu">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-            <div style="text-align: left;">
-                <h1 id="ui-title">FOUR GAMES FOR FUN</h1>
-                <p class="subtitle" data-i18n="subtitle">Created by HeiuNG</p>
+        <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:15px; position:relative;">
+            <button class="btn-outline" onclick="toggleLang()" id="btn-lang" style="position:absolute; right:0; top:0; padding:4px 8px; border-radius:8px; font-size:0.75rem; cursor:pointer; font-weight:bold; border-width:2px; height:max-content; margin:0;">🇺🇸 EN</button>
+            <div style="text-align: center; width: 100%; margin-top:10px;">
+                <h1 id="ui-title" style="margin: 0; padding: 0; line-height: 1;">
+                    <span style="font-size: 2.3rem; font-weight: 900; color: #f1c40f; text-shadow: 2px 2px 0px #e67e22, 4px 4px 0px rgba(0,0,0,0.2); display: block;">FOUR GAMES</span>
+                    <span style="font-size: 1.4rem; font-weight: 900; color: #e74c3c; text-shadow: 1px 1px 0px #c0392b, 2px 2px 0px rgba(0,0,0,0.2); letter-spacing: 3px; display: block; margin-top: 5px;">FOR FUN</span>
+                </h1>
+                <p class="subtitle" data-i18n="subtitle" style="margin-top: 8px;">Created by HeiuNG</p>
             </div>
-            <button class="btn-outline" onclick="toggleLang()" id="btn-lang" style="padding:5px 10px; border-radius:10px; font-size:0.8rem; cursor:pointer; font-weight:bold; border-width:2px; height:max-content; white-space:nowrap;">🇺🇸 EN</button>
         </div>
         
         <div class="menu-grid">
-            <div class="menu-card" style="border-color: #2ecc71;" onclick="openMode('sudoku')">
+            <div class="menu-card" style="border-color: #2980b9;" onclick="openMode('sudoku')">
                 <svg viewBox="0 0 100 100" class="menu-img">
-                    <rect x="10" y="10" width="80" height="80" rx="8" fill="#fff" stroke="#333" stroke-width="4"/>
-                    <line x1="36" y1="10" x2="36" y2="90" stroke="#333" stroke-width="2"/>
-                    <line x1="63" y1="10" x2="63" y2="90" stroke="#333" stroke-width="2"/>
-                    <line x1="10" y1="36" x2="90" y2="36" stroke="#333" stroke-width="2"/>
-                    <line x1="10" y1="63" x2="90" y2="63" stroke="#333" stroke-width="2"/>
-                    <text x="23" y="28" font-size="18" font-family="sans-serif" font-weight="bold" fill="#27ae60" text-anchor="middle" dominant-baseline="central">5</text>
-                    <text x="50" y="50" font-size="18" font-family="sans-serif" font-weight="bold" fill="#2c3e50" text-anchor="middle" dominant-baseline="central">8</text>
-                    <text x="76" y="76" font-size="18" font-family="sans-serif" font-weight="bold" fill="#27ae60" text-anchor="middle" dominant-baseline="central">1</text>
-                    <text x="76" y="28" font-size="18" font-family="sans-serif" font-weight="bold" fill="#2c3e50" text-anchor="middle" dominant-baseline="central">3</text>
+                    <rect x="5" y="5" width="90" height="90" rx="15" fill="#0b3d91"/>
+                    <rect x="5" y="5" width="90" height="85" rx="15" fill="#1555c0"/>
+                    <rect x="15" y="15" width="70" height="70" rx="8" fill="#e8f4f8" stroke="#0f4596" stroke-width="3"/>
+                    <line x1="38" y1="15" x2="38" y2="85" stroke="#90b4d4" stroke-width="2"/>
+                    <line x1="62" y1="15" x2="62" y2="85" stroke="#90b4d4" stroke-width="2"/>
+                    <line x1="15" y1="38" x2="85" y2="38" stroke="#90b4d4" stroke-width="2"/>
+                    <line x1="15" y1="62" x2="85" y2="62" stroke="#90b4d4" stroke-width="2"/>
+                    <rect x="15" y="15" width="70" height="70" rx="8" fill="none" stroke="#0f4596" stroke-width="4"/>
+                    <text x="26.5" y="27" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#0f4596" text-anchor="middle" dominant-baseline="central">5</text>
+                    <text x="50" y="27" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#0f4596" text-anchor="middle" dominant-baseline="central">3</text>
+                    <text x="73.5" y="27" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#0f4596" text-anchor="middle" dominant-baseline="central">7</text>
+                    <text x="26.5" y="50" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#0f4596" text-anchor="middle" dominant-baseline="central">6</text>
+                    <text x="73.5" y="50" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#0f4596" text-anchor="middle" dominant-baseline="central">1</text>
+                    <text x="50" y="73" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#0f4596" text-anchor="middle" dominant-baseline="central">9</text>
+                    <text x="73.5" y="73" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#0f4596" text-anchor="middle" dominant-baseline="central">8</text>
+                    <text x="26.5" y="73" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#0f4596" text-anchor="middle" dominant-baseline="central">4</text>
+                    <g transform="translate(62, 42) rotate(30) scale(0.9)" filter="drop-shadow(2px 4px 4px rgba(0,0,0,0.5))">
+                        <path d="M-10,-35 L10,-35 L10,15 L0,35 L-10,15 Z" fill="#f1c40f"/>
+                        <path d="M-10,-35 L0,-35 L0,15 L-10,15 Z" fill="#f39c12"/> 
+                        <polygon points="-10,15 10,15 0,35" fill="#f5cd9a"/> 
+                        <polygon points="-4,23 4,23 0,35" fill="#2c3e50"/> 
+                        <rect x="-10" y="-45" width="20" height="10" fill="#bdc3c7"/> 
+                        <rect x="-10" y="-55" width="20" height="10" rx="3" fill="#3498db"/> 
+                    </g>
                 </svg>
                 <h3 data-i18n="sudoku">SUDOKU</h3>
             </div>
-            <div class="menu-card" style="border-color: #3498db;" onclick="openMode('block-menu')">
+
+            <div class="menu-card" style="border-color: #8e44ad;" onclick="openMode('block-menu')">
                 <svg viewBox="0 0 100 100" class="menu-img">
-                    <rect x="15" y="45" width="20" height="20" rx="4" fill="#3498db"/>
-                    <rect x="37" y="45" width="20" height="20" rx="4" fill="#3498db"/>
-                    <rect x="15" y="67" width="20" height="20" rx="4" fill="#3498db"/>
-                    <rect x="37" y="67" width="20" height="20" rx="4" fill="#3498db"/>
-                    <rect x="59" y="23" width="20" height="20" rx="4" fill="#e67e22"/>
-                    <rect x="59" y="45" width="20" height="20" rx="4" fill="#e67e22"/>
-                    <rect x="59" y="67" width="20" height="20" rx="4" fill="#e67e22"/>
-                    <rect x="81" y="67" width="20" height="20" rx="4" fill="#e67e22"/>
-                    <rect x="15" y="23" width="20" height="20" rx="4" fill="#e74c3c"/>
-                    <rect x="37" y="23" width="20" height="20" rx="4" fill="#e74c3c"/>
+                    <rect x="5" y="5" width="90" height="90" rx="12" fill="#1c004a"/>
+                    <path d="M 5 25 L 95 25 M 5 45 L 95 45 M 5 65 L 95 65 M 5 85 L 95 85" stroke="#4a2377" stroke-width="0.5"/>
+                    <path d="M 25 5 L 25 95 M 45 5 L 45 95 M 65 5 L 65 95 M 85 5 L 85 95" stroke="#4a2377" stroke-width="0.5"/>
+                    <circle cx="15" cy="15" r="1.5" fill="#fff" opacity="0.8"/>
+                    <circle cx="85" cy="35" r="1" fill="#fff" opacity="0.6"/>
+                    <circle cx="70" cy="80" r="1.5" fill="#fff" opacity="0.8"/>
+                    <g transform="translate(10, 30) scale(0.8)">
+                        <g transform="translate(0, 20)">
+                            <rect x="0" y="0" width="20" height="20" rx="4" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+                            <rect x="2" y="2" width="16" height="8" rx="2" fill="#ff7675" opacity="0.8"/>
+                            <rect x="0" y="22" width="20" height="20" rx="4" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+                            <rect x="2" y="24" width="16" height="8" rx="2" fill="#ff7675" opacity="0.8"/>
+                            <rect x="22" y="0" width="20" height="20" rx="4" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+                            <rect x="24" y="2" width="16" height="8" rx="2" fill="#ff7675" opacity="0.8"/>
+                        </g>
+                        <g transform="translate(22, -20)">
+                            <rect x="0" y="0" width="20" height="20" rx="4" fill="#f1c40f" stroke="#f39c12" stroke-width="2"/>
+                            <rect x="2" y="2" width="16" height="8" rx="2" fill="#ffeaa7" opacity="0.8"/>
+                            <rect x="22" y="0" width="20" height="20" rx="4" fill="#f1c40f" stroke="#f39c12" stroke-width="2"/>
+                            <rect x="24" y="2" width="16" height="8" rx="2" fill="#ffeaa7" opacity="0.8"/>
+                            <rect x="44" y="0" width="20" height="20" rx="4" fill="#f1c40f" stroke="#f39c12" stroke-width="2"/>
+                            <rect x="46" y="2" width="16" height="8" rx="2" fill="#ffeaa7" opacity="0.8"/>
+                        </g>
+                        <g transform="translate(44, 20)">
+                            <rect x="0" y="0" width="20" height="20" rx="4" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+                            <rect x="2" y="2" width="16" height="8" rx="2" fill="#cd84f1" opacity="0.8"/>
+                            <rect x="0" y="22" width="20" height="20" rx="4" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+                            <rect x="2" y="24" width="16" height="8" rx="2" fill="#cd84f1" opacity="0.8"/>
+                            <rect x="22" y="22" width="20" height="20" rx="4" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+                            <rect x="24" y="24" width="16" height="8" rx="2" fill="#cd84f1" opacity="0.8"/>
+                            <rect x="22" y="44" width="20" height="20" rx="4" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+                            <rect x="24" y="46" width="16" height="8" rx="2" fill="#cd84f1" opacity="0.8"/>
+                        </g>
+                        <g transform="translate(22, 44)">
+                            <rect x="0" y="0" width="20" height="20" rx="4" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+                            <rect x="2" y="2" width="16" height="8" rx="2" fill="#74b9ff" opacity="0.8"/>
+                            <rect x="22" y="0" width="20" height="20" rx="4" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+                            <rect x="24" y="2" width="16" height="8" rx="2" fill="#74b9ff" opacity="0.8"/>
+                            <rect x="0" y="22" width="20" height="20" rx="4" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+                            <rect x="2" y="24" width="16" height="8" rx="2" fill="#74b9ff" opacity="0.8"/>
+                            <rect x="22" y="22" width="20" height="20" rx="4" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+                            <rect x="24" y="24" width="16" height="8" rx="2" fill="#74b9ff" opacity="0.8"/>
+                        </g>
+                        <g transform="translate(75, 44)">
+                            <rect x="0" y="0" width="20" height="20" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+                            <rect x="2" y="2" width="16" height="8" rx="2" fill="#55efc4" opacity="0.8"/>
+                            <rect x="0" y="22" width="20" height="20" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+                            <rect x="2" y="24" width="16" height="8" rx="2" fill="#55efc4" opacity="0.8"/>
+                        </g>
+                    </g>
                 </svg>
                 <h3 data-i18n="block_blast">BLOCK BLAST</h3>
             </div>
-            <div class="menu-card" style="border-color: #e67e22;" onclick="openMode('board-menu')">
+
+            <div class="menu-card" style="border-color: #27ae60;" onclick="openMode('board-menu')">
                 <svg viewBox="0 0 100 100" class="menu-img">
-                    <g transform="translate(10,10)">
-                        <rect width="80" height="80" rx="8" fill="#eeeed2" stroke="#4a3018" stroke-width="4"/>
-                        <rect x="0" y="0" width="40" height="40" fill="#769656" rx="4"/>
-                        <rect x="40" y="40" width="40" height="40" fill="#769656" rx="4"/>
+                    <defs>
+                        <radialGradient id="chessBg" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#2a7a3b"/>
+                            <stop offset="100%" stop-color="#0e3814"/>
+                        </radialGradient>
+                    </defs>
+                    <rect x="5" y="5" width="90" height="90" rx="15" fill="url(#chessBg)"/>
+                    <path d="M 5 60 L 95 60 L 95 90 C 95 92.7 92.7 95 90 95 L 10 95 C 7.2 95 5 92.7 5 90 Z" fill="#1b5e20" opacity="0.6"/>
+                    <path d="M 20 60 L 35 60 L 45 95 L 15 95 Z" fill="#000" opacity="0.2"/>
+                    <path d="M 50 60 L 65 60 L 75 95 L 45 95 Z" fill="#000" opacity="0.2"/>
+                    <path d="M 80 60 L 95 60 L 95 95 L 75 95 Z" fill="#000" opacity="0.2"/>
+                    <path d="M 5 70 L 95 70 M 5 80 L 95 80 M 5 90 L 95 90" stroke="#000" stroke-width="1" opacity="0.3"/>
+                    
+                    <g transform="translate(65, 40) scale(0.65)" filter="drop-shadow(3px 5px 4px rgba(0,0,0,0.6))">
+                        <path d="M 10 70 L 30 70 L 30 80 L 10 80 Z" fill="#111"/>
+                        <path d="M 12 40 L 28 40 L 32 70 L 8 70 Z" fill="#222"/>
+                        <path d="M 8 20 L 32 20 L 30 40 L 10 40 Z" fill="#111"/>
+                        <path d="M 6 10 L 12 10 L 12 20 L 6 20 Z" fill="#222"/>
+                        <path d="M 17 10 L 23 10 L 23 20 L 17 20 Z" fill="#222"/>
+                        <path d="M 28 10 L 34 10 L 34 20 L 28 20 Z" fill="#222"/>
+                        <path d="M 12 40 L 16 40 L 18 70 L 10 70 Z" fill="#444" opacity="0.5"/>
                     </g>
-                    <text x="30" y="48" font-size="40" fill="#fff" stroke="#000" stroke-width="1" text-anchor="middle">♙</text>
-                    <circle cx="70" cy="70" r="22" fill="#fcebb6" stroke="#8b4513" stroke-width="3"/>
-                    <text x="70" y="77" font-size="20" font-family="sans-serif" font-weight="900" fill="#c0392b" text-anchor="middle">砲</text>
+                    
+                    <g transform="translate(5, 35) scale(0.65)" filter="drop-shadow(-3px 5px 4px rgba(0,0,0,0.6))">
+                        <path d="M 15 80 L 45 80 L 40 70 L 20 70 Z" fill="#111"/>
+                        <path d="M 20 70 C 20 50, 10 40, 25 20 C 35 10, 45 15, 45 30 C 45 50, 40 70, 40 70 Z" fill="#1a1a1a"/>
+                        <path d="M 25 20 C 15 25, 5 35, 10 45 C 15 40, 20 40, 20 40 Z" fill="#111"/>
+                        <circle cx="32" cy="25" r="2" fill="#000"/>
+                        <path d="M 35 12 L 40 5 L 42 15 Z" fill="#111"/>
+                        <path d="M 25 20 C 30 15, 35 15, 40 20 C 40 30, 35 50, 35 70 L 25 70 C 25 50, 20 40, 25 20 Z" fill="#444" opacity="0.4"/>
+                    </g>
+                    
+                    <g transform="translate(30, 15) scale(0.85)" filter="drop-shadow(0px 8px 6px rgba(0,0,0,0.6))">
+                        <path d="M 10 80 L 40 80 L 40 90 L 10 90 Z" fill="#d4b886"/>
+                        <path d="M 15 70 L 35 70 L 38 80 L 12 80 Z" fill="#e6cd98"/>
+                        <path d="M 18 35 L 32 35 C 32 50, 38 65, 35 70 L 15 70 C 12 65, 18 50, 18 35 Z" fill="#f7e1b5"/>
+                        <path d="M 12 25 L 38 25 L 35 35 L 15 35 Z" fill="#e6cd98"/>
+                        <circle cx="25" cy="20" r="8" fill="#f7e1b5"/>
+                        <path d="M 22 5 L 28 5 L 28 10 L 33 10 L 33 15 L 28 15 L 28 20 L 22 20 L 22 15 L 17 15 L 17 10 L 22 10 Z" fill="#f7e1b5"/>
+                        <path d="M 15 70 C 12 65, 18 50, 18 35 L 22 35 C 22 50, 16 65, 20 70 Z" fill="#fff" opacity="0.6"/>
+                        <path d="M 35 70 C 38 65, 32 50, 32 35 L 28 35 C 28 50, 34 65, 30 70 Z" fill="#a68a56" opacity="0.6"/>
+                    </g>
                 </svg>
                 <h3 data-i18n="chess_game">GAME CỜ</h3>
             </div>
-            <div class="menu-card" style="border-color: #9b59b6;" onclick="openMode('ttt-menu')">
+
+            <div class="menu-card" style="border-color: #d35400;" onclick="openMode('ttt-menu')">
                 <svg viewBox="0 0 100 100" class="menu-img">
-                    <rect x="10" y="10" width="80" height="80" rx="12" fill="#27ae60"/>
-                    <line x1="36" y1="15" x2="36" y2="85" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="63" y1="15" x2="63" y2="85" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="15" y1="36" x2="85" y2="36" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="15" y1="63" x2="85" y2="63" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
-                    <g stroke-width="7" stroke-linecap="round">
-                        <line x1="20" y1="20" x2="30" y2="30" stroke="#e74c3c"/>
-                        <line x1="30" y1="20" x2="20" y2="30" stroke="#e74c3c"/>
-                        <circle cx="50" cy="50" r="9" fill="none" stroke="#3498db"/>
+                    <rect x="5" y="5" width="90" height="90" rx="15" fill="#a04000"/>
+                    <rect x="8" y="8" width="84" height="84" rx="12" fill="#e67e22"/>
+                    <rect x="12" y="12" width="76" height="76" rx="8" fill="#fef5e7"/>
+                    <rect x="12" y="12" width="76" height="76" rx="8" fill="none" stroke="#5d4037" stroke-width="2"/>
+                    
+                    <line x1="37" y1="12" x2="37" y2="88" stroke="#5d4037" stroke-width="4"/>
+                    <line x1="63" y1="12" x2="63" y2="88" stroke="#5d4037" stroke-width="4"/>
+                    <line x1="12" y1="37" x2="88" y2="37" stroke="#5d4037" stroke-width="4"/>
+                    <line x1="12" y1="63" x2="88" y2="63" stroke="#5d4037" stroke-width="4"/>
+
+                    <g filter="drop-shadow(2px 2px 2px rgba(0,0,0,0.3))">
+                        <circle cx="24.5" cy="24.5" r="7" fill="none" stroke="#c0392b" stroke-width="3"/>
+                        <path d="M 44 18 L 56 31 M 56 18 L 44 31" stroke="#2980b9" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="75.5" cy="24.5" r="7" fill="none" stroke="#c0392b" stroke-width="3"/>
+                        
+                        <path d="M 18 44 L 31 56 M 31 44 L 18 56" stroke="#2980b9" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="50" cy="50" r="8" fill="none" stroke="#e74c3c" stroke-width="4"/> 
+                        <path d="M 69 44 L 82 56 M 82 44 L 69 56" stroke="#2980b9" stroke-width="3" stroke-linecap="round"/>
+
+                        <circle cx="24.5" cy="75.5" r="7" fill="none" stroke="#c0392b" stroke-width="3"/>
+                        <path d="M 44 69 L 56 82 M 56 69 L 44 82" stroke="#2980b9" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="75.5" cy="75.5" r="7" fill="none" stroke="#c0392b" stroke-width="3"/>
+                    </g>
+
+                    <g filter="drop-shadow(0 0 4px #f1c40f)">
+                        <line x1="15" y1="85" x2="85" y2="15" stroke="#f1c40f" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="15" y1="85" x2="85" y2="15" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M 85 10 L 87 14 L 91 15 L 87 16 L 85 20 L 83 16 L 79 15 L 83 14 Z" fill="#fff"/>
                     </g>
                 </svg>
                 <h3 data-i18n="ttt">TIC TAC TOE</h3>
@@ -485,7 +615,10 @@
 </div>
 
 <script>
-    // --- ĐA NGÔN NGỮ (i18n) TOÀN DIỆN ---
+    function startFromSplash() {
+        document.getElementById('splash-screen').style.display = 'none';
+    }
+
     let currentLang = 'vi';
     const i18n = {
         vi: { 
@@ -520,7 +653,6 @@
             if (t[key]) el.innerText = t[key];
         });
         
-        // Update động các nhãn lượt chơi
         updateTurnLabels();
     }
 
@@ -535,7 +667,6 @@
         else document.getElementById('turn-cchess').innerText = i18n[currentLang].turn_bl;
     }
 
-    // --- STATE QUẢN LÝ ---
     let globalOptions = { boardGameType: 'chess', boardMode: 'pvp', boardAiDiff: 1, tttMode: 'pvp', tttAiDiff: 1, tttSize: 3, sudokuDiff: 45 };
     let currentActiveGame = null;
     let matchScores = { ttt_x: 0, ttt_o: 0, chess_w: 0, chess_b: 0, cchess_r: 0, cchess_b: 0 };
@@ -615,7 +746,6 @@
         }
     }
 
-    // --- TIC TAC TOE ---
     let tttBoard = [], tttTurn = 'X';
     let tttSize = 3, tttWinLen = 3;
     
@@ -773,7 +903,6 @@
         return moves[bestMove];
     }
 
-    // --- GAME CỜ: SETUP ---
     let boardGameType = 'chess';
     function initBoardGame(isNewMatch = false) {
         if(isNewMatch) { matchScores.chess_w = 0; matchScores.chess_b = 0; matchScores.cchess_r = 0; matchScores.cchess_b = 0; }
@@ -788,7 +917,6 @@
         if(boardGameType === 'cchess') { updateScoreBoard('cchess'); startCChess(); }
     }
 
-    // --- CỜ VUA (CHESS) ---
     const chP = { r:'♜', n:'♞', b:'♝', q:'♛', k:'♚', p:'♟', R:'♖', N:'♘', B:'♗', Q:'♕', K:'♔', P:'♙' };
     const pieceValues = { p:1, n:3, b:3, r:5, q:9, k:1000, P:1, N:3, B:3, R:5, Q:9, K:1000 };
     let cBoard = [], cTurn = 'W', cSel = null, cMoves = [];
@@ -967,7 +1095,6 @@
         document.getElementById('turn-chess').innerText = i18n[currentLang][`turn_${cTurn.toLowerCase()}`];
     }
 
-    // --- CỜ TƯỚNG (XIANGQI) ---
     const ccPieces = { r:'車', n:'馬', b:'象', a:'士', k:'將', c:'砲', p:'卒', R:'俥', N:'傌', B:'相', A:'仕', K:'帥', C:'炮', P:'兵' };
     const ccVals = { p:1, a:2, b:2, n:4, c:4.5, r:9, k:1000, P:1, A:2, B:2, N:4, C:4.5, R:9, K:1000 };
     let ccB = [], ccTurn = 'R', ccSelected = null, ccMoves = [];
@@ -1115,6 +1242,59 @@
         document.getElementById('cchess-undo-btn').innerText = `Undo (${undosLeftCC})`;
     }
 
+    function evalMoveC(from, to, board) {
+        let target = board[to];
+        let score = (target && pieceValues[target]) ? pieceValues[target] * 10 : 0;
+        let r = Math.floor(to/8), c = to%8;
+        
+        if(r >= 3 && r <= 4 && c >= 3 && c <= 4) score += 2;
+        
+        if (boardAiDiff >= 3) {
+            let temp = [...board]; 
+            temp[to] = temp[from]; 
+            temp[from] = null;
+            
+            if(isSquareAttacked(to, true, temp)) {
+                let pieceVal = pieceValues[board[from].toLowerCase()] || 1;
+                score -= pieceVal * 15; 
+            }
+            
+            if(boardAiDiff === 4) {
+                let wKingIdx = temp.findIndex(x => x === 'K');
+                if(wKingIdx !== -1 && isSquareAttacked(wKingIdx, false, temp)) score += 8; 
+            }
+        }
+        return score + Math.random(); 
+    }
+
+    function evalMoveCC(from, to, board) {
+        let target = board[to];
+        let score = (target && ccVals[target]) ? ccVals[target] * 10 : 0;
+        let r = Math.floor(to/9);
+        let fromR = Math.floor(from/9);
+        
+        if(r > fromR) score += 1.5; 
+        
+        if (boardAiDiff >= 3) {
+            let temp = [...board]; 
+            temp[to] = temp[from]; 
+            temp[from] = null;
+            
+            let isAttacked = false;
+            for (let i = 0; i < 90; i++) {
+                let p = temp[i];
+                if (p && p === p.toUpperCase()) { 
+                    if (getCCMovesSim(i, temp).includes(to)) { isAttacked = true; break; }
+                }
+            }
+            if (isAttacked) {
+                let pieceVal = ccVals[board[from].toLowerCase()] || 1;
+                score -= pieceVal * 15;
+            }
+        }
+        return score + Math.random();
+    }
+
     function makeAiBoardMove(type) {
         let moves = [];
         if(type === 'chess') {
@@ -1124,7 +1304,11 @@
                     mvs.forEach(to => moves.push({from: i, to: to, score: (boardAiDiff >= 2 ? evalMoveC(i, to, cBoard) : Math.random())}));
                 }
             }
-            if(moves.length === 0) return; moves.sort((a,b) => b.score - a.score); executeChessMove(moves[0].from, moves[0].to, true);
+            if(moves.length === 0) return; 
+            moves.sort((a,b) => b.score - a.score);
+            let bestMoves = moves.filter(m => m.score === moves[0].score);
+            let chosen = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+            executeChessMove(chosen.from, chosen.to, true);
         } else {
             for(let i=0; i<90; i++) {
                 if(ccB[i] && ccB[i] === ccB[i].toLowerCase()) {
@@ -1132,11 +1316,14 @@
                     mvs.forEach(to => moves.push({from: i, to: to, score: (boardAiDiff >= 2 ? evalMoveCC(i, to, ccB) : Math.random())}));
                 }
             }
-            if(moves.length === 0) return; moves.sort((a,b) => b.score - a.score); executeCCMove(moves[0].from, moves[0].to);
+            if(moves.length === 0) return; 
+            moves.sort((a,b) => b.score - a.score); 
+            let bestMoves = moves.filter(m => m.score === moves[0].score);
+            let chosen = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+            executeCCMove(chosen.from, chosen.to);
         }
     }
 
-    // --- SUDOKU ---
     let solutionS = [], selectedIdx = null;
     function startSudoku() {
         startTimer('timer-s'); const g = document.getElementById('grid-s'); g.innerHTML = ''; let b = Array.from({length:9},()=>Array(9).fill(0));
@@ -1150,7 +1337,6 @@
     function solveByAI(){ document.querySelectorAll('.cell-s').forEach((c,i)=> { if(!c.classList.contains('readonly')) c.innerText=solutionS[Math.floor(i/9)][i%9]; }); saveHistory('sudoku','AI Solved'); clearInterval(timerInterval); }
     function checkWinS(){ let f=true, cor=true; document.querySelectorAll('.cell-s').forEach((c,i)=>{ let v=parseInt(c.innerText); if(!v) f=false; if(v!==solutionS[Math.floor(i/9)][i%9]) cor=false; }); if(f && cor){ fireWin(currentLang==='vi'?"CHIẾN THẮNG!":"VICTORY!", 'win'); saveHistory('sudoku', "Time: " + document.getElementById('timer-s').innerText); } }
 
-    // --- BLOCK BLAST ---
     let bState = Array(64).fill(false), bScore = 0, bCombo = 0;
     const bShapes = [ [[0,0]], [[0,0],[0,1]], [[0,0],[1,0]], [[0,0],[0,1],[0,2]], [[0,0],[1,0],[2,0]], [[0,0],[0,1],[0,2],[0,3]], [[0,0],[1,0],[2,0],[3,0]], [[0,0],[0,1],[1,0],[1,1]], [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2],[2,0],[2,1],[2,2]], [[0,0],[1,0],[1,1]], [[0,1],[1,0],[1,1]], [[0,0],[0,1],[1,0]], [[0,0],[0,1],[1,1]], [[0,0],[1,0],[2,0],[2,1],[2,2]], [[2,0],[2,1],[2,2],[1,2],[0,2]], [[0,0],[0,1],[0,2],[1,0],[2,0]], [[0,0],[0,1],[0,2],[1,2],[2,2]], [[0,1],[1,0],[1,1],[1,2]], [[0,0],[0,1],[0,2],[1,1]], [[0,0],[1,0],[2,0],[1,1]], [[1,0],[0,1],[1,1],[2,1]], [[0,0],[0,1],[1,1],[1,2]], [[0,1],[0,2],[1,0],[1,1]] ];
     const bColors = ['#e74c3c', '#f1c40f', '#9b59b6', '#2ecc71', '#3498db', '#e67e22', '#1abc9c', '#e84393'];
@@ -1207,7 +1393,7 @@
     function startJourneyLevel(level) {
         isJourneyMode = true;
         currentJourneyLevel = level;
-        blockTargetScore = 150 + (level * 50); // Cập nhật mốc điểm cho hợp lý với hệ số điểm mới
+        blockTargetScore = 150 + (level * 50); 
         
         resetBlockBoard();
         document.getElementById('target-container').classList.remove('hidden');
@@ -1350,7 +1536,6 @@
                 let cell = document.querySelectorAll('.cell-b')[(r+dr)*8 + c+dc];
                 cell.classList.add('filled'); cell.style.backgroundColor = actColor; cell.style.boxShadow = 'inset 0 0 6px rgba(0,0,0,0.2)';
             });
-            // Điểm cơ bản x10
             bScore += actSh.length * 10; 
             document.getElementById(`slot-${actIdx}`).innerHTML=''; checkClearB();
             if(Array.from(document.querySelectorAll('.piece-slot')).every(s=>s.innerHTML==='')) { refillPieces(); }
@@ -1375,7 +1560,6 @@
         let cleared = rs.length + cs.length;
         if(cleared > 0){
             bCombo++; 
-            // Hệ thống điểm mới: Hàng đầu 100đ, các hàng sau x150. Combo x50đ
             let basePts = cleared * 100;
             if(cleared > 1) basePts += (cleared - 1) * 150;
             let comboBonus = bCombo > 1 ? (bCombo * 50) : 0;
@@ -1422,7 +1606,6 @@
         } 
     }
 
-    // --- HỆ THỐNG KẾT QUẢ VÀ LỊCH SỬ ---
     const winMemes = [
         "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjJreHludXhxdmRkbjNkYTgwanhmemc0d2JnNm45YXd5ajV4MWRiZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/lnlAifQdenMxW/giphy.gif",
         "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjJreHludXhxdmRkbjNkYTgwanhmemc0d2JnNm45YXd5ajV4MWRiZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/GxIdtANXpn3qL1FG25/giphy.gif",
@@ -1451,7 +1634,6 @@
         document.getElementById('overlay').style.display = 'block'; 
     }
 
-    // Lịch sử nay đã tách riêng từng mục: ecoHub_sudoku, ecoHub_block, v.v..
     function saveHistory(mode, result){ 
         let storageKey = 'ecoHub_' + mode;
         let h=JSON.parse(localStorage.getItem(storageKey)||'[]'); 
@@ -1501,9 +1683,8 @@
         }
     }
 
-    // Initialize
-    toggleLang(); // Gọi 1 lần để set vi/en ban đầu
-    toggleLang(); // Chuyển lại đúng ngôn ngữ gốc
+    toggleLang(); 
+    toggleLang(); 
     openMode('menu');
 </script>
 </body>
