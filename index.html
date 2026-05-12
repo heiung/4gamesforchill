@@ -2,8 +2,12 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4games4chill - Created by HeiuNG</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta property="og:title" content="FOUR GAMES FOR FUN">
+    <meta property="og:image" content="logo.png">
+    <link rel="icon" href="logo.png">
+    
+    <title>FOUR GAMES FOR FUN - Created by HeiuNG</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -12,12 +16,32 @@
             --text: #2c3e50; --border: #dcdde1;
         }
 
+        /* Chống bôi đen, bôi xanh văn bản khi chạm giữ trên điện thoại */
+        * {
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10 and IE 11 */
+            user-select: none; /* Standard syntax */
+            -webkit-touch-callout: none;
+        }
+
         body {
-            background: radial-gradient(circle at top, #e8f5e9, #f4f7f6);
+            background-color: var(--bg);
             color: var(--text); font-family: 'Segoe UI', Tahoma, sans-serif;
             margin: 0; padding: 0; display: block;
             width: 100vw; height: 100vh; overflow: hidden; touch-action: none;
             position: relative; 
+            z-index: 0;
+        }
+
+        /* Hình nền phong cảnh chìm */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            /* Thay link ảnh phong cảnh Việt Nam của bạn vào đây nếu cần */
+            background: url('https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
+            opacity: 0.12; /* Độ mờ chìm để không chói mắt */
+            z-index: -1;
         }
 
         .container-box {
@@ -30,7 +54,6 @@
             transition: all 0.3s ease; box-sizing: border-box;
         }
 
-        /* Tùy chỉnh thanh cuộn cho container */
         .container-box::-webkit-scrollbar { width: 6px; }
         .container-box::-webkit-scrollbar-track { background: transparent; }
         .container-box::-webkit-scrollbar-thumb { background: #bdc3c7; border-radius: 10px; }
@@ -54,11 +77,10 @@
             border-radius: 12px; width: 45px; height: 45px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin: 0; padding: 0;
+            margin: 0; padding: 0; flex-shrink: 0;
         }
         .btn-back:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateX(-3px); }
 
-        /* Nút Xem Lại Bàn Cờ Nổi */
         #btn-show-result {
             position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
             z-index: 998; padding: 12px 25px; background: var(--primary-dark); color: white;
@@ -68,7 +90,6 @@
         }
         #btn-show-result:hover { background: var(--primary); transform: translateX(-50%) scale(1.05); }
 
-        /* Giao diện Menu Chính (Dạng Grid Ảnh) */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; margin-bottom: 15px; }
         .menu-card {
             background: #fff; border: 2px solid var(--border); border-radius: 15px;
@@ -84,18 +105,15 @@
         .menu-card h3 { margin: 0; font-size: 0.95rem; color: var(--text); font-weight: bold; }
 
         .setup-group { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 15px; margin-bottom: 15px; }
-        
         .custom-radio-group { display: flex; gap: 8px; flex-wrap: wrap; margin: 5px 0 15px 0; }
         .custom-radio { 
             flex: 1; padding: 10px; border: 2px solid var(--primary); 
             border-radius: 12px; cursor: pointer; font-weight: bold; color: var(--primary-dark);
             transition: 0.2s; text-align: center; font-size: 0.9rem; background: #fff; box-sizing: border-box;
-            user-select: none;
         }
         .custom-radio:hover { background: #e8f5e9; }
         .custom-radio.active { background: var(--primary); color: white; transform: scale(1.05); box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); border-color: var(--primary-dark); }
 
-        /* Bảng Điểm 2 Người Chơi / AI */
         .pvp-scoreboard {
             display: flex; justify-content: space-between; align-items: center;
             background: linear-gradient(135deg, #3498db, #9b59b6); padding: 10px 15px;
@@ -105,8 +123,7 @@
         .pvp-scoreboard .vs { font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 8px; }
         .score-badge { background: white; padding: 2px 10px; border-radius: 8px; margin: 0 5px; color: #d35400; font-size: 1.1rem; }
 
-        /* UI Hành Trình Mới (Block Blast Journey) */
-        .journey-map-container { height: 400px; overflow-y: auto; padding: 20px 0; position: relative; scroll-behavior: smooth; border-radius: 15px; background: rgba(0,0,0,0.02); border: 2px solid var(--border);}
+        .journey-map-container { height: 400px; overflow-y: auto; padding: 20px 0; position: relative; scroll-behavior: smooth; border-radius: 15px; background: rgba(255,255,255,0.8); border: 2px solid var(--border);}
         .journey-map-container::-webkit-scrollbar { width: 5px; }
         .journey-map-container::-webkit-scrollbar-thumb { background: #bdc3c7; border-radius: 10px; }
         .j-path-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; padding: 40px 0;}
@@ -133,7 +150,7 @@
         .grid-b { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; background: #ecf0f1; border-radius: 8px; padding: 10px; margin: 0 auto 15px; width: 320px; height: 320px; box-sizing: border-box; position: relative; }
         .cell-b { background: #bdc3c7; border-radius: 4px; transition: 0.1s; position: relative; }
         .cell-b.preview::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(46, 204, 113, 0.4); border: 2px dashed var(--primary-dark); border-radius: 4px; box-sizing: border-box; pointer-events: none; z-index: 2; }
-        .pieces-area { display: flex; justify-content: space-around; height: 110px; background: #f9f9f9; border-radius: 12px; align-items: center; overflow: hidden; }
+        .pieces-area { display: flex; justify-content: space-around; height: 110px; background: rgba(255,255,255,0.8); border-radius: 12px; align-items: center; overflow: hidden; }
         .piece-slot { width: 95px; height: 95px; display: flex; justify-content: center; align-items: center; position: relative; }
         .piece { display: grid; gap: 4px; cursor: grab; touch-action: none; width: max-content; height: max-content; }
         .p-cell { width: 34px; height: 34px; border-radius: 4px; pointer-events: none; box-shadow: inset 0 0 6px rgba(0,0,0,0.2); }
@@ -147,7 +164,7 @@
         .cell-ttt { 
             background: #fff; display: flex; align-items: center; justify-content: center; 
             font-weight: bold; color: var(--text); cursor: pointer; transition: 0.2s; 
-            line-height: 1; margin: 0; padding: 0; box-sizing: border-box; user-select: none;
+            line-height: 1; margin: 0; padding: 0; box-sizing: border-box;
         }
         .cell-ttt:hover { background: #f4f7f6; }
         .cell-ttt.x { color: #e74c3c; }
@@ -160,7 +177,7 @@
             border: 6px solid #4a3018; border-radius: 6px; box-shadow: 0 8px 25px rgba(0,0,0,0.25);
             box-sizing: content-box; 
         }
-        .sq { width: 40px; height: 40px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; line-height: 1; cursor: pointer; position: relative; user-select: none; overflow: hidden; }
+        .sq { width: 40px; height: 40px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; line-height: 1; cursor: pointer; position: relative; overflow: hidden; }
         .sq.light { background: #eeeed2; } .sq.dark { background: #769656; }
         .sq.selected { background: #f6f669 !important; }
         .sq.valid::after { content: ''; width: 14px; height: 14px; background: rgba(0, 0, 0, 0.3); border-radius: 50%; position: absolute; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
@@ -175,7 +192,7 @@
             border: 4px solid #8b4513; border-radius: 4px; box-shadow: 0 8px 25px rgba(0,0,0,0.2);
         }
         .cc-sq { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; z-index: 5; cursor: pointer; position: relative; }
-        .cc-piece { width: 32px; height: 32px; border-radius: 50%; background: radial-gradient(circle at 10px 10px, #fff, #e0e0e0); border: 2px solid #555; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; box-shadow: 2px 3px 5px rgba(0,0,0,0.4), inset -1px -2px 3px rgba(0,0,0,0.2); user-select: none; transition: transform 0.1s; }
+        .cc-piece { width: 32px; height: 32px; border-radius: 50%; background: radial-gradient(circle at 10px 10px, #fff, #e0e0e0); border: 2px solid #555; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; box-shadow: 2px 3px 5px rgba(0,0,0,0.4), inset -1px -2px 3px rgba(0,0,0,0.2); transition: transform 0.1s; }
         .cc-piece.red { color: #c0392b; border-color: #922b21; }
         .cc-piece.black { color: #2c3e50; border-color: #1a252f; }
         .cc-sq.selected .cc-piece { transform: translateY(-3px) scale(1.1); border-color: #f1c40f; box-shadow: 0 5px 15px rgba(241,196,15,0.6); }
@@ -196,23 +213,23 @@
     <h2 id="modal-title" style="margin:0; color:var(--primary-dark); font-size:1.8rem; text-transform:uppercase;">KẾT QUẢ!</h2>
     <img id="memeImg" src="" alt="Meme">
     <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
-        <button class="btn" style="padding:12px; background:#3498db; font-size:1.1rem;" onclick="closeWin(true)">🔄 CHƠI LẠI</button>
+        <button class="btn" data-i18n="play_again" style="padding:12px; background:#3498db; font-size:1.1rem;" onclick="closeWin(true)">🔄 CHƠI LẠI</button>
         <div style="display:flex; gap:10px;">
-            <button class="btn btn-outline" style="flex:1; padding:10px; margin:0;" onclick="hideModalForReview()">👁️ XEM LẠI</button>
-            <button class="btn btn-outline" style="flex:1; padding:10px; margin:0; border-color:#e74c3c; color:#e74c3c;" onclick="closeWin(false)">🏠 MENU</button>
+            <button class="btn btn-outline" data-i18n="review" style="flex:1; padding:10px; margin:0;" onclick="hideModalForReview()">👁️ XEM LẠI</button>
+            <button class="btn btn-outline" data-i18n="menu" style="flex:1; padding:10px; margin:0; border-color:#e74c3c; color:#e74c3c;" onclick="closeWin(false)">🏠 MENU</button>
         </div>
     </div>
 </div>
 
 <div class="container-box">
     
-    <button id="btn-show-result" class="hidden" onclick="showResultModal()">🔙 Mở Bảng Kết Quả</button>
+    <button id="btn-show-result" class="hidden" data-i18n="show_result" onclick="showResultModal()">🔙 Mở Bảng Kết Quả</button>
 
     <div id="page-menu">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
             <div style="text-align: left;">
-                <h1 id="ui-title">4GAMES4CHILL</h1>
-                <p class="subtitle">Created by HeiuNG</p>
+                <h1 id="ui-title">FOUR GAMES FOR FUN</h1>
+                <p class="subtitle" data-i18n="subtitle">Created by HeiuNG</p>
             </div>
             <button class="btn-outline" onclick="toggleLang()" id="btn-lang" style="padding:5px 10px; border-radius:10px; font-size:0.8rem; cursor:pointer; font-weight:bold; border-width:2px; height:max-content; white-space:nowrap;">🇺🇸 EN</button>
         </div>
@@ -225,61 +242,40 @@
                     <line x1="63" y1="10" x2="63" y2="90" stroke="#333" stroke-width="2"/>
                     <line x1="10" y1="36" x2="90" y2="36" stroke="#333" stroke-width="2"/>
                     <line x1="10" y1="63" x2="90" y2="63" stroke="#333" stroke-width="2"/>
-                    <rect x="10" y="10" width="80" height="80" rx="8" fill="none" stroke="#333" stroke-width="5"/>
                     <text x="23" y="28" font-size="18" font-family="sans-serif" font-weight="bold" fill="#27ae60" text-anchor="middle" dominant-baseline="central">5</text>
                     <text x="50" y="50" font-size="18" font-family="sans-serif" font-weight="bold" fill="#2c3e50" text-anchor="middle" dominant-baseline="central">8</text>
                     <text x="76" y="76" font-size="18" font-family="sans-serif" font-weight="bold" fill="#27ae60" text-anchor="middle" dominant-baseline="central">1</text>
                     <text x="76" y="28" font-size="18" font-family="sans-serif" font-weight="bold" fill="#2c3e50" text-anchor="middle" dominant-baseline="central">3</text>
-                    <rect x="40" y="15" width="20" height="20" fill="#a2d9b5" opacity="0.5" rx="3"/>
                 </svg>
-                <h3>SUDOKU</h3>
+                <h3 data-i18n="sudoku">SUDOKU</h3>
             </div>
             <div class="menu-card" style="border-color: #3498db;" onclick="openMode('block-menu')">
                 <svg viewBox="0 0 100 100" class="menu-img">
-                    <defs>
-                        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-                            <feDropShadow dx="2" dy="4" stdDeviation="2" flood-opacity="0.2"/>
-                        </filter>
-                    </defs>
-                    <g filter="url(#shadow)">
-                        <rect x="15" y="45" width="20" height="20" rx="4" fill="#3498db"/>
-                        <rect x="37" y="45" width="20" height="20" rx="4" fill="#3498db"/>
-                        <rect x="15" y="67" width="20" height="20" rx="4" fill="#3498db"/>
-                        <rect x="37" y="67" width="20" height="20" rx="4" fill="#3498db"/>
-                    </g>
-                    <g filter="url(#shadow)">
-                        <rect x="59" y="23" width="20" height="20" rx="4" fill="#e67e22"/>
-                        <rect x="59" y="45" width="20" height="20" rx="4" fill="#e67e22"/>
-                        <rect x="59" y="67" width="20" height="20" rx="4" fill="#e67e22"/>
-                        <rect x="81" y="67" width="20" height="20" rx="4" fill="#e67e22"/>
-                    </g>
-                    <g filter="url(#shadow)">
-                        <rect x="15" y="23" width="20" height="20" rx="4" fill="#e74c3c"/>
-                        <rect x="37" y="23" width="20" height="20" rx="4" fill="#e74c3c"/>
-                    </g>
+                    <rect x="15" y="45" width="20" height="20" rx="4" fill="#3498db"/>
+                    <rect x="37" y="45" width="20" height="20" rx="4" fill="#3498db"/>
+                    <rect x="15" y="67" width="20" height="20" rx="4" fill="#3498db"/>
+                    <rect x="37" y="67" width="20" height="20" rx="4" fill="#3498db"/>
+                    <rect x="59" y="23" width="20" height="20" rx="4" fill="#e67e22"/>
+                    <rect x="59" y="45" width="20" height="20" rx="4" fill="#e67e22"/>
+                    <rect x="59" y="67" width="20" height="20" rx="4" fill="#e67e22"/>
+                    <rect x="81" y="67" width="20" height="20" rx="4" fill="#e67e22"/>
+                    <rect x="15" y="23" width="20" height="20" rx="4" fill="#e74c3c"/>
+                    <rect x="37" y="23" width="20" height="20" rx="4" fill="#e74c3c"/>
                 </svg>
-                <h3>BLOCK BLAST</h3>
+                <h3 data-i18n="block_blast">BLOCK BLAST</h3>
             </div>
             <div class="menu-card" style="border-color: #e67e22;" onclick="openMode('board-menu')">
                 <svg viewBox="0 0 100 100" class="menu-img">
-                    <defs>
-                        <filter id="c-shadow">
-                            <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.3"/>
-                        </filter>
-                    </defs>
                     <g transform="translate(10,10)">
                         <rect width="80" height="80" rx="8" fill="#eeeed2" stroke="#4a3018" stroke-width="4"/>
                         <rect x="0" y="0" width="40" height="40" fill="#769656" rx="4"/>
                         <rect x="40" y="40" width="40" height="40" fill="#769656" rx="4"/>
                     </g>
-                    <text x="30" y="48" font-size="40" fill="#fff" stroke="#000" stroke-width="1" text-anchor="middle" filter="url(#c-shadow)">♙</text>
-                    <g filter="url(#c-shadow)">
-                        <circle cx="70" cy="70" r="22" fill="#fcebb6" stroke="#8b4513" stroke-width="3"/>
-                        <circle cx="70" cy="70" r="16" fill="none" stroke="#c0392b" stroke-width="1"/>
-                        <text x="70" y="77" font-size="20" font-family="sans-serif" font-weight="900" fill="#c0392b" text-anchor="middle">砲</text>
-                    </g>
+                    <text x="30" y="48" font-size="40" fill="#fff" stroke="#000" stroke-width="1" text-anchor="middle">♙</text>
+                    <circle cx="70" cy="70" r="22" fill="#fcebb6" stroke="#8b4513" stroke-width="3"/>
+                    <text x="70" y="77" font-size="20" font-family="sans-serif" font-weight="900" fill="#c0392b" text-anchor="middle">砲</text>
                 </svg>
-                <h3>GAME CỜ</h3>
+                <h3 data-i18n="chess_game">GAME CỜ</h3>
             </div>
             <div class="menu-card" style="border-color: #9b59b6;" onclick="openMode('ttt-menu')">
                 <svg viewBox="0 0 100 100" class="menu-img">
@@ -292,103 +288,107 @@
                         <line x1="20" y1="20" x2="30" y2="30" stroke="#e74c3c"/>
                         <line x1="30" y1="20" x2="20" y2="30" stroke="#e74c3c"/>
                         <circle cx="50" cy="50" r="9" fill="none" stroke="#3498db"/>
-                        <line x1="68" y1="68" x2="78" y2="78" stroke="#e74c3c"/>
-                        <line x1="78" y1="68" x2="68" y2="78" stroke="#e74c3c"/>
                     </g>
                 </svg>
-                <h3>TIC TAC TOE</h3>
+                <h3 data-i18n="ttt">TIC TAC TOE</h3>
             </div>
         </div>
-
-        <button class="btn btn-outline" id="ui-h-btn" onclick="openMode('history')" style="margin-top: 5px;">LỊCH SỬ THÀNH TÍCH</button>
     </div>
 
     <div id="page-block-menu" class="hidden">
-        <div style="display:flex; align-items:center; margin-bottom:20px; gap:15px;">
-            <button class="btn-back" onclick="openMode('menu')">❮</button>
-            <h2 style="color:var(--primary-dark); margin:0;">BLOCK BLAST</h2>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <button class="btn-back" onclick="openMode('menu')">❮</button>
+                <h2 data-i18n="block_blast" style="color:var(--primary-dark); margin:0;">BLOCK BLAST</h2>
+            </div>
+            <button class="btn btn-outline" data-i18n="history" onclick="openMode('history', 'block')" style="padding:5px 10px; border-radius:10px; font-size:0.8rem; height:max-content; width:max-content;">LỊCH SỬ</button>
         </div>
-        <button class="btn" style="background:#3498db; padding:20px; font-size:1.2rem; margin-bottom:15px;" onclick="openMode('block')">🟦 CHẾ ĐỘ CỔ ĐIỂN</button>
-        <button class="btn" style="background:#e67e22; padding:20px; font-size:1.2rem;" onclick="openMode('block-journey')">🏆 CHẾ ĐỘ THỬ THÁCH</button>
+        <button class="btn" data-i18n="classic_mode" style="background:#3498db; padding:20px; font-size:1.2rem; margin-bottom:15px;" onclick="openMode('block')">🟦 CHẾ ĐỘ CỔ ĐIỂN</button>
+        <button class="btn" data-i18n="challenge_mode" style="background:#e67e22; padding:20px; font-size:1.2rem;" onclick="openMode('block-journey')">🏆 CHẾ ĐỘ THỬ THÁCH</button>
     </div>
 
     <div id="page-block-journey" class="hidden">
         <div style="display:flex; align-items:center; margin-bottom:10px; gap:15px;">
             <button class="btn-back" onclick="openMode('block-menu')">❮</button>
-            <h2 style="color:var(--primary-dark); margin:0;">HÀNH TRÌNH 200 MỐC</h2>
+            <h2 data-i18n="journey_200" style="color:var(--primary-dark); margin:0;">HÀNH TRÌNH 200 MỐC</h2>
         </div>
         <div class="journey-map-container" id="journey-scroll">
-            <div class="j-path-wrapper" id="journey-map">
-                </div>
+            <div class="j-path-wrapper" id="journey-map"></div>
         </div>
     </div>
 
     <div id="page-board-menu" class="hidden">
-        <div style="display:flex; align-items:center; margin-bottom:15px; gap:15px;">
-            <button class="btn-back" onclick="openMode('menu')">❮</button>
-            <h2 style="color:var(--primary-dark); margin:0;">GAME CỜ</h2>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px;">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <button class="btn-back" onclick="openMode('menu')">❮</button>
+                <h2 data-i18n="chess_game" style="color:var(--primary-dark); margin:0;">GAME CỜ</h2>
+            </div>
+            <button class="btn btn-outline" data-i18n="history" onclick="openMode('history', 'chess')" style="padding:5px 10px; border-radius:10px; font-size:0.8rem; height:max-content; width:max-content;">LỊCH SỬ</button>
         </div>
         <div class="setup-group">
-            <div style="font-weight:bold; text-align:left; color:var(--text);">Loại Cờ:</div>
+            <div data-i18n="chess_type" style="font-weight:bold; text-align:left; color:var(--text);">Loại Cờ:</div>
             <div class="custom-radio-group" id="c-type-group">
-                <div class="custom-radio active" onclick="setOption('boardGameType', 'chess', this, 'c-type-group')">Cờ Vua</div>
-                <div class="custom-radio" onclick="setOption('boardGameType', 'cchess', this, 'c-type-group')">Cờ Tướng</div>
+                <div class="custom-radio active" data-i18n="chess" onclick="setOption('boardGameType', 'chess', this, 'c-type-group')">Cờ Vua</div>
+                <div class="custom-radio" data-i18n="xiangqi" onclick="setOption('boardGameType', 'cchess', this, 'c-type-group')">Cờ Tướng</div>
             </div>
 
-            <div style="font-weight:bold; text-align:left; color:var(--text);">Chế độ:</div>
+            <div data-i18n="game_mode" style="font-weight:bold; text-align:left; color:var(--text);">Chế độ:</div>
             <div class="custom-radio-group" id="c-mode-group">
-                <div class="custom-radio active" onclick="setOption('boardMode', 'pvp', this, 'c-mode-group')">2 Người (PvP)</div>
-                <div class="custom-radio" onclick="setOption('boardMode', 'pve', this, 'c-mode-group')">Đấu AI (PvE)</div>
+                <div class="custom-radio active" data-i18n="pvp" onclick="setOption('boardMode', 'pvp', this, 'c-mode-group')">2 Người (PvP)</div>
+                <div class="custom-radio" data-i18n="pve" onclick="setOption('boardMode', 'pve', this, 'c-mode-group')">Đấu AI (PvE)</div>
             </div>
 
             <div id="board-diff-container" style="display:none;">
-                <div style="font-weight:bold; text-align:left; color:var(--text);">Độ khó AI:</div>
+                <div data-i18n="ai_diff" style="font-weight:bold; text-align:left; color:var(--text);">Độ khó AI:</div>
                 <div class="custom-radio-group" id="c-diff-group">
-                    <div class="custom-radio active" onclick="setOption('boardAiDiff', 1, this, 'c-diff-group')">Dễ</div>
-                    <div class="custom-radio" onclick="setOption('boardAiDiff', 2, this, 'c-diff-group')">TB</div>
-                    <div class="custom-radio" onclick="setOption('boardAiDiff', 3, this, 'c-diff-group')">Khó</div>
-                    <div class="custom-radio" onclick="setOption('boardAiDiff', 4, this, 'c-diff-group')">Cực Khó</div>
+                    <div class="custom-radio active" data-i18n="easy" onclick="setOption('boardAiDiff', 1, this, 'c-diff-group')">Dễ</div>
+                    <div class="custom-radio" data-i18n="med" onclick="setOption('boardAiDiff', 2, this, 'c-diff-group')">TB</div>
+                    <div class="custom-radio" data-i18n="hard" onclick="setOption('boardAiDiff', 3, this, 'c-diff-group')">Khó</div>
+                    <div class="custom-radio" data-i18n="extreme" onclick="setOption('boardAiDiff', 4, this, 'c-diff-group')">Cực Khó</div>
                 </div>
             </div>
         </div>
-        <button class="btn" onclick="initBoardGame(true)">BẮT ĐẦU</button>
+        <button class="btn" data-i18n="start" onclick="initBoardGame(true)">BẮT ĐẦU</button>
     </div>
 
     <div id="page-ttt-menu" class="hidden">
-        <div style="display:flex; align-items:center; margin-bottom:15px; gap:15px;">
-            <button class="btn-back" onclick="openMode('menu')">❮</button>
-            <h2 style="color:var(--primary-dark); margin:0;">TIC TAC TOE</h2>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px;">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <button class="btn-back" onclick="openMode('menu')">❮</button>
+                <h2 data-i18n="ttt" style="color:var(--primary-dark); margin:0;">TIC TAC TOE</h2>
+            </div>
+            <button class="btn btn-outline" data-i18n="history" onclick="openMode('history', 'ttt')" style="padding:5px 10px; border-radius:10px; font-size:0.8rem; height:max-content; width:max-content;">LỊCH SỬ</button>
         </div>
         <div class="setup-group">
-            <div style="font-weight:bold; text-align:left; color:var(--text);">Kích thước Bàn cờ:</div>
+            <div data-i18n="board_size" style="font-weight:bold; text-align:left; color:var(--text);">Kích thước Bàn cờ:</div>
             <div class="custom-radio-group" id="t-size-group">
                 <div class="custom-radio active" onclick="setOption('tttSize', 3, this, 't-size-group')">3x3</div>
                 <div class="custom-radio" onclick="setOption('tttSize', 7, this, 't-size-group')">7x7</div>
                 <div class="custom-radio" onclick="setOption('tttSize', 9, this, 't-size-group')">9x9</div>
             </div>
 
-            <div style="font-weight:bold; text-align:left; color:var(--text);">Chế độ chơi:</div>
+            <div data-i18n="game_mode" style="font-weight:bold; text-align:left; color:var(--text);">Chế độ chơi:</div>
             <div class="custom-radio-group" id="t-mode-group">
-                <div class="custom-radio active" onclick="setOption('tttMode', 'pvp', this, 't-mode-group')">2 Người (PvP)</div>
-                <div class="custom-radio" onclick="setOption('tttMode', 'pve', this, 't-mode-group')">Đấu AI (PvE)</div>
+                <div class="custom-radio active" data-i18n="pvp" onclick="setOption('tttMode', 'pvp', this, 't-mode-group')">2 Người (PvP)</div>
+                <div class="custom-radio" data-i18n="pve" onclick="setOption('tttMode', 'pve', this, 't-mode-group')">Đấu AI (PvE)</div>
             </div>
 
             <div id="ttt-diff-container" style="display:none;">
-                <div style="font-weight:bold; text-align:left; color:var(--text);">Độ khó AI:</div>
+                <div data-i18n="ai_diff" style="font-weight:bold; text-align:left; color:var(--text);">Độ khó AI:</div>
                 <div class="custom-radio-group" id="t-diff-group">
-                    <div class="custom-radio active" onclick="setOption('tttAiDiff', 1, this, 't-diff-group')">Dễ</div>
-                    <div class="custom-radio" onclick="setOption('tttAiDiff', 2, this, 't-diff-group')">TB</div>
-                    <div class="custom-radio" onclick="setOption('tttAiDiff', 3, this, 't-diff-group')">Khó</div>
-                    <div class="custom-radio" onclick="setOption('tttAiDiff', 4, this, 't-diff-group')">Cực Khó</div>
+                    <div class="custom-radio active" data-i18n="easy" onclick="setOption('tttAiDiff', 1, this, 't-diff-group')">Dễ</div>
+                    <div class="custom-radio" data-i18n="med" onclick="setOption('tttAiDiff', 2, this, 't-diff-group')">TB</div>
+                    <div class="custom-radio" data-i18n="hard" onclick="setOption('tttAiDiff', 3, this, 't-diff-group')">Khó</div>
+                    <div class="custom-radio" data-i18n="extreme" onclick="setOption('tttAiDiff', 4, this, 't-diff-group')">Cực Khó</div>
                 </div>
             </div>
         </div>
-        <button class="btn" onclick="initTTT(true)">BẮT ĐẦU</button>
+        <button class="btn" data-i18n="start" onclick="initTTT(true)">BẮT ĐẦU</button>
     </div>
 
     <div id="page-ttt" class="hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <button class="btn-back" onclick="openMode('menu')">❮</button>
+            <button class="btn-back" onclick="openMode('ttt-menu')">❮</button>
             <div id="turn-ttt" class="timer">Lượt của X</div>
             <div style="width:45px;"></div>
         </div>
@@ -402,7 +402,7 @@
 
     <div id="page-chess" class="hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <button class="btn-back" onclick="openMode('menu')">❮</button>
+            <button class="btn-back" onclick="openMode('board-menu')">❮</button>
             <div id="turn-chess" class="timer">White's Turn</div>
             <button class="btn btn-outline" id="chess-undo-btn" style="width:auto; padding:5px 10px; margin:0; border-radius:10px;" onclick="undoChess()">Undo (3)</button>
         </div>
@@ -422,7 +422,7 @@
 
     <div id="page-cchess" class="hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <button class="btn-back" onclick="openMode('menu')">❮</button>
+            <button class="btn-back" onclick="openMode('board-menu')">❮</button>
             <div id="turn-cchess" class="timer" style="color:#c0392b;">Đỏ đi</div>
             <button class="btn btn-outline" id="cchess-undo-btn" style="width:auto; padding:5px 10px; margin:0; border-radius:10px;" onclick="undoCChess()">Undo (3)</button>
         </div>
@@ -440,12 +440,12 @@
             <div style="display:flex; flex-direction:column; align-items:center;">
                 <div class="timer" id="timer-s" style="line-height:1;">00:00</div>
                 <div style="display:flex; justify-content:center; gap:5px; margin-top:5px;" id="s-diff-group">
-                    <div id="opt-e" class="custom-radio" style="padding:4px 10px; font-size:0.8rem; flex:none;" onclick="setOption('sudokuDiff', 30, this, 's-diff-group')">Dễ</div>
-                    <div id="opt-m" class="custom-radio active" style="padding:4px 10px; font-size:0.8rem; flex:none;" onclick="setOption('sudokuDiff', 45, this, 's-diff-group')">TB</div>
-                    <div id="opt-h" class="custom-radio" style="padding:4px 10px; font-size:0.8rem; flex:none;" onclick="setOption('sudokuDiff', 55, this, 's-diff-group')">Khó</div>
+                    <div id="opt-e" class="custom-radio" data-i18n="easy" style="padding:4px 10px; font-size:0.8rem; flex:none;" onclick="setOption('sudokuDiff', 30, this, 's-diff-group')">Dễ</div>
+                    <div id="opt-m" class="custom-radio active" data-i18n="med" style="padding:4px 10px; font-size:0.8rem; flex:none;" onclick="setOption('sudokuDiff', 45, this, 's-diff-group')">TB</div>
+                    <div id="opt-h" class="custom-radio" data-i18n="hard" style="padding:4px 10px; font-size:0.8rem; flex:none;" onclick="setOption('sudokuDiff', 55, this, 's-diff-group')">Khó</div>
                 </div>
             </div>
-            <div style="width:45px;"></div>
+            <button class="btn btn-outline" data-i18n="history" onclick="openMode('history', 'sudoku')" style="padding:5px 10px; border-radius:10px; font-size:0.8rem; height:max-content; width:max-content; margin: 0;">LỊCH SỬ</button>
         </div>
         <div id="grid-s" class="grid-s"></div>
         <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:6px;">
@@ -453,8 +453,8 @@
             <button class="num-btn" onclick="inputS(6)">6</button><button class="num-btn" onclick="inputS(7)">7</button><button class="num-btn" onclick="inputS(8)">8</button><button class="num-btn" onclick="inputS(9)">9</button><button class="num-btn" onclick="inputS(0)">⌫</button>
         </div>
         <div style="display:flex; gap:10px; margin-top:15px;">
-            <button class="btn btn-outline" id="btn-hint" onclick="getHint()" style="margin:0; flex:1;">GỢI Ý (+10s)</button>
-            <button class="btn" style="margin:0; flex:1; background:#34495e;" id="btn-ai" onclick="solveByAI()">AI GIẢI</button>
+            <button class="btn btn-outline" id="btn-hint" data-i18n="hint" onclick="getHint()" style="margin:0; flex:1;">GỢI Ý (+10s)</button>
+            <button class="btn" style="margin:0; flex:1; background:#34495e;" id="btn-ai" data-i18n="ai_solve" onclick="solveByAI()">AI GIẢI</button>
         </div>
     </div>
 
@@ -466,7 +466,7 @@
         </div>
         
         <div id="target-container" class="hidden" style="background:#e67e22; color:white; padding:8px 15px; border-radius:10px; font-weight:bold; margin-bottom:10px; text-align:center; font-size:1.1rem; box-shadow:0 3px 10px rgba(230,126,34,0.3);">
-            🎯 MỤC TIÊU MỐC <span id="current-j-level"></span>: <span id="target-b">0</span>
+            <span data-i18n="target_lvl">🎯 MỤC TIÊU MỐC</span> <span id="current-j-level"></span>: <span id="target-b">0</span>
         </div>
 
         <div id="board-b" class="grid-b"></div>
@@ -477,18 +477,69 @@
 
     <div id="page-history" class="hidden">
         <div style="display:flex; align-items:center; margin-bottom:15px; gap:15px;">
-            <button class="btn-back" onclick="openMode('menu')">❮</button>
-            <h2 id="ui-h" style="color:var(--primary-dark); margin:0;">LỊCH SỬ GIẢI</h2>
+            <button class="btn-back" id="btn-back-history" onclick="openMode('menu')">❮</button>
+            <h2 id="ui-h" data-i18n="history_title" style="color:var(--primary-dark); margin:0;">LỊCH SỬ GIẢI</h2>
         </div>
         <div id="history-list" style="text-align:left; max-height:350px; overflow-y:auto; border-top:1px solid #eee; padding-top:10px;"></div>
     </div>
 </div>
 
 <script>
+    // --- ĐA NGÔN NGỮ (i18n) TOÀN DIỆN ---
+    let currentLang = 'vi';
+    const i18n = {
+        vi: { 
+            subtitle: "Created by HeiuNG", lang: "🇺🇸 EN",
+            sudoku: "SUDOKU", block_blast: "BLOCK BLAST", chess_game: "GAME CỜ", ttt: "TIC TAC TOE",
+            history: "LỊCH SỬ", history_title: "LỊCH SỬ CHƠI", play_again: "🔄 CHƠI LẠI", review: "👁️ XEM LẠI", menu: "🏠 MENU", show_result: "🔙 Mở Bảng Kết Quả",
+            classic_mode: "🟦 CHẾ ĐỘ CỔ ĐIỂN", challenge_mode: "🏆 CHẾ ĐỘ THỬ THÁCH", journey_200: "HÀNH TRÌNH 200 MỐC",
+            chess_type: "Loại Cờ:", chess: "Cờ Vua", xiangqi: "Cờ Tướng", game_mode: "Chế độ:", pvp: "2 Người (PvP)", pve: "Đấu AI (PvE)",
+            ai_diff: "Độ khó AI:", easy: "Dễ", med: "TB", hard: "Khó", extreme: "Cực Khó", board_size: "Kích thước Bàn cờ:",
+            start: "BẮT ĐẦU", hint: "GỢI Ý (+10s)", ai_solve: "AI GIẢI", target_lvl: "🎯 MỤC TIÊU MỐC",
+            turn_w: "Lượt Trắng", turn_b: "Lượt Đen", turn_r: "Lượt Đỏ", turn_bl: "Lượt Đen", turn_x: "Lượt của X", turn_o: "Lượt của O"
+        },
+        en: { 
+            subtitle: "Created by HeiuNG", lang: "🇻🇳 VN",
+            sudoku: "SUDOKU", block_blast: "BLOCK BLAST", chess_game: "BOARD GAMES", ttt: "TIC TAC TOE",
+            history: "HISTORY", history_title: "MATCH HISTORY", play_again: "🔄 REPLAY", review: "👁️ REVIEW", menu: "🏠 MENU", show_result: "🔙 Show Results",
+            classic_mode: "🟦 CLASSIC MODE", challenge_mode: "🏆 CHALLENGE MODE", journey_200: "200 LEVELS JOURNEY",
+            chess_type: "Game Type:", chess: "Chess", xiangqi: "Xiangqi", game_mode: "Mode:", pvp: "2 Players (PvP)", pve: "vs AI (PvE)",
+            ai_diff: "AI Diff:", easy: "Easy", med: "Med", hard: "Hard", extreme: "Expert", board_size: "Board Size:",
+            start: "START", hint: "HINT (+10s)", ai_solve: "AI SOLVE", target_lvl: "🎯 TARGET LEVEL",
+            turn_w: "White's Turn", turn_b: "Black's Turn", turn_r: "Red's Turn", turn_bl: "Black's Turn", turn_x: "X's Turn", turn_o: "O's Turn"
+        }
+    };
+
+    function toggleLang() {
+        currentLang = (currentLang === 'vi') ? 'en' : 'vi';
+        const t = i18n[currentLang];
+        document.getElementById('btn-lang').innerText = t.lang;
+        
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            let key = el.getAttribute('data-i18n');
+            if (t[key]) el.innerText = t[key];
+        });
+        
+        // Update động các nhãn lượt chơi
+        updateTurnLabels();
+    }
+
+    function updateTurnLabels() {
+        if(document.getElementById('turn-ttt').innerText.includes('X')) document.getElementById('turn-ttt').innerText = i18n[currentLang].turn_x;
+        else if(document.getElementById('turn-ttt').innerText.includes('O')) document.getElementById('turn-ttt').innerText = i18n[currentLang].turn_o;
+
+        if(cTurn === 'W') document.getElementById('turn-chess').innerText = i18n[currentLang].turn_w;
+        else document.getElementById('turn-chess').innerText = i18n[currentLang].turn_b;
+
+        if(ccTurn === 'R') document.getElementById('turn-cchess').innerText = i18n[currentLang].turn_r;
+        else document.getElementById('turn-cchess').innerText = i18n[currentLang].turn_bl;
+    }
+
     // --- STATE QUẢN LÝ ---
     let globalOptions = { boardGameType: 'chess', boardMode: 'pvp', boardAiDiff: 1, tttMode: 'pvp', tttAiDiff: 1, tttSize: 3, sudokuDiff: 45 };
     let currentActiveGame = null;
     let matchScores = { ttt_x: 0, ttt_o: 0, chess_w: 0, chess_b: 0, cchess_r: 0, cchess_b: 0 };
+    let currentHistoryContext = 'menu';
 
     function setOption(key, val, el, group) {
         globalOptions[key] = val;
@@ -499,27 +550,10 @@
         if(key === 'sudokuDiff') { startSudoku(); }
     }
 
-    let timerInterval, startTime, penalty = 0, currentLang = 'vi';
+    let timerInterval, startTime, penalty = 0;
     let isBoardAi = false, boardAiDiff = 1, isTttAi = false, tttAiDiff = 1;
-    
-    const i18n = {
-        vi: { title: "4GAMES4CHILL", subtitle: "Created by HeiuNG", h: "LỊCH SỬ GIẢI", lang: "🇺🇸 EN", hint: "GỢI Ý (+10s)", ai: "AI GIẢI", win: "CHIẾN THẮNG!" },
-        en: { title: "4GAMES4CHILL", subtitle: "Created by HeiuNG", h: "HISTORY", lang: "🇻🇳 VN", hint: "HINT (+10s)", ai: "AI SOLVE", win: "VICTORY!" }
-    };
 
-    function toggleLang() {
-        currentLang = (currentLang === 'vi') ? 'en' : 'vi';
-        const t = i18n[currentLang];
-        document.getElementById('ui-title').innerText = t.title;
-        document.querySelector('.subtitle').innerText = t.subtitle;
-        document.getElementById('btn-lang').innerText = t.lang;
-        document.getElementById('btn-hint').innerText = t.hint;
-        document.getElementById('btn-ai').innerText = t.ai;
-        document.getElementById('ui-h').innerText = t.h;
-        document.getElementById('ui-h-btn').innerText = t.h;
-    }
-
-    function openMode(mode) {
+    function openMode(mode, historyContext = null) {
         clearInterval(timerInterval);
         document.querySelectorAll('.container-box > div').forEach(div => div.classList.add('hidden'));
         document.getElementById('btn-show-result').classList.add('hidden'); 
@@ -539,7 +573,17 @@
                 refillPieces(); 
             }
         }
-        if(mode === 'history') renderHistory();
+        if(mode === 'history') {
+            currentHistoryContext = historyContext || 'menu';
+            renderHistory(currentHistoryContext);
+            document.getElementById('btn-back-history').onclick = () => {
+                if(currentHistoryContext === 'sudoku') openMode('sudoku');
+                else if(currentHistoryContext === 'block') openMode('block-menu');
+                else if(currentHistoryContext === 'chess') openMode('board-menu');
+                else if(currentHistoryContext === 'ttt') openMode('ttt-menu');
+                else openMode('menu');
+            };
+        }
     }
 
     function startTimer(id) {
@@ -554,30 +598,29 @@
 
     function updateScoreBoard(game) {
         if(game === 'ttt') {
-            document.getElementById('ttt-p1-name').innerText = isTttAi ? 'Bạn (X)' : 'X (P1)';
-            document.getElementById('ttt-p2-name').innerText = isTttAi ? 'Máy (O)' : 'O (P2)';
+            document.getElementById('ttt-p1-name').innerText = isTttAi ? (currentLang==='vi'?'Bạn (X)':'You (X)') : 'X (P1)';
+            document.getElementById('ttt-p2-name').innerText = isTttAi ? (currentLang==='vi'?'Máy (O)':'AI (O)') : 'O (P2)';
             document.getElementById('ttt-score-x').innerText = matchScores.ttt_x;
             document.getElementById('ttt-score-o').innerText = matchScores.ttt_o;
         } else if (game === 'chess') {
-            document.getElementById('c-p1-name').innerText = isBoardAi ? 'Bạn (Trắng)' : 'Trắng (P1)';
-            document.getElementById('c-p2-name').innerText = isBoardAi ? 'Máy (Đen)' : 'Đen (P2)';
+            document.getElementById('c-p1-name').innerText = isBoardAi ? (currentLang==='vi'?'Bạn (Trắng)':'You (W)') : (currentLang==='vi'?'Trắng (P1)':'White (P1)');
+            document.getElementById('c-p2-name').innerText = isBoardAi ? (currentLang==='vi'?'Máy (Đen)':'AI (B)') : (currentLang==='vi'?'Đen (P2)':'Black (P2)');
             document.getElementById('c-score-w').innerText = matchScores.chess_w;
             document.getElementById('c-score-b').innerText = matchScores.chess_b;
         } else if (game === 'cchess') {
-            document.getElementById('cc-p1-name').innerText = isBoardAi ? 'Bạn (Đỏ)' : 'Đỏ (P1)';
-            document.getElementById('cc-p2-name').innerText = isBoardAi ? 'Máy (Đen)' : 'Đen (P2)';
+            document.getElementById('cc-p1-name').innerText = isBoardAi ? (currentLang==='vi'?'Bạn (Đỏ)':'You (R)') : (currentLang==='vi'?'Đỏ (P1)':'Red (P1)');
+            document.getElementById('cc-p2-name').innerText = isBoardAi ? (currentLang==='vi'?'Máy (Đen)':'AI (B)') : (currentLang==='vi'?'Đen (P2)':'Black (P2)');
             document.getElementById('cc-score-r').innerText = matchScores.cchess_r;
             document.getElementById('cc-score-b').innerText = matchScores.cchess_b;
         }
     }
 
-    // --- TIC TAC TOE (BẢN MỞ RỘNG CARO) ---
+    // --- TIC TAC TOE ---
     let tttBoard = [], tttTurn = 'X';
     let tttSize = 3, tttWinLen = 3;
     
     function initTTT(isNewMatch = false) {
         if(isNewMatch) { matchScores.ttt_x = 0; matchScores.ttt_o = 0; }
-        
         tttSize = parseInt(globalOptions.tttSize);
         tttWinLen = (tttSize === 3) ? 3 : (tttSize === 7 ? 4 : 5);
         isTttAi = globalOptions.tttMode === 'pve';
@@ -612,10 +655,11 @@
                         renderTTT(); 
                         if(winner === 'X') matchScores.ttt_x++; else matchScores.ttt_o++;
                         updateScoreBoard('ttt');
+                        saveHistory('ttt', `Size: ${tttSize}x${tttSize} | Winner: ${winner}`);
                         let gameStatus = (isTttAi && winner === 'O') ? 'lose' : 'win';
-                        fireWin(`${winner} CHIẾN THẮNG!`, gameStatus); return; 
+                        fireWin(`${winner} ` + (currentLang==='vi'?'CHIẾN THẮNG!':'WINS!'), gameStatus); return; 
                     }
-                    if(!tttBoard.includes(null)){ renderTTT(); fireWin("HÒA NHAU!", 'draw'); return; }
+                    if(!tttBoard.includes(null)){ renderTTT(); saveHistory('ttt', 'Draw'); fireWin(currentLang==='vi'?"HÒA NHAU!":"DRAW!", 'draw'); return; }
                     tttTurn = tttTurn === 'X' ? 'O' : 'X'; renderTTT();
                     
                     if(isTttAi && tttTurn === 'O' && !checkWinCaro(tttBoard, tttSize, tttWinLen) && tttBoard.includes(null)) {
@@ -625,7 +669,7 @@
             };
             grid.appendChild(div);
         });
-        document.getElementById('turn-ttt').innerText = `Lượt của ${tttTurn}`;
+        document.getElementById('turn-ttt').innerText = i18n[currentLang][`turn_${tttTurn.toLowerCase()}`];
     }
 
     function checkWinCaro(b, size, winLen) {
@@ -664,9 +708,10 @@
             if(winner){ 
                 renderTTT(); 
                 matchScores.ttt_o++; updateScoreBoard('ttt');
-                fireWin("O CHIẾN THẮNG!", 'lose'); return; 
+                saveHistory('ttt', `Size: ${tttSize}x${tttSize} | Winner: O (AI)`);
+                fireWin("O " + (currentLang==='vi'?'CHIẾN THẮNG!':'WINS!'), 'lose'); return; 
             }
-            if(!tttBoard.includes(null)){ renderTTT(); fireWin("HÒA NHAU!", 'draw'); return; }
+            if(!tttBoard.includes(null)){ renderTTT(); saveHistory('ttt', 'Draw'); fireWin(currentLang==='vi'?"HÒA NHAU!":"DRAW!", 'draw'); return; }
             tttTurn = 'X'; renderTTT();
         }
     }
@@ -732,7 +777,6 @@
     let boardGameType = 'chess';
     function initBoardGame(isNewMatch = false) {
         if(isNewMatch) { matchScores.chess_w = 0; matchScores.chess_b = 0; matchScores.cchess_r = 0; matchScores.cchess_b = 0; }
-
         boardGameType = globalOptions.boardGameType;
         isBoardAi = globalOptions.boardMode === 'pve';
         boardAiDiff = parseInt(globalOptions.boardAiDiff);
@@ -871,10 +915,12 @@
             if (isSquareAttacked(kIdx, cTurn==='B', cBoard)) {
                 if(cTurn === 'B') matchScores.chess_w++; else matchScores.chess_b++;
                 updateScoreBoard('chess');
+                saveHistory('chess', `Winner: ${cTurn === 'B' ? 'White' : 'Black'}`);
                 let status = (isBoardAi && cTurn === 'W') ? 'lose' : 'win';
-                fireWin((cTurn==='W'?'Đen':'Trắng') + " THẮNG!", status);
+                fireWin((cTurn==='W'?'Đen':'Trắng') + (currentLang==='vi'?" THẮNG!":" WINS!"), status);
             } else {
-                fireWin("HÒA!", 'draw');
+                saveHistory('chess', 'Draw');
+                fireWin(currentLang==='vi'?"HÒA!":"DRAW!", 'draw');
             }
             return;
         }
@@ -918,7 +964,7 @@
             };
             board.appendChild(sq);
         }
-        document.getElementById('turn-chess').innerText = (cTurn === 'W') ? "Lượt Trắng" : "Lượt Đen";
+        document.getElementById('turn-chess').innerText = i18n[currentLang][`turn_${cTurn.toLowerCase()}`];
     }
 
     // --- CỜ TƯỚNG (XIANGQI) ---
@@ -1010,12 +1056,15 @@
             updateScoreBoard('cchess');
             let status = (isBoardAi && ccTurn === 'R') ? 'lose' : 'win';
 
-            if (inCheck) fireWin((ccTurn === 'R' ? "ĐEN" : "ĐỎ") + " CHIẾU BÍ!", status);
-            else fireWin((ccTurn === 'R' ? "ĐEN" : "ĐỎ") + " THẮNG (HẾT NƯỚC ĐI)!", status);
+            let winnerText = ccTurn === 'R' ? (currentLang==='vi'?'ĐEN':'BLACK') : (currentLang==='vi'?'ĐỎ':'RED');
+            saveHistory('chess', `Winner (Xiangqi): ${winnerText}`);
+
+            if (inCheck) fireWin(`${winnerText} ` + (currentLang==='vi'?"CHIẾU BÍ!":"CHECKMATE!"), status);
+            else fireWin(`${winnerText} ` + (currentLang==='vi'?"THẮNG (HẾT NƯỚC ĐI)!":"WINS (STALEMATE)!"), status);
             return;
         }
 
-        if (ccProgressMoves >= 60 || ccTotalMoves >= 600) { fireWin("HÒA THEO LUẬT CHUẨN!", 'draw'); return; }
+        if (ccProgressMoves >= 60 || ccTotalMoves >= 600) { saveHistory('chess', 'Draw (Xiangqi)'); fireWin(currentLang==='vi'?"HÒA THEO LUẬT CHUẨN!":"DRAW BY RULE!", 'draw'); return; }
         if(isBoardAi && ccTurn === 'B') setTimeout(() => makeAiBoardMove('cchess'), 500);
     }
 
@@ -1062,7 +1111,7 @@
             };
             board.appendChild(sq);
         }
-        document.getElementById('turn-cchess').innerText = (ccTurn === 'R') ? 'Lượt Đỏ' : 'Lượt Đen';
+        document.getElementById('turn-cchess').innerText = i18n[currentLang][`turn_${ccTurn==='R'?'r':'bl'}`];
         document.getElementById('cchess-undo-btn').innerText = `Undo (${undosLeftCC})`;
     }
 
@@ -1098,17 +1147,16 @@
     function isValidS(b,r,c,n){ for(let i=0; i<9; i++) if(b[r][i]===n || b[i][c]===n) return false; let sR=Math.floor(r/3)*3, sC=Math.floor(c/3)*3; for(let i=0; i<3; i++) for(let j=0; j<3; j++) if(b[sR+i][sC+j]===n) return false; return true; }
     function inputS(n){ if(selectedIdx!==null){ document.querySelectorAll('.cell-s')[selectedIdx].innerText = n===0?'':n; checkWinS(); } }
     function getHint(){ let em=[]; document.querySelectorAll('.cell-s').forEach((c,i)=>{ if(c.innerText==='' && !c.classList.contains('readonly')) em.push(i); }); if(em.length>0){ let idx=em[Math.floor(Math.random()*em.length)]; document.querySelectorAll('.cell-s')[idx].innerText=solutionS[Math.floor(idx/9)][idx%9]; penalty+=10000; checkWinS(); } }
-    function solveByAI(){ document.querySelectorAll('.cell-s').forEach((c,i)=> { if(!c.classList.contains('readonly')) c.innerText=solutionS[Math.floor(i/9)][i%9]; }); saveHistory('Sudoku','AI Solved'); clearInterval(timerInterval); }
-    function checkWinS(){ let f=true, cor=true; document.querySelectorAll('.cell-s').forEach((c,i)=>{ let v=parseInt(c.innerText); if(!v) f=false; if(v!==solutionS[Math.floor(i/9)][i%9]) cor=false; }); if(f && cor){ fireWin(i18n[currentLang].win, 'win'); saveHistory('Sudoku', document.getElementById('timer-s').innerText); } }
+    function solveByAI(){ document.querySelectorAll('.cell-s').forEach((c,i)=> { if(!c.classList.contains('readonly')) c.innerText=solutionS[Math.floor(i/9)][i%9]; }); saveHistory('sudoku','AI Solved'); clearInterval(timerInterval); }
+    function checkWinS(){ let f=true, cor=true; document.querySelectorAll('.cell-s').forEach((c,i)=>{ let v=parseInt(c.innerText); if(!v) f=false; if(v!==solutionS[Math.floor(i/9)][i%9]) cor=false; }); if(f && cor){ fireWin(currentLang==='vi'?"CHIẾN THẮNG!":"VICTORY!", 'win'); saveHistory('sudoku', "Time: " + document.getElementById('timer-s').innerText); } }
 
-    // --- BLOCK BLAST (CỔ ĐIỂN & THỬ THÁCH HÀNH TRÌNH 200 MỐC) ---
+    // --- BLOCK BLAST ---
     let bState = Array(64).fill(false), bScore = 0, bCombo = 0;
     const bShapes = [ [[0,0]], [[0,0],[0,1]], [[0,0],[1,0]], [[0,0],[0,1],[0,2]], [[0,0],[1,0],[2,0]], [[0,0],[0,1],[0,2],[0,3]], [[0,0],[1,0],[2,0],[3,0]], [[0,0],[0,1],[1,0],[1,1]], [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2],[2,0],[2,1],[2,2]], [[0,0],[1,0],[1,1]], [[0,1],[1,0],[1,1]], [[0,0],[0,1],[1,0]], [[0,0],[0,1],[1,1]], [[0,0],[1,0],[2,0],[2,1],[2,2]], [[2,0],[2,1],[2,2],[1,2],[0,2]], [[0,0],[0,1],[0,2],[1,0],[2,0]], [[0,0],[0,1],[0,2],[1,2],[2,2]], [[0,1],[1,0],[1,1],[1,2]], [[0,0],[0,1],[0,2],[1,1]], [[0,0],[1,0],[2,0],[1,1]], [[1,0],[0,1],[1,1],[2,1]], [[0,0],[0,1],[1,1],[1,2]], [[0,1],[0,2],[1,0],[1,1]] ];
     const bColors = ['#e74c3c', '#f1c40f', '#9b59b6', '#2ecc71', '#3498db', '#e67e22', '#1abc9c', '#e84393'];
     let dragP = null, dragOff = {x:0, y:0}, dragStartPt = {x:0, y:0};
     let actSh = null, actIdx = -1, actColor = null, isTouch = false;
 
-    // Biến cho Hành Trình
     let isJourneyMode = false;
     let currentJourneyLevel = 1;
     let maxUnlockedLevel = parseInt(localStorage.getItem('ecoHub_journeyLevel') || '1');
@@ -1132,7 +1180,7 @@
                 node.onclick = () => startJourneyLevel(i);
             } else {
                 node.innerText = i;
-                node.onclick = () => alert(`Bạn cần vượt qua mốc ${i-1} trước!`);
+                node.onclick = () => alert(currentLang==='vi'?`Bạn cần vượt qua mốc ${i-1} trước!`:`Complete level ${i-1} first!`);
             }
             mapDiv.appendChild(node);
         }
@@ -1159,18 +1207,16 @@
     function startJourneyLevel(level) {
         isJourneyMode = true;
         currentJourneyLevel = level;
-        blockTargetScore = 50 + (level * 20); // Mốc điểm: Mốc 1 cần 70, mốc 2 cần 90...
+        blockTargetScore = 150 + (level * 50); // Cập nhật mốc điểm cho hợp lý với hệ số điểm mới
         
         resetBlockBoard();
         document.getElementById('target-container').classList.remove('hidden');
         document.getElementById('current-j-level').innerText = level;
         document.getElementById('target-b').innerText = blockTargetScore;
         
-        // Tạo lưới có sẵn vật cản
-        let obsCount = Math.min(Math.floor(level / 5) + 3, 15); // Tối đa 15 vật cản
+        let obsCount = Math.min(Math.floor(level / 5) + 3, 15);
         for(let i=0; i<obsCount; i++) {
             let r, c;
-            // Tránh khu vực trung tâm để khối to dễ thở lúc đầu
             do {
                 r = Math.floor(Math.random()*8); c = Math.floor(Math.random()*8);
             } while(bState[r*8+c] || (r>=3&&r<=4 && c>=3&&c<=4));
@@ -1178,15 +1224,14 @@
             bState[r*8+c] = true;
             let cell = document.querySelectorAll('.cell-b')[r*8+c];
             cell.classList.add('filled');
-            cell.style.backgroundColor = '#7f8c8d'; // Màu xám cho vật cản
+            cell.style.backgroundColor = '#7f8c8d';
             cell.style.boxShadow = 'inset 0 0 6px rgba(0,0,0,0.4)';
         }
         
         refillPieces();
-        openMode('block'); // Hiển thị màn hình game
+        openMode('block');
     }
 
-    // Thuật toán Đảm Bảo Khối Luôn Có Đường Giải (Tránh Game Over do xui xẻo)
     function canPBTemp(sh, r, c, boardArr) {
         return sh.every(([dr,dc]) => {
             let nr = r + dr, nc = c + dc;
@@ -1216,14 +1261,13 @@
                 let spot = chosen.spots[Math.floor(Math.random() * chosen.spots.length)];
                 chosen.shape.forEach(([dr,dc]) => { tempBoard[(spot.r+dr)*8 + (spot.c+dc)] = true; });
             } else {
-                pieces.push(bShapes[0]); // 1x1 fallback nếu thật sự tắc nghẽn
+                pieces.push(bShapes[0]);
             }
         }
         return pieces;
     }
 
     function refillPieces() {
-        // Trong chế độ thử thách (hoặc luôn dùng cũng được), sinh 3 khối an toàn
         let safeShapes = generateSafePieces();
         safeShapes.forEach((sh, idx) => createPiece(idx, sh));
     }
@@ -1243,11 +1287,11 @@
             pc.style.backgroundColor = shapeColor; piece.appendChild(pc); 
         }); 
         piece.style.gridTemplateRows = `repeat(${mR+1}, 34px)`; piece.style.gridTemplateColumns = `repeat(${mC+1}, 34px)`; 
-
         piece.style.transform = 'scale(0.45)'; piece.style.transformOrigin = 'center center';
 
         piece.onpointerdown = (e) => {
-            e.preventDefault(); actSh = sh; actIdx = idx; actColor = piece.dataset.color; isTouch = e.pointerType === 'touch';
+            e.preventDefault(); 
+            actSh = sh; actIdx = idx; actColor = piece.dataset.color; isTouch = e.pointerType === 'touch';
             const rect = piece.getBoundingClientRect(); 
             dragOff.x = e.clientX - rect.left; dragOff.y = e.clientY - rect.top; dragStartPt = { x: e.clientX, y: e.clientY };
 
@@ -1306,7 +1350,9 @@
                 let cell = document.querySelectorAll('.cell-b')[(r+dr)*8 + c+dc];
                 cell.classList.add('filled'); cell.style.backgroundColor = actColor; cell.style.boxShadow = 'inset 0 0 6px rgba(0,0,0,0.2)';
             });
-            bScore += actSh.length; document.getElementById(`slot-${actIdx}`).innerHTML=''; checkClearB();
+            // Điểm cơ bản x10
+            bScore += actSh.length * 10; 
+            document.getElementById(`slot-${actIdx}`).innerHTML=''; checkClearB();
             if(Array.from(document.querySelectorAll('.piece-slot')).every(s=>s.innerHTML==='')) { refillPieces(); }
             checkGOB();
         } else {
@@ -1328,7 +1374,14 @@
 
         let cleared = rs.length + cs.length;
         if(cleared > 0){
-            bCombo++; let pts = (cleared * 10) * bCombo; bScore += pts;
+            bCombo++; 
+            // Hệ thống điểm mới: Hàng đầu 100đ, các hàng sau x150. Combo x50đ
+            let basePts = cleared * 100;
+            if(cleared > 1) basePts += (cleared - 1) * 150;
+            let comboBonus = bCombo > 1 ? (bCombo * 50) : 0;
+            let pts = basePts + comboBonus;
+            
+            bScore += pts;
             let displayScore = bScore + (bCombo > 1 ? ` (+${pts} COMBO x${bCombo}!)` : ` (+${pts})`);
             document.getElementById('score-b').innerText = displayScore;
             
@@ -1338,15 +1391,14 @@
                 }); 
                 document.getElementById('score-b').innerText = bScore; 
 
-                // Check Win Journey
                 if(isJourneyMode && bScore >= blockTargetScore) {
                     if (currentJourneyLevel === maxUnlockedLevel && currentJourneyLevel < 200) {
                         maxUnlockedLevel++;
                         localStorage.setItem('ecoHub_journeyLevel', maxUnlockedLevel);
                     }
                     setTimeout(() => {
-                        saveHistory('Journey Mốc ' + currentJourneyLevel, 'Thắng (' + bScore + 'đ)');
-                        fireWin(`HOÀN THÀNH MỐC ${currentJourneyLevel}!`, 'win');
+                        saveHistory('block', `Level ${currentJourneyLevel} - Win (${bScore} pts)`);
+                        fireWin((currentLang==='vi'?`HOÀN THÀNH MỐC ${currentJourneyLevel}!`:`LEVEL ${currentJourneyLevel} CLEARED!`), 'win');
                     }, 400); 
                 }
             }, 600); 
@@ -1354,7 +1406,6 @@
     }
 
     function checkGOB(){ 
-        // Trong Journey mode, nếu vừa đủ điểm qua vòng, checkClearB setTimeout chưa kịp chạy thì ta ko nên GOB
         if(isJourneyMode && bScore >= blockTargetScore) return;
 
         const ps=Array.from(document.querySelectorAll('.piece')).map(p=>JSON.parse(p.dataset.sh)); 
@@ -1362,16 +1413,16 @@
         
         if(!pos && ps.length>0){ 
             if(isJourneyMode) {
-                saveHistory('Journey Mốc ' + currentJourneyLevel, 'Thua');
-                fireWin("THỬ LẠI MỐC " + currentJourneyLevel, 'lose');
+                saveHistory('block', `Level ${currentJourneyLevel} - Lose (${bScore} pts)`);
+                fireWin((currentLang==='vi'?`THỬ LẠI MỐC ${currentJourneyLevel}`:`RETRY LEVEL ${currentJourneyLevel}`), 'lose');
             } else {
-                saveHistory('Block Blast', bScore);
+                saveHistory('block', `Classic - Score: ${bScore}`);
                 fireWin("GAME OVER!", 'lose'); 
             }
         } 
     }
 
-    // --- HỆ THỐNG XỬ LÝ MEME VÀ KẾT QUẢ ---
+    // --- HỆ THỐNG KẾT QUẢ VÀ LỊCH SỬ ---
     const winMemes = [
         "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjJreHludXhxdmRkbjNkYTgwanhmemc0d2JnNm45YXd5ajV4MWRiZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/lnlAifQdenMxW/giphy.gif",
         "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjJreHludXhxdmRkbjNkYTgwanhmemc0d2JnNm45YXd5ajV4MWRiZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/GxIdtANXpn3qL1FG25/giphy.gif",
@@ -1381,8 +1432,7 @@
     const loseMemes = [
         "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExemNrMzFmeXoxbm1paTZlampzZzNzd2ZubTJkNGJjcGtnZ2ZvNG00MSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/cr9vIO7NsP5cY/giphy.gif",
         "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2pqbzJ4YW5jaTA3NHlwbnFoNGRsbGhyNWtuY3o3M28xbGVucjVyciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ej2dS4FUCNRJK/giphy.gif",
-        "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2pqbzJ4YW5jaTA3NHlwbnFoNGRsbGhyNWtuY3o3M28xbGVucjVyciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/RgZNLvoDJxsOW0m2Jj/giphy.gif",
-        "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXp0ZW9pMHluN3BiZzJrNTB3ZHJwaXMzdzE4YWpoeHI2emNuMXo4eCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/eJ4j2VnYOZU8qJU3Py/giphy.gif"
+        "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2pqbzJ4YW5jaTA3NHlwbnFoNGRsbGhyNWtuY3o3M28xbGVucjVyciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/RgZNLvoDJxsOW0m2Jj/giphy.gif"
     ];
 
     function fireWin(t, status) { 
@@ -1401,24 +1451,33 @@
         document.getElementById('overlay').style.display = 'block'; 
     }
 
-    function saveHistory(m,r){ let h=JSON.parse(localStorage.getItem('ecoHub')||'[]'); h.unshift({d:new Date().toLocaleString(), m, r}); localStorage.setItem('ecoHub', JSON.stringify(h.slice(0,15))); }
-    function renderHistory(){ let h=JSON.parse(localStorage.getItem('ecoHub')||'[]'); document.getElementById('history-list').innerHTML=h.map(x=>`<div style="padding:10px; border-bottom:1px solid #eee; font-size:0.85rem;"><b>${x.d}</b><br>${x.m} | Result: ${x.r}</div>`).join('')||"No data."; }
+    // Lịch sử nay đã tách riêng từng mục: ecoHub_sudoku, ecoHub_block, v.v..
+    function saveHistory(mode, result){ 
+        let storageKey = 'ecoHub_' + mode;
+        let h=JSON.parse(localStorage.getItem(storageKey)||'[]'); 
+        h.unshift({d:new Date().toLocaleString(), r: result}); 
+        localStorage.setItem(storageKey, JSON.stringify(h.slice(0,15))); 
+    }
     
-    // Logic Ẩn Bảng kết quả để xem lại bàn cờ
+    function renderHistory(mode){ 
+        let storageKey = 'ecoHub_' + mode;
+        let h=JSON.parse(localStorage.getItem(storageKey)||'[]'); 
+        let noDataMsg = currentLang === 'vi' ? "Chưa có dữ liệu." : "No data.";
+        document.getElementById('history-list').innerHTML=h.map(x=>`<div style="padding:10px; border-bottom:1px solid #eee; font-size:0.85rem;"><b>${x.d}</b><br>Result: ${x.r}</div>`).join('')||noDataMsg; 
+    }
+    
     function hideModalForReview() {
         document.getElementById('winModal').style.display = 'none'; 
         document.getElementById('overlay').style.display = 'none'; 
         document.getElementById('btn-show-result').classList.remove('hidden'); 
     }
 
-    // Logic Bật lại bảng Kết quả
     function showResultModal() {
         document.getElementById('winModal').style.display = 'block'; 
         document.getElementById('overlay').style.display = 'block'; 
         document.getElementById('btn-show-result').classList.add('hidden'); 
     }
 
-    // Logic Đóng hoặc Chơi Lại
     function closeWin(playAgain) { 
         document.getElementById('winModal').style.display='none'; 
         document.getElementById('overlay').style.display='none'; 
@@ -1433,7 +1492,6 @@
                 else startBlockBlast();
             }
         } else {
-            // Về menu tuỳ theo chế độ
             if(currentActiveGame === 'block') {
                 if (isJourneyMode) openMode('block-journey');
                 else openMode('block-menu');
@@ -1443,6 +1501,9 @@
         }
     }
 
+    // Initialize
+    toggleLang(); // Gọi 1 lần để set vi/en ban đầu
+    toggleLang(); // Chuyển lại đúng ngôn ngữ gốc
     openMode('menu');
 </script>
 </body>
