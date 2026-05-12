@@ -286,55 +286,59 @@
 
             <div class="menu-card" style="border-color: #8e44ad;" onclick="openMode('block-menu')">
                 <svg viewBox="0 0 100 100" class="menu-img">
-                    <rect x="5" y="5" width="90" height="90" rx="12" fill="#1c004a"/>
-                    <path d="M 5 25 L 95 25 M 5 45 L 95 45 M 5 65 L 95 65 M 5 85 L 95 85" stroke="#4a2377" stroke-width="0.5"/>
-                    <path d="M 25 5 L 25 95 M 45 5 L 45 95 M 65 5 L 65 95 M 85 5 L 85 95" stroke="#4a2377" stroke-width="0.5"/>
-                    <circle cx="15" cy="15" r="1.5" fill="#fff" opacity="0.8"/>
-                    <circle cx="85" cy="35" r="1" fill="#fff" opacity="0.6"/>
-                    <circle cx="70" cy="80" r="1.5" fill="#fff" opacity="0.8"/>
-                    <g transform="translate(10, 30) scale(0.8)">
-                        <g transform="translate(0, 20)">
-                            <rect x="0" y="0" width="20" height="20" rx="4" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
-                            <rect x="2" y="2" width="16" height="8" rx="2" fill="#ff7675" opacity="0.8"/>
-                            <rect x="0" y="22" width="20" height="20" rx="4" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
-                            <rect x="2" y="24" width="16" height="8" rx="2" fill="#ff7675" opacity="0.8"/>
-                            <rect x="22" y="0" width="20" height="20" rx="4" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
-                            <rect x="24" y="2" width="16" height="8" rx="2" fill="#ff7675" opacity="0.8"/>
-                        </g>
-                        <g transform="translate(22, -20)">
-                            <rect x="0" y="0" width="20" height="20" rx="4" fill="#f1c40f" stroke="#f39c12" stroke-width="2"/>
-                            <rect x="2" y="2" width="16" height="8" rx="2" fill="#ffeaa7" opacity="0.8"/>
-                            <rect x="22" y="0" width="20" height="20" rx="4" fill="#f1c40f" stroke="#f39c12" stroke-width="2"/>
-                            <rect x="24" y="2" width="16" height="8" rx="2" fill="#ffeaa7" opacity="0.8"/>
-                            <rect x="44" y="0" width="20" height="20" rx="4" fill="#f1c40f" stroke="#f39c12" stroke-width="2"/>
-                            <rect x="46" y="2" width="16" height="8" rx="2" fill="#ffeaa7" opacity="0.8"/>
-                        </g>
-                        <g transform="translate(44, 20)">
-                            <rect x="0" y="0" width="20" height="20" rx="4" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
-                            <rect x="2" y="2" width="16" height="8" rx="2" fill="#cd84f1" opacity="0.8"/>
-                            <rect x="0" y="22" width="20" height="20" rx="4" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
-                            <rect x="2" y="24" width="16" height="8" rx="2" fill="#cd84f1" opacity="0.8"/>
-                            <rect x="22" y="22" width="20" height="20" rx="4" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
-                            <rect x="24" y="24" width="16" height="8" rx="2" fill="#cd84f1" opacity="0.8"/>
-                            <rect x="22" y="44" width="20" height="20" rx="4" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
-                            <rect x="24" y="46" width="16" height="8" rx="2" fill="#cd84f1" opacity="0.8"/>
-                        </g>
-                        <g transform="translate(22, 44)">
-                            <rect x="0" y="0" width="20" height="20" rx="4" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
-                            <rect x="2" y="2" width="16" height="8" rx="2" fill="#74b9ff" opacity="0.8"/>
-                            <rect x="22" y="0" width="20" height="20" rx="4" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
-                            <rect x="24" y="2" width="16" height="8" rx="2" fill="#74b9ff" opacity="0.8"/>
-                            <rect x="0" y="22" width="20" height="20" rx="4" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
-                            <rect x="2" y="24" width="16" height="8" rx="2" fill="#74b9ff" opacity="0.8"/>
-                            <rect x="22" y="22" width="20" height="20" rx="4" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
-                            <rect x="24" y="24" width="16" height="8" rx="2" fill="#74b9ff" opacity="0.8"/>
-                        </g>
-                        <g transform="translate(75, 44)">
-                            <rect x="0" y="0" width="20" height="20" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
-                            <rect x="2" y="2" width="16" height="8" rx="2" fill="#55efc4" opacity="0.8"/>
-                            <rect x="0" y="22" width="20" height="20" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
-                            <rect x="2" y="24" width="16" height="8" rx="2" fill="#55efc4" opacity="0.8"/>
-                        </g>
+                    <rect x="5" y="5" width="90" height="90" rx="15" fill="#300066"/>
+                    <path d="M 5 25 L 95 25 M 5 45 L 95 45 M 5 65 L 95 65 M 5 85 L 95 85" stroke="#ffffff" stroke-width="0.5" opacity="0.2"/>
+                    <path d="M 25 5 L 25 95 M 45 5 L 45 95 M 65 5 L 65 95 M 85 5 L 85 95" stroke="#ffffff" stroke-width="0.5" opacity="0.2"/>
+                    
+                    <defs>
+                        <filter id="blkShadow" x="-10%" y="-10%" width="120%" height="120%">
+                            <feDropShadow dx="1" dy="3" stdDeviation="2" flood-color="#000" flood-opacity="0.8"/>
+                        </filter>
+                    </defs>
+                    
+                    <g filter="url(#blkShadow)" transform="translate(30, 10)">
+                        <rect x="0" y="0" width="18" height="18" rx="4" fill="#f1c40f"/>
+                        <rect x="2" y="2" width="14" height="6" rx="2" fill="#f9e79f"/>
+                        <rect x="20" y="0" width="18" height="18" rx="4" fill="#f1c40f"/>
+                        <rect x="22" y="2" width="14" height="6" rx="2" fill="#f9e79f"/>
+                        <rect x="40" y="0" width="18" height="18" rx="4" fill="#f1c40f"/>
+                        <rect x="42" y="2" width="14" height="6" rx="2" fill="#f9e79f"/>
+                    </g>
+                    <g filter="url(#blkShadow)" transform="translate(50, 30)">
+                        <rect x="0" y="0" width="18" height="18" rx="4" fill="#9b59b6"/>
+                        <rect x="2" y="2" width="14" height="6" rx="2" fill="#d2b4de"/>
+                        <rect x="20" y="0" width="18" height="18" rx="4" fill="#9b59b6"/>
+                        <rect x="22" y="2" width="14" height="6" rx="2" fill="#d2b4de"/>
+                        <rect x="20" y="20" width="18" height="18" rx="4" fill="#9b59b6"/>
+                        <rect x="22" y="22" width="14" height="6" rx="2" fill="#d2b4de"/>
+                        <rect x="20" y="40" width="18" height="18" rx="4" fill="#9b59b6"/>
+                        <rect x="22" y="42" width="14" height="6" rx="2" fill="#d2b4de"/>
+                    </g>
+                    <g filter="url(#blkShadow)" transform="translate(10, 30)">
+                        <rect x="0" y="0" width="18" height="18" rx="4" fill="#e74c3c"/>
+                        <rect x="2" y="2" width="14" height="6" rx="2" fill="#fadbd8"/>
+                        <rect x="20" y="0" width="18" height="18" rx="4" fill="#e74c3c"/>
+                        <rect x="22" y="2" width="14" height="6" rx="2" fill="#fadbd8"/>
+                        <rect x="0" y="20" width="18" height="18" rx="4" fill="#e74c3c"/>
+                        <rect x="2" y="22" width="14" height="6" rx="2" fill="#fadbd8"/>
+                        <rect x="0" y="40" width="18" height="18" rx="4" fill="#e74c3c"/>
+                        <rect x="2" y="42" width="14" height="6" rx="2" fill="#fadbd8"/>
+                    </g>
+                    <g filter="url(#blkShadow)" transform="translate(25, 55)">
+                        <rect x="0" y="0" width="18" height="18" rx="4" fill="#3498db"/>
+                        <rect x="2" y="2" width="14" height="6" rx="2" fill="#aed6f1"/>
+                        <rect x="20" y="0" width="18" height="18" rx="4" fill="#3498db"/>
+                        <rect x="22" y="2" width="14" height="6" rx="2" fill="#aed6f1"/>
+                        <rect x="0" y="20" width="18" height="18" rx="4" fill="#3498db"/>
+                        <rect x="2" y="22" width="14" height="6" rx="2" fill="#aed6f1"/>
+                        <rect x="20" y="20" width="18" height="18" rx="4" fill="#3498db"/>
+                        <rect x="22" y="22" width="14" height="6" rx="2" fill="#aed6f1"/>
+                    </g>
+                    <g filter="url(#blkShadow)" transform="translate(70, 55)">
+                        <rect x="0" y="0" width="18" height="18" rx="4" fill="#2ecc71"/>
+                        <rect x="2" y="2" width="14" height="6" rx="2" fill="#a9dfbf"/>
+                        <rect x="0" y="20" width="18" height="18" rx="4" fill="#2ecc71"/>
+                        <rect x="2" y="22" width="14" height="6" rx="2" fill="#a9dfbf"/>
                     </g>
                 </svg>
                 <h3 data-i18n="block_blast">BLOCK BLAST</h3>
@@ -343,46 +347,41 @@
             <div class="menu-card" style="border-color: #27ae60;" onclick="openMode('board-menu')">
                 <svg viewBox="0 0 100 100" class="menu-img">
                     <defs>
-                        <radialGradient id="chessBg" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stop-color="#2a7a3b"/>
-                            <stop offset="100%" stop-color="#0e3814"/>
+                        <radialGradient id="chessBg2" cx="50%" cy="50%" r="70%">
+                            <stop offset="0%" stop-color="#145a32"/>
+                            <stop offset="100%" stop-color="#0a2a12"/>
                         </radialGradient>
+                        <filter id="chShadow" x="-20%" y="-20%" width="150%" height="150%">
+                            <feDropShadow dx="3" dy="5" stdDeviation="3" flood-color="#000" flood-opacity="0.6"/>
+                        </filter>
                     </defs>
-                    <rect x="5" y="5" width="90" height="90" rx="15" fill="url(#chessBg)"/>
-                    <path d="M 5 60 L 95 60 L 95 90 C 95 92.7 92.7 95 90 95 L 10 95 C 7.2 95 5 92.7 5 90 Z" fill="#1b5e20" opacity="0.6"/>
-                    <path d="M 20 60 L 35 60 L 45 95 L 15 95 Z" fill="#000" opacity="0.2"/>
-                    <path d="M 50 60 L 65 60 L 75 95 L 45 95 Z" fill="#000" opacity="0.2"/>
-                    <path d="M 80 60 L 95 60 L 95 95 L 75 95 Z" fill="#000" opacity="0.2"/>
-                    <path d="M 5 70 L 95 70 M 5 80 L 95 80 M 5 90 L 95 90" stroke="#000" stroke-width="1" opacity="0.3"/>
+                    <rect x="5" y="5" width="90" height="90" rx="15" fill="url(#chessBg2)"/>
                     
-                    <g transform="translate(65, 40) scale(0.65)" filter="drop-shadow(3px 5px 4px rgba(0,0,0,0.6))">
-                        <path d="M 10 70 L 30 70 L 30 80 L 10 80 Z" fill="#111"/>
-                        <path d="M 12 40 L 28 40 L 32 70 L 8 70 Z" fill="#222"/>
-                        <path d="M 8 20 L 32 20 L 30 40 L 10 40 Z" fill="#111"/>
-                        <path d="M 6 10 L 12 10 L 12 20 L 6 20 Z" fill="#222"/>
-                        <path d="M 17 10 L 23 10 L 23 20 L 17 20 Z" fill="#222"/>
-                        <path d="M 28 10 L 34 10 L 34 20 L 28 20 Z" fill="#222"/>
-                        <path d="M 12 40 L 16 40 L 18 70 L 10 70 Z" fill="#444" opacity="0.5"/>
+                    <path d="M 10 70 L 90 70 L 80 40 L 20 40 Z" fill="#2e7d32" opacity="0.3"/>
+                    <path d="M 30 70 L 45 70 L 45 40 L 35 40 Z" fill="#000" opacity="0.1"/>
+                    <path d="M 60 70 L 75 70 L 65 40 L 55 40 Z" fill="#000" opacity="0.1"/>
+                    
+                    <g filter="url(#chShadow)" transform="translate(10, 30) scale(0.8)">
+                        <path d="M20,60 C20,40 10,25 25,10 C35,20 40,30 40,60 Z" fill="#111"/>
+                        <path d="M22,60 C22,40 15,30 25,18 C30,25 35,35 35,60 Z" fill="#2d3436"/>
+                        <path d="M20,15 L25,5 L30,15 Z" fill="#111"/>
+                        <rect x="15" y="60" width="30" height="8" rx="2" fill="#0a0a0a"/>
                     </g>
-                    
-                    <g transform="translate(5, 35) scale(0.65)" filter="drop-shadow(-3px 5px 4px rgba(0,0,0,0.6))">
-                        <path d="M 15 80 L 45 80 L 40 70 L 20 70 Z" fill="#111"/>
-                        <path d="M 20 70 C 20 50, 10 40, 25 20 C 35 10, 45 15, 45 30 C 45 50, 40 70, 40 70 Z" fill="#1a1a1a"/>
-                        <path d="M 25 20 C 15 25, 5 35, 10 45 C 15 40, 20 40, 20 40 Z" fill="#111"/>
-                        <circle cx="32" cy="25" r="2" fill="#000"/>
-                        <path d="M 35 12 L 40 5 L 42 15 Z" fill="#111"/>
-                        <path d="M 25 20 C 30 15, 35 15, 40 20 C 40 30, 35 50, 35 70 L 25 70 C 25 50, 20 40, 25 20 Z" fill="#444" opacity="0.4"/>
+
+                    <g filter="url(#chShadow)" transform="translate(58, 38) scale(0.7)">
+                        <path d="M10,15 L15,15 L15,25 L20,25 L20,15 L25,15 L25,25 L30,25 L30,15 L35,15 L35,30 L10,30 Z" fill="#111"/>
+                        <path d="M12,30 L33,30 L28,60 L17,60 Z" fill="#1a1a1a"/>
+                        <path d="M16,30 L22,30 L20,60 L18,60 Z" fill="#333" opacity="0.4"/>
+                        <rect x="8" y="60" width="29" height="8" rx="2" fill="#0a0a0a"/>
                     </g>
-                    
-                    <g transform="translate(30, 15) scale(0.85)" filter="drop-shadow(0px 8px 6px rgba(0,0,0,0.6))">
-                        <path d="M 10 80 L 40 80 L 40 90 L 10 90 Z" fill="#d4b886"/>
-                        <path d="M 15 70 L 35 70 L 38 80 L 12 80 Z" fill="#e6cd98"/>
-                        <path d="M 18 35 L 32 35 C 32 50, 38 65, 35 70 L 15 70 C 12 65, 18 50, 18 35 Z" fill="#f7e1b5"/>
-                        <path d="M 12 25 L 38 25 L 35 35 L 15 35 Z" fill="#e6cd98"/>
-                        <circle cx="25" cy="20" r="8" fill="#f7e1b5"/>
-                        <path d="M 22 5 L 28 5 L 28 10 L 33 10 L 33 15 L 28 15 L 28 20 L 22 20 L 22 15 L 17 15 L 17 10 L 22 10 Z" fill="#f7e1b5"/>
-                        <path d="M 15 70 C 12 65, 18 50, 18 35 L 22 35 C 22 50, 16 65, 20 70 Z" fill="#fff" opacity="0.6"/>
-                        <path d="M 35 70 C 38 65, 32 50, 32 35 L 28 35 C 28 50, 34 65, 30 70 Z" fill="#a68a56" opacity="0.6"/>
+
+                    <g filter="url(#chShadow)" transform="translate(32, 10) scale(0.9)">
+                        <path d="M15,0 L25,0 L25,5 L30,5 L30,10 L25,10 L25,15 L15,15 L15,10 L10,10 L10,5 L15,5 Z" fill="#f5cd9a"/>
+                        <path d="M10,20 C5,15 5,30 10,35 C15,40 25,40 30,35 C35,30 35,15 30,20 C25,25 15,25 10,20 Z" fill="#fdf3e2"/>
+                        <path d="M13,35 C10,55 5,75 5,80 L35,80 C35,75 30,55 27,35 Z" fill="#fff5e6"/>
+                        <path d="M18,35 C15,55 10,75 10,80 L20,80 C20,75 22,55 22,35 Z" fill="#fff" opacity="0.7"/>
+                        <rect x="3" y="80" width="34" height="6" rx="2" fill="#e6cd98"/>
+                        <rect x="0" y="86" width="40" height="8" rx="3" fill="#d4b886"/>
                     </g>
                 </svg>
                 <h3 data-i18n="chess_game">GAME CỜ</h3>
@@ -495,6 +494,9 @@
                 <div class="custom-radio active" onclick="setOption('tttSize', 3, this, 't-size-group')">3x3</div>
                 <div class="custom-radio" onclick="setOption('tttSize', 7, this, 't-size-group')">7x7</div>
                 <div class="custom-radio" onclick="setOption('tttSize', 9, this, 't-size-group')">9x9</div>
+                <div class="custom-radio" onclick="setOption('tttSize', 11, this, 't-size-group')">11x11</div>
+                <div class="custom-radio" onclick="setOption('tttSize', 13, this, 't-size-group')">13x13</div>
+                <div class="custom-radio" onclick="setOption('tttSize', 15, this, 't-size-group')">15x15</div>
             </div>
 
             <div data-i18n="game_mode" style="font-weight:bold; text-align:left; color:var(--text);">Chế độ chơi:</div>
@@ -752,7 +754,8 @@
     function initTTT(isNewMatch = false) {
         if(isNewMatch) { matchScores.ttt_x = 0; matchScores.ttt_o = 0; }
         tttSize = parseInt(globalOptions.tttSize);
-        tttWinLen = (tttSize === 3) ? 3 : (tttSize === 7 ? 4 : 5);
+        // Tự động nhận winLen = 5 cho các bàn lớn 9x9, 11x11, 13x13, 15x15
+        tttWinLen = (tttSize === 3) ? 3 : (tttSize === 7 ? 4 : 5); 
         isTttAi = globalOptions.tttMode === 'pve';
         tttAiDiff = parseInt(globalOptions.tttAiDiff);
         currentActiveGame = 'ttt';
@@ -770,8 +773,10 @@
         grid.innerHTML = '';
         grid.style.gridTemplateColumns = `repeat(${tttSize}, 1fr)`;
         grid.style.gridTemplateRows = `repeat(${tttSize}, 1fr)`;
+        grid.style.gap = tttSize >= 11 ? '2px' : '4px';
 
-        let fontSize = tttSize === 3 ? '4.5rem' : (tttSize === 7 ? '2rem' : '1.5rem');
+        // Tự động chỉnh font-size để tránh tràn ô cờ
+        let fontSize = tttSize === 3 ? '4.5rem' : (tttSize === 7 ? '2rem' : (tttSize === 9 ? '1.5rem' : (tttSize === 11 ? '1.2rem' : (tttSize === 13 ? '1rem' : '0.8rem'))));
 
         tttBoard.forEach((cell, i) => {
             let div = document.createElement('div'); div.className = `cell-ttt ${cell ? cell.toLowerCase() : ''}`;
