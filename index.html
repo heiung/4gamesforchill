@@ -134,18 +134,48 @@
         .pvp-scoreboard .vs { font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 8px; }
         .score-badge { background: white; padding: 2px 10px; border-radius: 8px; margin: 0 5px; color: #d35400; font-size: 1.1rem; }
 
-        .journey-map-container { height: 400px; overflow-y: auto; padding: 20px 0; position: relative; scroll-behavior: smooth; border-radius: 15px; background: rgba(255,255,255,0.8); border: 2px solid var(--border);}
+        /* Giao diện Hành trình con đường đồi núi */
+        .journey-map-container { 
+            height: 400px; overflow-y: auto; padding: 0; position: relative; scroll-behavior: smooth; border-radius: 15px; 
+            border: 2px solid var(--border);
+            /* Bầu trời và đồi núi bằng CSS */
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 30%, #a8e6cf 50%, #76d7c4 100%);
+        }
         .journey-map-container::-webkit-scrollbar { width: 5px; }
         .journey-map-container::-webkit-scrollbar-thumb { background: #bdc3c7; border-radius: 10px; }
         .j-path-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; padding: 40px 0;}
-        .j-path-line { position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 8px; background: var(--border); z-index: 0; border-radius: 10px;}
-        .j-node { width: 60px; height: 60px; border-radius: 50%; background: #fff; border: 6px solid var(--border); color: #95a5a6; font-weight: 900; font-size: 1.3rem; display: flex; justify-content: center; align-items: center; z-index: 1; margin: 18px 0; cursor: pointer; transition: 0.3s; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
-        .j-node:nth-child(odd) { transform: translateX(-45px); }
-        .j-node:nth-child(even) { transform: translateX(45px); }
-        .j-node.completed { background: var(--primary); border-color: var(--primary-dark); color: white; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);}
+        
+        /* Con đường uốn lượn */
+        .j-path-line { 
+            position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 25px; 
+            background: #444; z-index: 0; border-radius: 10px;
+            border-left: 2px solid #222; border-right: 2px solid #222;
+        }
+        /* Vạch kẻ đường */
+        .j-path-line::after {
+            content: ''; position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px;
+            background: repeating-linear-gradient(to bottom, #f1c40f 0, #f1c40f 15px, transparent 15px, transparent 30px);
+        }
+
+        .j-node { 
+            width: 60px; height: 60px; border-radius: 50%; background: #fff; border: 6px solid #e74c3c; color: #e74c3c; font-weight: 900; font-size: 1.3rem; display: flex; justify-content: center; align-items: center; z-index: 1; margin: 25px 0; cursor: pointer; transition: 0.3s; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        /* Đặt các node zigzag trên con đường */
+        .j-node:nth-child(odd) { transform: translateX(-35px); }
+        .j-node:nth-child(even) { transform: translateX(35px); }
+        
+        .j-node.completed { background: #2ecc71; border-color: #27ae60; color: white; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);}
         .j-node.current { background: #f1c40f; border-color: #f39c12; color: white; box-shadow: 0 0 20px rgba(241,196,15,0.7); z-index: 3; }
-        .j-node.current:nth-child(odd) { transform: translateX(-45px) scale(1.15); }
-        .j-node.current:nth-child(even) { transform: translateX(45px) scale(1.15); }
+        .j-node.current:nth-child(odd) { transform: translateX(-35px) scale(1.15); }
+        .j-node.current:nth-child(even) { transform: translateX(35px) scale(1.15); }
+        
+        /* Cây xanh trang trí CSS hai bên đường */
+        .j-node::before {
+            content: '🌲'; position: absolute; font-size: 1.5rem; z-index: -1;
+        }
+        .j-node:nth-child(odd)::before { right: -40px; top: 10px; }
+        .j-node:nth-child(even)::before { left: -40px; top: 10px; }
+
         .j-boy { position: absolute; top: -38px; font-size: 2.5rem; animation: bounce 0.6s infinite alternate; filter: drop-shadow(0 4px 5px rgba(0,0,0,0.3));}
         @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-12px); } }
 
@@ -219,6 +249,10 @@
 </head>
 <body>
 
+<audio id="bg-music" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
+</audio>
+
 <div id="splash-screen" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:var(--bg); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
     <img src="logo.png" alt="Logo" style="max-width:85%; max-height:50vh; object-fit:contain; margin-bottom:40px; animation: floatSplash 3s ease-in-out infinite; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));">
     <button class="btn" style="width:220px; font-size:1.5rem; padding:15px; border-radius:50px; background:linear-gradient(135deg, #2ecc71, #27ae60); box-shadow:0 10px 20px rgba(46,204,113,0.4);" onclick="startFromSplash()">PLAY NOW</button>
@@ -229,27 +263,30 @@
     <h2 id="modal-title" style="margin:0; color:var(--primary-dark); font-size:1.8rem; text-transform:uppercase;">KẾT QUẢ!</h2>
     <img id="memeImg" src="" alt="Meme">
     <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
-        <button class="btn" data-i18n="play_again" style="padding:12px; background:#3498db; font-size:1.1rem;" onclick="closeWin(true)">🔄 CHƠI LẠI</button>
+        <button class="btn" data-i18n="play_again" style="padding:12px; background:#3498db; font-size:1.1rem;" onclick="closeWin(true)">CHƠI LẠI</button>
         <div style="display:flex; gap:10px;">
-            <button class="btn btn-outline" data-i18n="review" style="flex:1; padding:10px; margin:0;" onclick="hideModalForReview()">👁️ XEM LẠI</button>
-            <button class="btn btn-outline" data-i18n="menu" style="flex:1; padding:10px; margin:0; border-color:#e74c3c; color:#e74c3c;" onclick="closeWin(false)">🏠 MENU</button>
+            <button class="btn btn-outline" data-i18n="review" style="flex:1; padding:10px; margin:0;" onclick="hideModalForReview()">XEM LẠI</button>
+            <button class="btn btn-outline" data-i18n="menu" style="flex:1; padding:10px; margin:0; border-color:#e74c3c; color:#e74c3c;" onclick="closeWin(false)">MENU</button>
         </div>
     </div>
 </div>
 
 <div class="container-box">
     
-    <button id="btn-show-result" class="hidden" data-i18n="show_result" onclick="showResultModal()">🔙 Mở Bảng Kết Quả</button>
+    <button id="btn-show-result" class="hidden" data-i18n="show_result" onclick="showResultModal()">Mở Bảng Kết Quả</button>
 
     <div id="page-menu">
-        <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:15px; position:relative;">
-            <button class="btn-outline" onclick="toggleLang()" id="btn-lang" style="position:absolute; right:0; top:0; padding:4px 8px; border-radius:8px; font-size:0.75rem; cursor:pointer; font-weight:bold; border-width:2px; height:max-content; margin:0;">🇺🇸 EN</button>
-            <div style="text-align: center; width: 100%; margin-top:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width:100%;">
+            <div style="text-align: left; flex:1;">
                 <h1 id="ui-title" style="margin: 0; padding: 0; line-height: 1;">
                     <span style="font-size: 2.3rem; font-weight: 900; color: #f1c40f; text-shadow: 2px 2px 0px #e67e22, 4px 4px 0px rgba(0,0,0,0.2); display: block;">FOUR GAMES</span>
                     <span style="font-size: 1.4rem; font-weight: 900; color: #e74c3c; text-shadow: 1px 1px 0px #c0392b, 2px 2px 0px rgba(0,0,0,0.2); letter-spacing: 3px; display: block; margin-top: 5px;">FOR FUN</span>
                 </h1>
                 <p class="subtitle" data-i18n="subtitle" style="margin-top: 8px;">Created by HeiuNG</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button class="btn-outline" onclick="toggleMusic()" id="btn-music" style="padding:4px 8px; border-radius:8px; font-size:0.75rem; cursor:pointer; font-weight:bold; border-width:2px; height:max-content; margin:0; white-space:nowrap; border-color:#9b59b6; color:#9b59b6;">Nhạc: BẬT</button>
+                <button class="btn-outline" onclick="toggleLang()" id="btn-lang" style="padding:4px 8px; border-radius:8px; font-size:0.75rem; cursor:pointer; font-weight:bold; border-width:2px; height:max-content; margin:0;">EN</button>
             </div>
         </div>
         
@@ -352,36 +389,36 @@
                             <stop offset="100%" stop-color="#0a2a12"/>
                         </radialGradient>
                         <filter id="chShadow" x="-20%" y="-20%" width="150%" height="150%">
-                            <feDropShadow dx="3" dy="5" stdDeviation="3" flood-color="#000" flood-opacity="0.6"/>
+                            <feDropShadow dx="0" dy="5" stdDeviation="3" flood-color="#000" flood-opacity="0.6"/>
                         </filter>
+                        <linearGradient id="kingGloss" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#000000" />
+                            <stop offset="25%" stop-color="#444444" />
+                            <stop offset="50%" stop-color="#111111" />
+                            <stop offset="80%" stop-color="#555555" />
+                            <stop offset="100%" stop-color="#000000" />
+                        </linearGradient>
                     </defs>
                     <rect x="5" y="5" width="90" height="90" rx="15" fill="url(#chessBg2)"/>
                     
-                    <path d="M 10 70 L 90 70 L 80 40 L 20 40 Z" fill="#2e7d32" opacity="0.3"/>
-                    <path d="M 30 70 L 45 70 L 45 40 L 35 40 Z" fill="#000" opacity="0.1"/>
-                    <path d="M 60 70 L 75 70 L 65 40 L 55 40 Z" fill="#000" opacity="0.1"/>
+                    <path d="M 10 75 L 90 75 L 80 40 L 20 40 Z" fill="#2e7d32" opacity="0.3"/>
+                    <path d="M 30 75 L 45 75 L 45 40 L 35 40 Z" fill="#000" opacity="0.1"/>
+                    <path d="M 60 75 L 75 75 L 65 40 L 55 40 Z" fill="#000" opacity="0.1"/>
                     
-                    <g filter="url(#chShadow)" transform="translate(10, 30) scale(0.8)">
-                        <path d="M20,60 C20,40 10,25 25,10 C35,20 40,30 40,60 Z" fill="#111"/>
-                        <path d="M22,60 C22,40 15,30 25,18 C30,25 35,35 35,60 Z" fill="#2d3436"/>
-                        <path d="M20,15 L25,5 L30,15 Z" fill="#111"/>
-                        <rect x="15" y="60" width="30" height="8" rx="2" fill="#0a0a0a"/>
-                    </g>
-
-                    <g filter="url(#chShadow)" transform="translate(58, 38) scale(0.7)">
-                        <path d="M10,15 L15,15 L15,25 L20,25 L20,15 L25,15 L25,25 L30,25 L30,15 L35,15 L35,30 L10,30 Z" fill="#111"/>
-                        <path d="M12,30 L33,30 L28,60 L17,60 Z" fill="#1a1a1a"/>
-                        <path d="M16,30 L22,30 L20,60 L18,60 Z" fill="#333" opacity="0.4"/>
-                        <rect x="8" y="60" width="29" height="8" rx="2" fill="#0a0a0a"/>
-                    </g>
-
-                    <g filter="url(#chShadow)" transform="translate(32, 10) scale(0.9)">
-                        <path d="M15,0 L25,0 L25,5 L30,5 L30,10 L25,10 L25,15 L15,15 L15,10 L10,10 L10,5 L15,5 Z" fill="#f5cd9a"/>
-                        <path d="M10,20 C5,15 5,30 10,35 C15,40 25,40 30,35 C35,30 35,15 30,20 C25,25 15,25 10,20 Z" fill="#fdf3e2"/>
-                        <path d="M13,35 C10,55 5,75 5,80 L35,80 C35,75 30,55 27,35 Z" fill="#fff5e6"/>
-                        <path d="M18,35 C15,55 10,75 10,80 L20,80 C20,75 22,55 22,35 Z" fill="#fff" opacity="0.7"/>
-                        <rect x="3" y="80" width="34" height="6" rx="2" fill="#e6cd98"/>
-                        <rect x="0" y="86" width="40" height="8" rx="3" fill="#d4b886"/>
+                    <g filter="url(#chShadow)" transform="translate(25, 10)">
+                        <path d="M 22 5 L 28 5 L 28 10 L 33 10 L 33 15 L 28 15 L 28 20 L 22 20 L 22 15 L 17 15 L 17 10 L 22 10 Z" fill="url(#kingGloss)"/>
+                        
+                        <path d="M 15 25 C 10 25, 10 35, 20 40 L 30 40 C 40 35, 40 25, 35 25 Z" fill="url(#kingGloss)"/>
+                        
+                        <rect x="18" y="40" width="14" height="4" rx="2" fill="#222"/>
+                        <rect x="15" y="44" width="20" height="6" rx="3" fill="url(#kingGloss)"/>
+                        
+                        <path d="M 18 50 C 15 65, 12 75, 10 80 L 40 80 C 38 75, 35 65, 32 50 Z" fill="url(#kingGloss)"/>
+                        
+                        <rect x="8" y="80" width="34" height="5" rx="2" fill="#222"/>
+                        <path d="M 5 85 L 45 85 C 45 90, 40 92, 25 92 C 10 92, 5 90, 5 85 Z" fill="url(#kingGloss)"/>
+                        
+                        <path d="M 19 50 C 17 65, 15 75, 14 80 L 16 80 C 18 75, 20 65, 22 50 Z" fill="#fff" opacity="0.15"/>
                     </g>
                 </svg>
                 <h3 data-i18n="chess_game">GAME CỜ</h3>
@@ -432,8 +469,8 @@
             </div>
             <button class="btn btn-outline" data-i18n="history" onclick="openMode('history', 'block')" style="padding:5px 10px; border-radius:10px; font-size:0.8rem; height:max-content; width:max-content;">LỊCH SỬ</button>
         </div>
-        <button class="btn" data-i18n="classic_mode" style="background:#3498db; padding:20px; font-size:1.2rem; margin-bottom:15px;" onclick="openMode('block')">🟦 CHẾ ĐỘ CỔ ĐIỂN</button>
-        <button class="btn" data-i18n="challenge_mode" style="background:#e67e22; padding:20px; font-size:1.2rem;" onclick="openMode('block-journey')">🏆 CHẾ ĐỘ THỬ THÁCH</button>
+        <button class="btn" data-i18n="classic_mode" style="background:#3498db; padding:20px; font-size:1.2rem; margin-bottom:15px;" onclick="openMode('block')">CHẾ ĐỘ CỔ ĐIỂN</button>
+        <button class="btn" data-i18n="challenge_mode" style="background:#e67e22; padding:20px; font-size:1.2rem;" onclick="openMode('block-journey')">CHẾ ĐỘ THỬ THÁCH</button>
     </div>
 
     <div id="page-block-journey" class="hidden">
@@ -474,6 +511,7 @@
                     <div class="custom-radio" data-i18n="med" onclick="setOption('boardAiDiff', 2, this, 'c-diff-group')">TB</div>
                     <div class="custom-radio" data-i18n="hard" onclick="setOption('boardAiDiff', 3, this, 'c-diff-group')">Khó</div>
                     <div class="custom-radio" data-i18n="extreme" onclick="setOption('boardAiDiff', 4, this, 'c-diff-group')">Cực Khó</div>
+                    <div class="custom-radio" data-i18n="super_hard" onclick="setOption('boardAiDiff', 5, this, 'c-diff-group')">Siêu Khó</div>
                 </div>
             </div>
         </div>
@@ -492,11 +530,8 @@
             <div data-i18n="board_size" style="font-weight:bold; text-align:left; color:var(--text);">Kích thước Bàn cờ:</div>
             <div class="custom-radio-group" id="t-size-group">
                 <div class="custom-radio active" onclick="setOption('tttSize', 3, this, 't-size-group')">3x3</div>
-                <div class="custom-radio" onclick="setOption('tttSize', 7, this, 't-size-group')">7x7</div>
                 <div class="custom-radio" onclick="setOption('tttSize', 9, this, 't-size-group')">9x9</div>
-                <div class="custom-radio" onclick="setOption('tttSize', 11, this, 't-size-group')">11x11</div>
-                <div class="custom-radio" onclick="setOption('tttSize', 13, this, 't-size-group')">13x13</div>
-                <div class="custom-radio" onclick="setOption('tttSize', 15, this, 't-size-group')">15x15</div>
+                <div class="custom-radio" onclick="setOption('tttSize', 25, this, 't-size-group')">25x25</div>
             </div>
 
             <div data-i18n="game_mode" style="font-weight:bold; text-align:left; color:var(--text);">Chế độ chơi:</div>
@@ -512,6 +547,7 @@
                     <div class="custom-radio" data-i18n="med" onclick="setOption('tttAiDiff', 2, this, 't-diff-group')">TB</div>
                     <div class="custom-radio" data-i18n="hard" onclick="setOption('tttAiDiff', 3, this, 't-diff-group')">Khó</div>
                     <div class="custom-radio" data-i18n="extreme" onclick="setOption('tttAiDiff', 4, this, 't-diff-group')">Cực Khó</div>
+                    <div class="custom-radio" data-i18n="super_hard" onclick="setOption('tttAiDiff', 5, this, 't-diff-group')">Siêu Khó</div>
                 </div>
             </div>
         </div>
@@ -598,7 +634,7 @@
         </div>
         
         <div id="target-container" class="hidden" style="background:#e67e22; color:white; padding:8px 15px; border-radius:10px; font-weight:bold; margin-bottom:10px; text-align:center; font-size:1.1rem; box-shadow:0 3px 10px rgba(230,126,34,0.3);">
-            <span data-i18n="target_lvl">🎯 MỤC TIÊU MỐC</span> <span id="current-j-level"></span>: <span id="target-b">0</span>
+            <span data-i18n="target_lvl">MỤC TIÊU MỐC</span> <span id="current-j-level"></span>: <span id="target-b">0</span>
         </div>
 
         <div id="board-b" class="grid-b"></div>
@@ -617,30 +653,49 @@
 </div>
 
 <script>
+    let isMusicOn = true;
+    const bgm = new Audio('https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3');
+    bgm.loop = true;
+
+    function toggleMusic() {
+        isMusicOn = !isMusicOn;
+        let btn = document.getElementById('btn-music');
+        if (isMusicOn) {
+            bgm.play().catch(e => console.log(e));
+            btn.innerText = currentLang === 'vi' ? 'Nhạc: BẬT' : 'Music: ON';
+        } else {
+            bgm.pause();
+            btn.innerText = currentLang === 'vi' ? 'Nhạc: TẮT' : 'Music: OFF';
+        }
+    }
+
     function startFromSplash() {
         document.getElementById('splash-screen').style.display = 'none';
+        if (isMusicOn) {
+            bgm.play().catch(e => console.log(e));
+        }
     }
 
     let currentLang = 'vi';
     const i18n = {
         vi: { 
-            subtitle: "Created by HeiuNG", lang: "🇺🇸 EN",
+            subtitle: "Created by HeiuNG", lang: "EN",
             sudoku: "SUDOKU", block_blast: "BLOCK BLAST", chess_game: "GAME CỜ", ttt: "TIC TAC TOE",
-            history: "LỊCH SỬ", history_title: "LỊCH SỬ CHƠI", play_again: "🔄 CHƠI LẠI", review: "👁️ XEM LẠI", menu: "🏠 MENU", show_result: "🔙 Mở Bảng Kết Quả",
-            classic_mode: "🟦 CHẾ ĐỘ CỔ ĐIỂN", challenge_mode: "🏆 CHẾ ĐỘ THỬ THÁCH", journey_200: "HÀNH TRÌNH 200 MỐC",
+            history: "LỊCH SỬ", history_title: "LỊCH SỬ CHƠI", play_again: "CHƠI LẠI", review: "XEM LẠI", menu: "MENU", show_result: "Mở Bảng Kết Quả",
+            classic_mode: "CHẾ ĐỘ CỔ ĐIỂN", challenge_mode: "CHẾ ĐỘ THỬ THÁCH", journey_200: "HÀNH TRÌNH 200 MỐC",
             chess_type: "Loại Cờ:", chess: "Cờ Vua", xiangqi: "Cờ Tướng", game_mode: "Chế độ:", pvp: "2 Người (PvP)", pve: "Đấu AI (PvE)",
-            ai_diff: "Độ khó AI:", easy: "Dễ", med: "TB", hard: "Khó", extreme: "Cực Khó", board_size: "Kích thước Bàn cờ:",
-            start: "BẮT ĐẦU", hint: "GỢI Ý (+10s)", ai_solve: "AI GIẢI", target_lvl: "🎯 MỤC TIÊU MỐC",
+            ai_diff: "Độ khó AI:", easy: "Dễ", med: "TB", hard: "Khó", extreme: "Cực Khó", super_hard: "Siêu Khó", board_size: "Kích thước Bàn cờ:",
+            start: "BẮT ĐẦU", hint: "GỢI Ý (+10s)", ai_solve: "AI GIẢI", target_lvl: "MỤC TIÊU MỐC",
             turn_w: "Lượt Trắng", turn_b: "Lượt Đen", turn_r: "Lượt Đỏ", turn_bl: "Lượt Đen", turn_x: "Lượt của X", turn_o: "Lượt của O"
         },
         en: { 
-            subtitle: "Created by HeiuNG", lang: "🇻🇳 VN",
+            subtitle: "Created by HeiuNG", lang: "VN",
             sudoku: "SUDOKU", block_blast: "BLOCK BLAST", chess_game: "BOARD GAMES", ttt: "TIC TAC TOE",
-            history: "HISTORY", history_title: "MATCH HISTORY", play_again: "🔄 REPLAY", review: "👁️ REVIEW", menu: "🏠 MENU", show_result: "🔙 Show Results",
-            classic_mode: "🟦 CLASSIC MODE", challenge_mode: "🏆 CHALLENGE MODE", journey_200: "200 LEVELS JOURNEY",
+            history: "HISTORY", history_title: "MATCH HISTORY", play_again: "REPLAY", review: "REVIEW", menu: "MENU", show_result: "Show Results",
+            classic_mode: "CLASSIC MODE", challenge_mode: "CHALLENGE MODE", journey_200: "200 LEVELS JOURNEY",
             chess_type: "Game Type:", chess: "Chess", xiangqi: "Xiangqi", game_mode: "Mode:", pvp: "2 Players (PvP)", pve: "vs AI (PvE)",
-            ai_diff: "AI Diff:", easy: "Easy", med: "Med", hard: "Hard", extreme: "Expert", board_size: "Board Size:",
-            start: "START", hint: "HINT (+10s)", ai_solve: "AI SOLVE", target_lvl: "🎯 TARGET LEVEL",
+            ai_diff: "AI Diff:", easy: "Easy", med: "Med", hard: "Hard", extreme: "Expert", super_hard: "Extreme+", board_size: "Board Size:",
+            start: "START", hint: "HINT (+10s)", ai_solve: "AI SOLVE", target_lvl: "TARGET LEVEL",
             turn_w: "White's Turn", turn_b: "Black's Turn", turn_r: "Red's Turn", turn_bl: "Black's Turn", turn_x: "X's Turn", turn_o: "O's Turn"
         }
     };
@@ -649,6 +704,7 @@
         currentLang = (currentLang === 'vi') ? 'en' : 'vi';
         const t = i18n[currentLang];
         document.getElementById('btn-lang').innerText = t.lang;
+        document.getElementById('btn-music').innerText = isMusicOn ? (currentLang === 'vi' ? 'Nhạc: BẬT' : 'Music: ON') : (currentLang === 'vi' ? 'Nhạc: TẮT' : 'Music: OFF');
         
         document.querySelectorAll('[data-i18n]').forEach(el => {
             let key = el.getAttribute('data-i18n');
@@ -754,8 +810,7 @@
     function initTTT(isNewMatch = false) {
         if(isNewMatch) { matchScores.ttt_x = 0; matchScores.ttt_o = 0; }
         tttSize = parseInt(globalOptions.tttSize);
-        // Tự động nhận winLen = 5 cho các bàn lớn 9x9, 11x11, 13x13, 15x15
-        tttWinLen = (tttSize === 3) ? 3 : (tttSize === 7 ? 4 : 5); 
+        tttWinLen = (tttSize === 3) ? 3 : (tttSize === 9 ? 4 : 5); 
         isTttAi = globalOptions.tttMode === 'pve';
         tttAiDiff = parseInt(globalOptions.tttAiDiff);
         currentActiveGame = 'ttt';
@@ -773,10 +828,9 @@
         grid.innerHTML = '';
         grid.style.gridTemplateColumns = `repeat(${tttSize}, 1fr)`;
         grid.style.gridTemplateRows = `repeat(${tttSize}, 1fr)`;
-        grid.style.gap = tttSize >= 11 ? '2px' : '4px';
+        grid.style.gap = tttSize >= 25 ? '1px' : '4px';
 
-        // Tự động chỉnh font-size để tránh tràn ô cờ
-        let fontSize = tttSize === 3 ? '4.5rem' : (tttSize === 7 ? '2rem' : (tttSize === 9 ? '1.5rem' : (tttSize === 11 ? '1.2rem' : (tttSize === 13 ? '1rem' : '0.8rem'))));
+        let fontSize = tttSize === 3 ? '4.5rem' : (tttSize === 9 ? '1.5rem' : '0.6rem');
 
         tttBoard.forEach((cell, i) => {
             let div = document.createElement('div'); div.className = `cell-ttt ${cell ? cell.toLowerCase() : ''}`;
@@ -798,7 +852,7 @@
                     tttTurn = tttTurn === 'X' ? 'O' : 'X'; renderTTT();
                     
                     if(isTttAi && tttTurn === 'O' && !checkWinCaro(tttBoard, tttSize, tttWinLen) && tttBoard.includes(null)) {
-                        setTimeout(() => makeTTTAiMove(), 200);
+                        setTimeout(() => makeTTTAiMove(), 100);
                     }
                 }
             };
@@ -824,7 +878,7 @@
     function makeTTTAiMove() {
         let empty = tttBoard.map((v,i) => v===null?i:-1).filter(v=>v!==-1);
         let move = -1; let r = Math.random();
-        let useSmart = (tttAiDiff===4) || (tttAiDiff===3 && r<0.95) || (tttAiDiff===2 && r<0.5);
+        let useSmart = (tttAiDiff>=4) || (tttAiDiff===3 && r<0.95) || (tttAiDiff===2 && r<0.5);
         
         if(!useSmart || empty.length === tttSize*tttSize) { 
             move = empty[Math.floor(Math.random()*empty.length)]; 
@@ -833,8 +887,27 @@
                 if (tttBoard[center] === null) move = center;
             }
         } else { 
-            if(tttSize === 3) move = getBestMoveTTT(tttBoard, 'O').index; 
-            else move = getCaroHeuristicMove(tttBoard, tttSize, tttWinLen, 'O');
+            if(tttSize === 3) {
+                move = getBestMoveTTT(tttBoard, 'O').index; 
+            } else {
+                if(tttAiDiff === 5) {
+                    for(let idx of empty) {
+                        tttBoard[idx] = 'O';
+                        if(checkWinCaro(tttBoard, tttSize, tttWinLen)) { tttBoard[idx] = null; move = idx; break; }
+                        tttBoard[idx] = null;
+                    }
+                    if(move === -1) {
+                        for(let idx of empty) {
+                            tttBoard[idx] = 'X';
+                            if(checkWinCaro(tttBoard, tttSize, tttWinLen)) { tttBoard[idx] = null; move = idx; break; }
+                            tttBoard[idx] = null;
+                        }
+                    }
+                }
+                if(move === -1) {
+                    move = getCaroHeuristicMove(tttBoard, tttSize, tttWinLen, 'O');
+                }
+            }
         }
         
         if(move !== -1) {
@@ -854,9 +927,11 @@
     function getCaroHeuristicMove(b, size, winLen, player) {
         let empty = b.map((v,i) => v===null?i:-1).filter(v=>v!==-1);
         let bestScore = -1; let bestMoves = []; let opp = player === 'X' ? 'O' : 'X';
+        
+        let blockMultiplier = (tttAiDiff === 5) ? 2.5 : 1.1;
 
         empty.forEach(idx => {
-            let score = evalCaroCell(b, idx, size, winLen, player) * 1.1 + evalCaroCell(b, idx, size, winLen, opp);
+            let score = evalCaroCell(b, idx, size, winLen, player) + evalCaroCell(b, idx, size, winLen, opp) * blockMultiplier;
             score += Math.random(); 
             if(score > bestScore) { bestScore = score; bestMoves = [idx]; }
             else if (score === bestScore) { bestMoves.push(idx); }
@@ -1264,7 +1339,7 @@
                 score -= pieceVal * 15; 
             }
             
-            if(boardAiDiff === 4) {
+            if(boardAiDiff >= 4) {
                 let wKingIdx = temp.findIndex(x => x === 'K');
                 if(wKingIdx !== -1 && isSquareAttacked(wKingIdx, false, temp)) score += 8; 
             }
@@ -1306,7 +1381,22 @@
             for(let i=0; i<64; i++) {
                 if(cBoard[i] && cBoard[i] === cBoard[i].toLowerCase()) {
                     let mvs = getLegalMoves(i, cBoard, castling, epTarget);
-                    mvs.forEach(to => moves.push({from: i, to: to, score: (boardAiDiff >= 2 ? evalMoveC(i, to, cBoard) : Math.random())}));
+                    
+                    if (boardAiDiff === 5) {
+                        mvs.forEach(to => {
+                            let tempBoard = [...cBoard];
+                            tempBoard[to] = tempBoard[i];
+                            tempBoard[i] = null;
+                            let baseScore = evalMoveC(i, to, cBoard);
+                            // Cực kỳ thông minh: Nhìn trước 1 bước xem có bị đối phương ăn lại hay không
+                            if (isSquareAttacked(to, true, tempBoard)) {
+                                baseScore -= (pieceValues[tempBoard[to].toLowerCase()] || 1) * 20; 
+                            }
+                            moves.push({from: i, to: to, score: baseScore + Math.random()});
+                        });
+                    } else {
+                        mvs.forEach(to => moves.push({from: i, to: to, score: (boardAiDiff >= 2 ? evalMoveC(i, to, cBoard) : Math.random())}));
+                    }
                 }
             }
             if(moves.length === 0) return; 
@@ -1318,7 +1408,22 @@
             for(let i=0; i<90; i++) {
                 if(ccB[i] && ccB[i] === ccB[i].toLowerCase()) {
                     let mvs = getCCLegalMoves(i, ccB);
-                    mvs.forEach(to => moves.push({from: i, to: to, score: (boardAiDiff >= 2 ? evalMoveCC(i, to, ccB) : Math.random())}));
+                    if (boardAiDiff === 5) {
+                        mvs.forEach(to => {
+                            let tempBoard = [...ccB];
+                            tempBoard[to] = tempBoard[i];
+                            tempBoard[i] = null;
+                            let baseScore = evalMoveCC(i, to, ccB);
+                            let isAttacked = false;
+                            for (let j = 0; j < 90; j++) {
+                                if (tempBoard[j] && tempBoard[j] === tempBoard[j].toUpperCase() && getCCMovesSim(j, tempBoard).includes(to)) { isAttacked = true; break; }
+                            }
+                            if (isAttacked) baseScore -= (ccVals[tempBoard[to].toLowerCase()] || 1) * 20;
+                            moves.push({from: i, to: to, score: baseScore + Math.random()});
+                        });
+                    } else {
+                        mvs.forEach(to => moves.push({from: i, to: to, score: (boardAiDiff >= 2 ? evalMoveCC(i, to, ccB) : Math.random())}));
+                    }
                 }
             }
             if(moves.length === 0) return; 
