@@ -201,7 +201,7 @@
         /* --- TIC TAC TOE --- */
         .grid-ttt { 
             display: grid; gap: 4px; background: var(--primary-dark); border: 4px solid var(--primary-dark); 
-            border-radius: 12px; width: 300px; height: 300px; margin: 15px auto; 
+            border-radius: 12px; width: 300px; height: 300px; margin: 0 auto; 
             overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); box-sizing: border-box;
         }
         .cell-ttt { 
@@ -247,6 +247,15 @@
         #winModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 20px; z-index: 1000; width: 320px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
         #winModal img { width: 100%; border-radius: 10px; margin: 15px 0; max-height: 200px; object-fit: cover;}
         .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index: 999; backdrop-filter: blur(5px); }
+        
+        /* Box bọc TTT để hỗ trợ Zoom & Scroll */
+        #ttt-zoom-wrapper {
+            width: 100%; overflow: auto; max-height: 380px; 
+            border: 2px dashed #bdc3c7; border-radius: 12px; 
+            background: rgba(255,255,255,0.5); display: flex; 
+            justify-content: center; align-items: center; 
+            padding: 10px; box-sizing: border-box; margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -540,6 +549,8 @@
             <div class="custom-radio-group" id="t-mode-group">
                 <div class="custom-radio active" data-i18n="pvp" onclick="setOption('tttMode', 'pvp', this, 't-mode-group')">2 Người (PvP)</div>
                 <div class="custom-radio" data-i18n="pve" onclick="setOption('tttMode', 'pve', this, 't-mode-group')">Đấu AI (PvE)</div>
+                <!-- ĐÃ THÊM CHẾ ĐỘ ONLINE VÀO ĐÂY -->
+                <div class="custom-radio" data-i18n="online" onclick="setOption('tttMode', 'online', this, 't-mode-group')">Online (Từ xa)</div>
             </div>
 
             <div id="ttt-diff-container" style="display:none;">
@@ -563,16 +574,15 @@
             <div style="width:45px;"></div>
         </div>
         
-        <!-- THÊM BẢNG ĐIỀU KHIỂN ONLINE TẠI ĐÂY -->
-        <div id="online-controls" style="background: #f8f9fa; padding: 10px; border-radius: 10px; margin-bottom: 10px; font-size: 0.8rem; border: 1px solid #ddd;">
+        <!-- BẢNG ĐIỀU KHIỂN ONLINE (Chỉ hiển thị khi chọn chế độ Online) -->
+        <div id="online-controls" class="hidden" style="background: #f8f9fa; padding: 10px; border-radius: 10px; margin-bottom: 10px; font-size: 0.8rem; border: 1px solid #ddd;">
             <div style="font-weight: bold; margin-bottom: 5px; color: #27ae60;">CHẾ ĐỘ TỪ XA</div>
             <div>
-                Mã của bạn: <strong id="my-id" style="color: #e67e22; letter-spacing: 1px;">Đang lấy...</strong>
-                <!-- NÚT COPY MÃ ID -->
+                Mã của bạn (Host = Quân X): <strong id="my-id" style="color: #e67e22; letter-spacing: 1px;">Đang lấy...</strong>
                 <button onclick="copyMyID()" style="margin-left: 10px; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; background: #95a5a6; color: white; border: none; border-radius: 4px;">Copy</button>
             </div>
             <div style="display: flex; gap: 5px; margin-top: 5px;">
-                <input type="text" id="peer-id-input" placeholder="Dán mã bạn bè vào đây" style="flex: 1; padding: 6px; border-radius: 5px; border: 1px solid #ccc; font-family: monospace;">
+                <input type="text" id="peer-id-input" placeholder="Dán mã Host vào đây (Bạn = Quân O)" style="flex: 1; padding: 6px; border-radius: 5px; border: 1px solid #ccc; font-family: monospace;">
                 <button onclick="connectToFriend()" style="background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold;">KẾT NỐI</button>
             </div>
             <div id="conn-status" style="color: #7f8c8d; margin-top: 5px; font-style: italic;">Chưa kết nối</div>
@@ -583,7 +593,18 @@
             <div class="vs">VS</div>
             <div style="color:#2ecc71;"><span class="score-badge" id="ttt-score-o">0</span> <span id="ttt-p2-name">O (P2)</span></div>
         </div>
-        <div id="grid-ttt" class="grid-ttt"></div>
+
+        <!-- THÊM THANH CÔNG CỤ ZOOM CHO BÀN CỜ -->
+        <div style="display:flex; justify-content:center; gap:10px; margin-bottom: 10px;">
+            <button class="btn btn-outline" style="width:auto; padding:4px 12px; margin:0; font-size: 0.85rem;" onclick="zoomTTT(0.2)">Zoom In ➕</button>
+            <button class="btn btn-outline" style="width:auto; padding:4px 12px; margin:0; font-size: 0.85rem;" onclick="zoomTTT(-0.2)">Zoom Out ➖</button>
+            <button class="btn btn-outline" style="width:auto; padding:4px 12px; margin:0; font-size: 0.85rem;" onclick="zoomTTT(0, true)">Reset</button>
+        </div>
+
+        <!-- BỌC BÀN CỜ TRONG KHUNG HỖ TRỢ ZOOM -->
+        <div id="ttt-zoom-wrapper">
+            <div id="grid-ttt" class="grid-ttt" style="transition: transform 0.2s; transform-origin: top center; margin: 0 auto;"></div>
+        </div>
     </div>
 
     <div id="page-chess" class="hidden">
@@ -701,7 +722,7 @@
             sudoku: "SUDOKU", block_blast: "BLOCK BLAST", chess_game: "GAME CỜ", ttt: "TIC TAC TOE",
             history: "LỊCH SỬ", history_title: "LỊCH SỬ CHƠI", play_again: "CHƠI LẠI", review: "XEM LẠI", menu: "MENU", show_result: "Mở Bảng Kết Quả",
             classic_mode: "CHẾ ĐỘ CỔ ĐIỂN", challenge_mode: "CHẾ ĐỘ THỬ THÁCH", journey_200: "HÀNH TRÌNH 200 MỐC",
-            chess_type: "Loại Cờ:", chess: "Cờ Vua", xiangqi: "Cờ Tướng", game_mode: "Chế độ:", pvp: "2 Người (PvP)", pve: "Đấu AI (PvE)",
+            chess_type: "Loại Cờ:", chess: "Cờ Vua", xiangqi: "Cờ Tướng", game_mode: "Chế độ:", pvp: "2 Người (PvP)", pve: "Đấu AI (PvE)", online: "Online (Từ xa)",
             ai_diff: "Độ khó AI:", easy: "Dễ", med: "TB", hard: "Khó", extreme: "Cực Khó", super_hard: "Siêu Khó", board_size: "Kích thước Bàn cờ:",
             start: "BẮT ĐẦU", hint: "GỢI Ý (+10s)", ai_solve: "AI GIẢI", target_lvl: "MỤC TIÊU MỐC",
             turn_w: "Lượt Trắng", turn_b: "Lượt Đen", turn_r: "Lượt Đỏ", turn_bl: "Lượt Đen", turn_x: "Lượt của X", turn_o: "Lượt của O"
@@ -711,7 +732,7 @@
             sudoku: "SUDOKU", block_blast: "BLOCK BLAST", chess_game: "BOARD GAMES", ttt: "TIC TAC TOE",
             history: "HISTORY", history_title: "MATCH HISTORY", play_again: "REPLAY", review: "REVIEW", menu: "MENU", show_result: "Show Results",
             classic_mode: "CLASSIC MODE", challenge_mode: "CHALLENGE MODE", journey_200: "200 LEVELS JOURNEY",
-            chess_type: "Game Type:", chess: "Chess", xiangqi: "Xiangqi", game_mode: "Mode:", pvp: "2 Players (PvP)", pve: "vs AI (PvE)",
+            chess_type: "Game Type:", chess: "Chess", xiangqi: "Xiangqi", game_mode: "Mode:", pvp: "2 Players (PvP)", pve: "vs AI (PvE)", online: "Online (Remote)",
             ai_diff: "AI Diff:", easy: "Easy", med: "Med", hard: "Hard", extreme: "Expert", super_hard: "Extreme+", board_size: "Board Size:",
             start: "START", hint: "HINT (+10s)", ai_solve: "AI SOLVE", target_lvl: "TARGET LEVEL",
             turn_w: "White's Turn", turn_b: "Black's Turn", turn_r: "Red's Turn", turn_bl: "Black's Turn", turn_x: "X's Turn", turn_o: "O's Turn"
@@ -805,8 +826,17 @@
 
     function updateScoreBoard(game) {
         if(game === 'ttt') {
-            document.getElementById('ttt-p1-name').innerText = isTttAi ? (currentLang==='vi'?'Bạn (X)':'You (X)') : 'X (P1)';
-            document.getElementById('ttt-p2-name').innerText = isTttAi ? (currentLang==='vi'?'Máy (O)':'AI (O)') : 'O (P2)';
+            let p1Label = isTttAi ? (currentLang==='vi'?'Bạn (X)':'You (X)') : 'X (P1)';
+            let p2Label = isTttAi ? (currentLang==='vi'?'Máy (O)':'AI (O)') : 'O (P2)';
+            
+            // Xử lý label cho online mode
+            if (globalOptions.tttMode === 'online') {
+                p1Label = (myOnlineSymbol === 'X') ? 'Bạn (X)' : 'Đối thủ (X)';
+                p2Label = (myOnlineSymbol === 'O') ? 'Bạn (O)' : 'Đối thủ (O)';
+            }
+            
+            document.getElementById('ttt-p1-name').innerText = p1Label;
+            document.getElementById('ttt-p2-name').innerText = p2Label;
             document.getElementById('ttt-score-x').innerText = matchScores.ttt_x;
             document.getElementById('ttt-score-o').innerText = matchScores.ttt_o;
         } else if (game === 'chess') {
@@ -824,6 +854,19 @@
 
     let tttBoard = [], tttTurn = 'X';
     let tttSize = 3, tttWinLen = 3;
+    let tttCurrentZoom = 1; // Biến kiểm soát mức độ zoom
+    
+    // Hàm phóng to/thu nhỏ TicTacToe
+    function zoomTTT(step, isReset = false) {
+        if (isReset) {
+            tttCurrentZoom = 1;
+        } else {
+            tttCurrentZoom += step;
+            if (tttCurrentZoom < 0.4) tttCurrentZoom = 0.4; // Min zoom
+            if (tttCurrentZoom > 3.0) tttCurrentZoom = 3.0; // Max zoom
+        }
+        document.getElementById('grid-ttt').style.transform = `scale(${tttCurrentZoom})`;
+    }
     
     function initTTT(isNewMatch = false) {
         if(isNewMatch) { matchScores.ttt_x = 0; matchScores.ttt_o = 0; }
@@ -833,11 +876,19 @@
         tttAiDiff = parseInt(globalOptions.tttAiDiff);
         currentActiveGame = 'ttt';
         
+        // Ẩn/hiện tính năng online
+        if (globalOptions.tttMode === 'online') {
+            document.getElementById('online-controls').classList.remove('hidden');
+        } else {
+            document.getElementById('online-controls').classList.add('hidden');
+        }
+        
         updateScoreBoard('ttt');
         openMode('ttt');
         
         tttBoard = Array(tttSize * tttSize).fill(null); 
         tttTurn = 'X';
+        zoomTTT(0, true); // Reset Zoom khi bắt đầu bàn mới
         renderTTT();
     }
     
@@ -855,11 +906,24 @@
             div.innerText = cell || '';
             div.style.fontSize = fontSize;
             div.onclick = () => {
+                // CHẶN NẾU ĐANG CHƠI ONLINE MÀ CHƯA TỚI LƯỢT HOẶC CHƯA KẾT NỐI
+                if (globalOptions.tttMode === 'online') {
+                    if (!conn || !conn.open) {
+                        alert("Đang đợi người chơi kết nối vào phòng!");
+                        return;
+                    }
+                    if (tttTurn !== myOnlineSymbol) {
+                        return; // Chưa tới lượt của bạn, không được bấm
+                    }
+                }
+
                 if(!cell && !checkWinCaro(tttBoard, tttSize, tttWinLen)) {
                     tttBoard[i] = tttTurn;
                     
-                    // --- GỬI NƯỚC ĐI ONLINE ---
-                    sendMoveOnline(i, tttTurn);
+                    // GỬI NƯỚC ĐI QUA ONLINE NẾU CHẾ ĐỘ ONLINE
+                    if (globalOptions.tttMode === 'online') {
+                        sendMoveOnline(i, tttTurn);
+                    }
 
                     let winner = checkWinCaro(tttBoard, tttSize, tttWinLen);
                     if(winner){ 
@@ -868,6 +932,10 @@
                         updateScoreBoard('ttt');
                         saveHistory('ttt', `Size: ${tttSize}x${tttSize} | Winner: ${winner}`);
                         let gameStatus = (isTttAi && winner === 'O') ? 'lose' : 'win';
+                        // Nếu chơi online, bạn cầm quân gì thì hiện Win/Lose theo đó
+                        if (globalOptions.tttMode === 'online') {
+                            gameStatus = (winner === myOnlineSymbol) ? 'win' : 'lose';
+                        }
                         fireWin(`${winner} ` + (currentLang==='vi'?'CHIẾN THẮNG!':'WINS!'), gameStatus); return; 
                     }
                     if(!tttBoard.includes(null)){ renderTTT(); saveHistory('ttt', 'Draw'); fireWin(currentLang==='vi'?"HÒA NHAU!":"DRAW!", 'draw'); return; }
@@ -880,7 +948,12 @@
             };
             grid.appendChild(div);
         });
-        document.getElementById('turn-ttt').innerText = i18n[currentLang][`turn_${tttTurn.toLowerCase()}`];
+        
+        let turnText = i18n[currentLang][`turn_${tttTurn.toLowerCase()}`];
+        if (globalOptions.tttMode === 'online') {
+            if (tttTurn === myOnlineSymbol) turnText += (currentLang==='vi' ? " (Bạn)" : " (You)");
+        }
+        document.getElementById('turn-ttt').innerText = turnText;
     }
 
     function checkWinCaro(b, size, winLen) {
@@ -1798,7 +1871,13 @@
         document.getElementById('btn-show-result').classList.add('hidden');
 
         if (playAgain) {
-            if (currentActiveGame === 'ttt') initTTT(false); 
+            if (currentActiveGame === 'ttt') {
+                initTTT(false);
+                // Đồng bộ khởi động lại bàn nếu đang chơi online
+                if (globalOptions.tttMode === 'online' && conn && conn.open) {
+                    conn.send({ type: 'RESTART' });
+                }
+            } 
             else if (currentActiveGame === 'chess' || currentActiveGame === 'cchess') initBoardGame(false);
             else if (currentActiveGame === 'sudoku') startSudoku();
             else if (currentActiveGame === 'block') {
@@ -1815,59 +1894,87 @@
         }
     }
 
-    // --- PHẦN KẾT NỐI TỪ XA QUA PEERJS ---
+    // --- PHẦN KẾT NỐI TỪ XA QUA PEERJS CHUẨN ---
     const peer = new Peer(); 
-    let conn;
+    let conn = null;
+    let myOnlineSymbol = null; // Biến lưu trữ ký hiệu khi chơi Online
 
-    // Khi máy của Hiếu xin được mã ID từ server
+    // Khi máy của bạn (Host) xin được mã ID từ server
     peer.on('open', (id) => { 
         document.getElementById('my-id').innerText = id; 
         console.log("Peer ID của bạn: " + id);
     });
 
-    // Khi bạn bè chủ động kết nối tới Hiếu
+    // Khi Host (người tạo mã) nhận được yêu cầu kết nối
     peer.on('connection', (c) => { 
+        if (globalOptions.tttMode !== 'online') return; // Không cho kết nối nếu không ở chế độ online
         conn = c; 
+        myOnlineSymbol = 'X'; // Host luôn đánh X
         setupPeerEvents(); 
+        
+        conn.on('open', () => {
+            // Host sẽ gửi thông số kích thước bàn cờ cho Guest để đồng bộ
+            conn.send({ type: 'CONFIG', size: tttSize });
+        });
     });
 
-    // Hàm để Hiếu nhập mã của bạn và kết nối
+    // Hàm khi bạn bè (Guest) chủ động kết nối tới Host
     function connectToFriend() {
         const friendId = document.getElementById('peer-id-input').value;
-        if (!friendId) return alert("Vui lòng dán mã của bạn bè!");
+        if (!friendId) return alert("Vui lòng dán mã của Host vào đây!");
+        
+        document.getElementById('conn-status').innerText = "Đang kết nối...";
         conn = peer.connect(friendId);
-        setupPeerEvents();
+        myOnlineSymbol = 'O'; // Guest (người kết nối) luôn đánh O
+        
+        conn.on('open', () => {
+            setupPeerEvents();
+        });
     }
 
-    // Thiết lập xử lý dữ liệu truyền tải
+    // Thiết lập xử lý dữ liệu truyền tải (cho cả 2 máy)
     function setupPeerEvents() {
         document.getElementById('conn-status').innerText = "Đã kết nối thành công!";
         document.getElementById('conn-status').style.color = "#2ecc71";
+        updateScoreBoard('ttt'); // Cập nhật lại tên người chơi trên bảng điểm
         
         conn.on('data', (data) => {
+            if (data.type === 'CONFIG') {
+                // Nhận cấu hình từ Host
+                globalOptions.tttSize = data.size;
+                initTTT(true); 
+            }
+            if (data.type === 'RESTART') {
+                // Máy kia bấm chơi lại
+                initTTT(false);
+            }
             if (data.type === 'MOVE') {
-                // Nhận nước đi từ bạn và cập nhật bàn cờ
+                // Nhận nước đi từ đối thủ và cập nhật bàn cờ
                 tttBoard[data.index] = data.symbol;
                 tttTurn = (data.symbol === 'X') ? 'O' : 'X';
                 renderTTT();
                 
-                // Kiểm tra xem nước đi của bạn có kết thúc game không
+                // Kiểm tra xem đối thủ đi bước đó có thắng hay hòa không
                 let winner = checkWinCaro(tttBoard, tttSize, tttWinLen);
                 if (winner) {
                     if(winner === 'X') matchScores.ttt_x++; else matchScores.ttt_o++;
                     updateScoreBoard('ttt');
-                    fireWin(`${winner} CHIẾN THẮNG!`, 'win');
+                    let status = (winner === myOnlineSymbol) ? 'win' : 'lose';
+                    fireWin(`${winner} CHIẾN THẮNG!`, status);
+                } else if (!tttBoard.includes(null)) {
+                    fireWin("HÒA NHAU!", 'draw');
                 }
             }
         });
 
         conn.on('close', () => {
-            document.getElementById('conn-status').innerText = "Mất kết nối!";
+            document.getElementById('conn-status').innerText = "Đối thủ đã ngắt kết nối!";
             document.getElementById('conn-status').style.color = "#e74c3c";
+            conn = null;
         });
     }
 
-    // Hàm gửi nước đi sang máy bạn
+    // Hàm gửi nước đi sang máy đối thủ
     function sendMoveOnline(idx, sym) {
         if (conn && conn.open) {
             conn.send({ type: 'MOVE', index: idx, symbol: sym });
