@@ -9,6 +9,8 @@
     
     <title>FOUR GAMES FOR FUN - Created by HeiuNG</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- THÊM THƯ VIỆN PEERJS -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         :root {
             --primary: #2ecc71; --primary-dark: #27ae60;
@@ -560,6 +562,22 @@
             <div id="turn-ttt" class="timer">Lượt của X</div>
             <div style="width:45px;"></div>
         </div>
+        
+        <!-- THÊM BẢNG ĐIỀU KHIỂN ONLINE TẠI ĐÂY -->
+        <div id="online-controls" style="background: #f8f9fa; padding: 10px; border-radius: 10px; margin-bottom: 10px; font-size: 0.8rem; border: 1px solid #ddd;">
+            <div style="font-weight: bold; margin-bottom: 5px; color: #27ae60;">CHẾ ĐỘ TỪ XA</div>
+            <div>
+                Mã của bạn: <strong id="my-id" style="color: #e67e22; letter-spacing: 1px;">Đang lấy...</strong>
+                <!-- NÚT COPY MÃ ID -->
+                <button onclick="copyMyID()" style="margin-left: 10px; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; background: #95a5a6; color: white; border: none; border-radius: 4px;">Copy</button>
+            </div>
+            <div style="display: flex; gap: 5px; margin-top: 5px;">
+                <input type="text" id="peer-id-input" placeholder="Dán mã bạn bè vào đây" style="flex: 1; padding: 6px; border-radius: 5px; border: 1px solid #ccc; font-family: monospace;">
+                <button onclick="connectToFriend()" style="background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold;">KẾT NỐI</button>
+            </div>
+            <div id="conn-status" style="color: #7f8c8d; margin-top: 5px; font-style: italic;">Chưa kết nối</div>
+        </div>
+
         <div id="ttt-score" class="pvp-scoreboard">
             <div style="color:#e74c3c;"><span id="ttt-p1-name">X (P1)</span> <span class="score-badge" id="ttt-score-x">0</span></div>
             <div class="vs">VS</div>
@@ -839,6 +857,10 @@
             div.onclick = () => {
                 if(!cell && !checkWinCaro(tttBoard, tttSize, tttWinLen)) {
                     tttBoard[i] = tttTurn;
+                    
+                    // --- GỬI NƯỚC ĐI ONLINE ---
+                    sendMoveOnline(i, tttTurn);
+
                     let winner = checkWinCaro(tttBoard, tttSize, tttWinLen);
                     if(winner){ 
                         renderTTT(); 
@@ -1791,6 +1813,85 @@
                 openMode('menu'); 
             }
         }
+    }
+
+    // --- PHẦN KẾT NỐI TỪ XA QUA PEERJS ---
+    const peer = new Peer(); 
+    let conn;
+
+    // Khi máy của Hiếu xin được mã ID từ server
+    peer.on('open', (id) => { 
+        document.getElementById('my-id').innerText = id; 
+        console.log("Peer ID của bạn: " + id);
+    });
+
+    // Khi bạn bè chủ động kết nối tới Hiếu
+    peer.on('connection', (c) => { 
+        conn = c; 
+        setupPeerEvents(); 
+    });
+
+    // Hàm để Hiếu nhập mã của bạn và kết nối
+    function connectToFriend() {
+        const friendId = document.getElementById('peer-id-input').value;
+        if (!friendId) return alert("Vui lòng dán mã của bạn bè!");
+        conn = peer.connect(friendId);
+        setupPeerEvents();
+    }
+
+    // Thiết lập xử lý dữ liệu truyền tải
+    function setupPeerEvents() {
+        document.getElementById('conn-status').innerText = "Đã kết nối thành công!";
+        document.getElementById('conn-status').style.color = "#2ecc71";
+        
+        conn.on('data', (data) => {
+            if (data.type === 'MOVE') {
+                // Nhận nước đi từ bạn và cập nhật bàn cờ
+                tttBoard[data.index] = data.symbol;
+                tttTurn = (data.symbol === 'X') ? 'O' : 'X';
+                renderTTT();
+                
+                // Kiểm tra xem nước đi của bạn có kết thúc game không
+                let winner = checkWinCaro(tttBoard, tttSize, tttWinLen);
+                if (winner) {
+                    if(winner === 'X') matchScores.ttt_x++; else matchScores.ttt_o++;
+                    updateScoreBoard('ttt');
+                    fireWin(`${winner} CHIẾN THẮNG!`, 'win');
+                }
+            }
+        });
+
+        conn.on('close', () => {
+            document.getElementById('conn-status').innerText = "Mất kết nối!";
+            document.getElementById('conn-status').style.color = "#e74c3c";
+        });
+    }
+
+    // Hàm gửi nước đi sang máy bạn
+    function sendMoveOnline(idx, sym) {
+        if (conn && conn.open) {
+            conn.send({ type: 'MOVE', index: idx, symbol: sym });
+        }
+    }
+
+    // HÀM COPY MÃ ID VÀO BỘ NHỚ TẠM
+    function copyMyID() {
+        const myId = document.getElementById('my-id').innerText;
+        if (myId === "Đang lấy..." || myId === "...") return;
+
+        navigator.clipboard.writeText(myId).then(() => {
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "Đã chép!";
+            btn.style.background = "#2ecc71";
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "#95a5a6";
+            }, 2000);
+        }).catch(err => {
+            console.error('Lỗi khi copy: ', err);
+        });
     }
 
     toggleLang(); 
