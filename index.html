@@ -16,9 +16,10 @@
             --primary: #2ecc71; --primary-dark: #27ae60;
             --bg: #f4f7f6; --surface: rgba(255, 255, 255, 0.95);
             --text: #2c3e50; --border: #dcdde1;
+            --theme-color: #2ecc71; /* Biến động cho màu từng game */
         }
 
-        /* Chống bôi đen, bôi xanh văn bản khi chạm giữ trên điện thoại */
+        /* Chống bôi đen văn bản */
         * {
             -webkit-user-select: none;
             -ms-user-select: none;
@@ -33,26 +34,43 @@
             width: 100vw; height: 100vh; overflow: hidden; touch-action: none;
             position: relative; 
             z-index: 0;
+            transition: background 0.5s ease;
         }
 
-        /* Hình nền mờ đằng sau (Desktop - Khổ ngang) */
         body::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: url('https://i.ibb.co/sp39DH1q/nenngang.png') center/cover no-repeat;
-            opacity: 0.15; /* Giữ mờ để không làm chói mắt */
-            z-index: -1;
+            opacity: 0.15; z-index: -1; transition: opacity 0.5s ease;
         }
 
-        /* Hình nền mờ đằng sau (Mobile - Khổ dọc) */
         @media (max-width: 768px) {
-            body::before {
-                background: url('https://i.ibb.co/Mxq96pFN/nendoc.png') center/cover no-repeat;
-            }
+            body::before { background: url('https://i.ibb.co/Mxq96pFN/nendoc.png') center/cover no-repeat; }
         }
 
-        /* Animation cho Splash Screen */
+        /* GIAO DIỆN LIQUID GLASS CỦA APPLE */
+        body.theme-liquid { background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); }
+        body.theme-liquid::before { opacity: 0.4; filter: blur(5px); }
+        
+        body.theme-liquid .container-box {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+        
+        body.theme-liquid .menu-card {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        body.theme-liquid .setup-group {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
         @keyframes floatSplash {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-15px); }
@@ -65,7 +83,7 @@
             box-shadow: 0 15px 50px rgba(0,0,0,0.08); text-align: center;
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            transition: all 0.3s ease; box-sizing: border-box;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); box-sizing: border-box;
         }
 
         .container-box::-webkit-scrollbar { width: 6px; }
@@ -78,21 +96,32 @@
         .btn {
             width: 100%; padding: 14px; margin: 8px 0; border: none;
             border-radius: 12px; cursor: pointer; font-weight: bold;
-            transition: 0.2s; font-size: 1rem; background: var(--primary); color: white;
+            transition: 0.2s; font-size: 1rem; background: var(--theme-color); color: white;
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); }
-        .btn-outline { background: none; border: 2px solid var(--primary); color: var(--primary); }
-        .btn-outline:hover { background: var(--primary); color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); filter: brightness(1.1); }
+        
+        /* FIX LỖI MÀU NÚT BẤM (Kế thừa thông minh từ biến cục bộ) */
+        .btn-outline { 
+            --btn-color: var(--theme-color); 
+            background: transparent; 
+            border: 2px solid var(--btn-color); 
+            color: var(--btn-color); 
+        }
+        .btn-outline:hover { 
+            background: var(--btn-color); 
+            color: white; 
+            opacity: 0.9;
+        }
         
         .btn-back {
             background: #fff; border: 2px solid var(--border);
-            color: var(--primary-dark); font-size: 1.1rem; font-weight: bold;
+            color: var(--text); font-size: 1.1rem; font-weight: bold;
             border-radius: 12px; width: 45px; height: 45px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             margin: 0; padding: 0; flex-shrink: 0;
         }
-        .btn-back:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateX(-3px); }
+        .btn-back:hover { background: var(--theme-color); color: white; border-color: var(--theme-color); transform: translateX(-3px); }
 
         #btn-show-result {
             position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -110,7 +139,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;
             position: relative; overflow: hidden;
         }
-        .menu-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 25px rgba(46, 204, 113, 0.2); }
+        .menu-card:hover { transform: translateY(-5px); border-color: inherit; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); }
         .menu-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 60%); opacity: 0; transition: 0.5s; pointer-events: none; }
         .menu-card:hover::before { opacity: 1; transform: scale(1.2); }
         .menu-img { width: 75px; height: 75px; object-fit: contain; margin-bottom: 12px; transition: 0.3s; }
@@ -119,13 +148,14 @@
 
         .setup-group { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 15px; margin-bottom: 15px; }
         .custom-radio-group { display: flex; gap: 8px; flex-wrap: wrap; margin: 5px 0 15px 0; }
+        
         .custom-radio { 
-            flex: 1; padding: 10px; border: 2px solid var(--primary); 
-            border-radius: 12px; cursor: pointer; font-weight: bold; color: var(--primary-dark);
-            transition: 0.2s; text-align: center; font-size: 0.9rem; background: #fff; box-sizing: border-box;
+            flex: 1; padding: 10px; border: 2px solid var(--theme-color); 
+            border-radius: 12px; cursor: pointer; font-weight: bold; color: var(--theme-color);
+            transition: 0.2s; text-align: center; font-size: 0.9rem; background: transparent; box-sizing: border-box;
         }
-        .custom-radio:hover { background: #e8f5e9; }
-        .custom-radio.active { background: var(--primary); color: white; transform: scale(1.05); box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); border-color: var(--primary-dark); }
+        .custom-radio:hover { background: var(--theme-color); color: white; opacity: 0.8; }
+        .custom-radio.active { background: var(--theme-color); color: white; transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.2); opacity: 1; }
 
         .pvp-scoreboard {
             display: flex; justify-content: space-between; align-items: center;
@@ -140,50 +170,29 @@
         .journey-map-container { 
             height: 400px; overflow-y: auto; padding: 0; position: relative; scroll-behavior: smooth; border-radius: 15px; 
             border: 2px solid var(--border);
-            /* Bầu trời và đồi núi bằng CSS */
             background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 30%, #a8e6cf 50%, #76d7c4 100%);
         }
         .journey-map-container::-webkit-scrollbar { width: 5px; }
         .journey-map-container::-webkit-scrollbar-thumb { background: #bdc3c7; border-radius: 10px; }
         .j-path-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; padding: 40px 0;}
-        
-        /* Con đường uốn lượn */
-        .j-path-line { 
-            position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 25px; 
-            background: #444; z-index: 0; border-radius: 10px;
-            border-left: 2px solid #222; border-right: 2px solid #222;
-        }
-        /* Vạch kẻ đường */
-        .j-path-line::after {
-            content: ''; position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px;
-            background: repeating-linear-gradient(to bottom, #f1c40f 0, #f1c40f 15px, transparent 15px, transparent 30px);
-        }
-
-        .j-node { 
-            width: 60px; height: 60px; border-radius: 50%; background: #fff; border: 6px solid #e74c3c; color: #e74c3c; font-weight: 900; font-size: 1.3rem; display: flex; justify-content: center; align-items: center; z-index: 1; margin: 25px 0; cursor: pointer; transition: 0.3s; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        /* Đặt các node zigzag trên con đường */
+        .j-path-line { position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 25px; background: #444; z-index: 0; border-radius: 10px; border-left: 2px solid #222; border-right: 2px solid #222; }
+        .j-path-line::after { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; background: repeating-linear-gradient(to bottom, #f1c40f 0, #f1c40f 15px, transparent 15px, transparent 30px); }
+        .j-node { width: 60px; height: 60px; border-radius: 50%; background: #fff; border: 6px solid #e74c3c; color: #e74c3c; font-weight: 900; font-size: 1.3rem; display: flex; justify-content: center; align-items: center; z-index: 1; margin: 25px 0; cursor: pointer; transition: 0.3s; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .j-node:nth-child(odd) { transform: translateX(-35px); }
         .j-node:nth-child(even) { transform: translateX(35px); }
-        
         .j-node.completed { background: #2ecc71; border-color: #27ae60; color: white; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);}
         .j-node.current { background: #f1c40f; border-color: #f39c12; color: white; box-shadow: 0 0 20px rgba(241,196,15,0.7); z-index: 3; }
         .j-node.current:nth-child(odd) { transform: translateX(-35px) scale(1.15); }
         .j-node.current:nth-child(even) { transform: translateX(35px) scale(1.15); }
-        
-        /* Cây xanh trang trí CSS hai bên đường */
-        .j-node::before {
-            content: '🌲'; position: absolute; font-size: 1.5rem; z-index: -1;
-        }
+        .j-node::before { content: '🌲'; position: absolute; font-size: 1.5rem; z-index: -1; }
         .j-node:nth-child(odd)::before { right: -40px; top: 10px; }
         .j-node:nth-child(even)::before { left: -40px; top: 10px; }
-
         .j-boy { position: absolute; top: -38px; font-size: 2.5rem; animation: bounce 0.6s infinite alternate; filter: drop-shadow(0 4px 5px rgba(0,0,0,0.3));}
         @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-12px); } }
 
         /* --- SUDOKU --- */
         .grid-s { display: grid; grid-template-columns: repeat(9, 1fr); gap: 1px; background: #333; border: 2px solid #333; margin: 15px 0; }
-        .cell-s { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 1.2rem; background: #ffffff; color: var(--primary-dark); }
+        .cell-s { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 1.2rem; background: #ffffff; color: #2c3e50; transition: 0.2s;}
         .cell-s.readonly { background: #e0e0e0; color: #333; cursor: default; } 
         .cell-s.selected { background: #a2d9b5 !important; }
         .grid-s > div:nth-child(3n):not(:nth-child(9n)) { border-right: 2px solid #333; }
@@ -192,7 +201,7 @@
         /* --- BLOCK BLAST --- */
         .grid-b { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; background: #ecf0f1; border-radius: 8px; padding: 10px; margin: 0 auto 15px; width: 320px; height: 320px; box-sizing: border-box; position: relative; }
         .cell-b { background: #bdc3c7; border-radius: 4px; transition: 0.1s; position: relative; }
-        .cell-b.preview::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(46, 204, 113, 0.4); border: 2px dashed var(--primary-dark); border-radius: 4px; box-sizing: border-box; pointer-events: none; z-index: 2; }
+        .cell-b.preview::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(46, 204, 113, 0.4); border: 2px dashed #8e44ad; border-radius: 4px; box-sizing: border-box; pointer-events: none; z-index: 2; }
         .pieces-area { display: flex; justify-content: space-around; height: 110px; background: rgba(255,255,255,0.8); border-radius: 12px; align-items: center; overflow: hidden; }
         .piece-slot { width: 95px; height: 95px; display: flex; justify-content: center; align-items: center; position: relative; }
         .piece { display: grid; gap: 4px; cursor: grab; touch-action: none; width: max-content; height: max-content; }
@@ -200,7 +209,7 @@
 
         /* --- TIC TAC TOE --- */
         .grid-ttt { 
-            display: grid; gap: 4px; background: var(--primary-dark); border: 4px solid var(--primary-dark); 
+            display: grid; gap: 4px; background: var(--theme-color); border: 4px solid var(--theme-color); 
             border-radius: 12px; width: 300px; height: 300px; margin: 0 auto; 
             overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); box-sizing: border-box;
         }
@@ -212,6 +221,8 @@
         .cell-ttt:hover { background: #f4f7f6; }
         .cell-ttt.x { color: #e74c3c; }
         .cell-ttt.o { color: #3498db; }
+        /* Thêm Highlight màu xanh lá mờ cho ô vừa đánh */
+        .cell-ttt.last-move { background-color: rgba(46, 204, 113, 0.4) !important; border-radius: 8px; }
 
         /* --- CHESS BOARDS --- */
         .board-chess { 
@@ -242,16 +253,15 @@
         .cc-sq.valid::after { content: ''; width: 14px; height: 14px; background: rgba(46, 204, 113, 0.7); border-radius: 50%; position: absolute; z-index: 1; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
 
         /* --- UI MODALS --- */
-        .timer { font-size: 1.3rem; font-weight: bold; color: var(--primary-dark); }
+        .timer { font-size: 1.3rem; font-weight: bold; color: var(--text); }
         .num-btn { padding: 12px; background: #f1f2f6; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 1.1rem; }
         #winModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 20px; z-index: 1000; width: 320px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
         #winModal img { width: 100%; border-radius: 10px; margin: 15px 0; max-height: 200px; object-fit: cover;}
         .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index: 999; backdrop-filter: blur(5px); }
         
-        /* Box bọc TTT để hỗ trợ Zoom & Scroll */
         #ttt-zoom-wrapper {
             width: 100%; overflow: auto; max-height: 380px; 
-            border: 2px dashed #bdc3c7; border-radius: 12px; 
+            border: 2px dashed var(--theme-color); border-radius: 12px; 
             background: rgba(255,255,255,0.5); display: flex; 
             justify-content: center; align-items: center; 
             padding: 10px; box-sizing: border-box; margin-bottom: 10px;
@@ -271,13 +281,13 @@
 
 <div class="overlay" id="overlay"></div>
 <div id="winModal">
-    <h2 id="modal-title" style="margin:0; color:var(--primary-dark); font-size:1.8rem; text-transform:uppercase;">KẾT QUẢ!</h2>
+    <h2 id="modal-title" style="margin:0; color:#2c3e50; font-size:1.8rem; text-transform:uppercase;">KẾT QUẢ!</h2>
     <img id="memeImg" src="" alt="Meme">
     <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
         <button class="btn" data-i18n="play_again" style="padding:12px; background:#3498db; font-size:1.1rem;" onclick="closeWin(true)">CHƠI LẠI</button>
         <div style="display:flex; gap:10px;">
             <button class="btn btn-outline" data-i18n="review" style="flex:1; padding:10px; margin:0;" onclick="hideModalForReview()">XEM LẠI</button>
-            <button class="btn btn-outline" data-i18n="menu" style="flex:1; padding:10px; margin:0; border-color:#e74c3c; color:#e74c3c;" onclick="closeWin(false)">MENU</button>
+            <button class="btn btn-outline" data-i18n="menu" style="flex:1; padding:10px; margin:0; --btn-color:#e74c3c;" onclick="closeWin(false)">MENU</button>
         </div>
     </div>
 </div>
@@ -295,14 +305,17 @@
                 </h1>
                 <p class="subtitle" data-i18n="subtitle" style="margin-top: 8px;">Created by HeiuNG</p>
             </div>
-            <div style="display:flex; gap:8px;">
-                <button class="btn-outline" onclick="toggleMusic()" id="btn-music" style="padding:4px 8px; border-radius:8px; font-size:0.75rem; cursor:pointer; font-weight:bold; border-width:2px; height:max-content; margin:0; white-space:nowrap; border-color:#9b59b6; color:#9b59b6;">Nhạc: BẬT</button>
-                <button class="btn-outline" onclick="toggleLang()" id="btn-lang" style="padding:4px 8px; border-radius:8px; font-size:0.75rem; cursor:pointer; font-weight:bold; border-width:2px; height:max-content; margin:0;">EN</button>
+            <div style="display:flex; flex-direction:column; gap:8px; align-items: flex-end;">
+                <button class="btn-outline" onclick="toggleTheme()" id="btn-theme" style="padding:4px 8px; border-radius:8px; font-size:0.75rem; cursor:pointer; font-weight:bold; border-width:2px; height:max-content; margin:0; --btn-color:#2980b9;">Theme: Nomal</button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-outline" onclick="toggleMusic()" id="btn-music" style="padding:4px 8px; border-radius:8px; font-size:0.75rem; cursor:pointer; font-weight:bold; border-width:2px; height:max-content; margin:0; white-space:nowrap; --btn-color:#9b59b6;">Nhạc: BẬT</button>
+                    <button class="btn-outline" onclick="toggleLang()" id="btn-lang" style="padding:4px 8px; border-radius:8px; font-size:0.75rem; cursor:pointer; font-weight:bold; border-width:2px; height:max-content; margin:0; --btn-color:#2ecc71;">EN</button>
+                </div>
             </div>
         </div>
         
         <div class="menu-grid">
-            <div class="menu-card" style="border-color: #2980b9;" onclick="openMode('sudoku')">
+            <div class="menu-card" style="border-color: #2980b9;" onclick="openMode('sudoku-menu')">
                 <svg viewBox="0 0 100 100" class="menu-img">
                     <rect x="5" y="5" width="90" height="90" rx="15" fill="#0b3d91"/>
                     <rect x="5" y="5" width="90" height="85" rx="15" fill="#1555c0"/>
@@ -472,33 +485,34 @@
         </div>
     </div>
 
-    <div id="page-block-menu" class="hidden">
+    <!-- MÀN HÌNH CHỌN MENU THEO THEME MÀU -->
+    <div id="page-block-menu" class="hidden" style="--theme-color: #8e44ad;">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
             <div style="display:flex; align-items:center; gap:15px;">
                 <button class="btn-back" onclick="openMode('menu')">❮</button>
-                <h2 data-i18n="block_blast" style="color:var(--primary-dark); margin:0;">BLOCK BLAST</h2>
+                <h2 data-i18n="block_blast" style="color:var(--theme-color); margin:0;">BLOCK BLAST</h2>
             </div>
             <button class="btn btn-outline" data-i18n="history" onclick="openMode('history', 'block')" style="padding:5px 10px; border-radius:10px; font-size:0.8rem; height:max-content; width:max-content;">LỊCH SỬ</button>
         </div>
-        <button class="btn" data-i18n="classic_mode" style="background:#3498db; padding:20px; font-size:1.2rem; margin-bottom:15px;" onclick="openMode('block')">CHẾ ĐỘ CỔ ĐIỂN</button>
-        <button class="btn" data-i18n="challenge_mode" style="background:#e67e22; padding:20px; font-size:1.2rem;" onclick="openMode('block-journey')">CHẾ ĐỘ THỬ THÁCH</button>
+        <button class="btn" data-i18n="classic_mode" style="background:#8e44ad; padding:20px; font-size:1.2rem; margin-bottom:15px;" onclick="startBlockBlast()">CHẾ ĐỘ CỔ ĐIỂN</button>
+        <button class="btn" data-i18n="challenge_mode" style="background:#9b59b6; padding:20px; font-size:1.2rem;" onclick="openMode('block-journey')">CHẾ ĐỘ THỬ THÁCH</button>
     </div>
 
-    <div id="page-block-journey" class="hidden">
+    <div id="page-block-journey" class="hidden" style="--theme-color: #8e44ad;">
         <div style="display:flex; align-items:center; margin-bottom:10px; gap:15px;">
             <button class="btn-back" onclick="openMode('block-menu')">❮</button>
-            <h2 data-i18n="journey_200" style="color:var(--primary-dark); margin:0;">HÀNH TRÌNH 200 MỐC</h2>
+            <h2 data-i18n="journey_200" style="color:var(--theme-color); margin:0;">HÀNH TRÌNH 200 MỐC</h2>
         </div>
         <div class="journey-map-container" id="journey-scroll">
             <div class="j-path-wrapper" id="journey-map"></div>
         </div>
     </div>
 
-    <div id="page-board-menu" class="hidden">
+    <div id="page-board-menu" class="hidden" style="--theme-color: #27ae60;">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px;">
             <div style="display:flex; align-items:center; gap:15px;">
                 <button class="btn-back" onclick="openMode('menu')">❮</button>
-                <h2 data-i18n="chess_game" style="color:var(--primary-dark); margin:0;">GAME CỜ</h2>
+                <h2 data-i18n="chess_game" style="color:var(--theme-color); margin:0;">GAME CỜ</h2>
             </div>
             <button class="btn btn-outline" data-i18n="history" onclick="openMode('history', 'chess')" style="padding:5px 10px; border-radius:10px; font-size:0.8rem; height:max-content; width:max-content;">LỊCH SỬ</button>
         </div>
@@ -513,6 +527,7 @@
             <div class="custom-radio-group" id="c-mode-group">
                 <div class="custom-radio active" data-i18n="pvp" onclick="setOption('boardMode', 'pvp', this, 'c-mode-group')">2 Người (PvP)</div>
                 <div class="custom-radio" data-i18n="pve" onclick="setOption('boardMode', 'pve', this, 'c-mode-group')">Đấu AI (PvE)</div>
+                <div class="custom-radio" data-i18n="online" onclick="setOption('boardMode', 'online', this, 'c-mode-group')">Online (Từ xa)</div>
             </div>
 
             <div id="board-diff-container" style="display:none;">
@@ -529,11 +544,11 @@
         <button class="btn" data-i18n="start" onclick="initBoardGame(true)">BẮT ĐẦU</button>
     </div>
 
-    <div id="page-ttt-menu" class="hidden">
+    <div id="page-ttt-menu" class="hidden" style="--theme-color: #d35400;">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px;">
             <div style="display:flex; align-items:center; gap:15px;">
                 <button class="btn-back" onclick="openMode('menu')">❮</button>
-                <h2 data-i18n="ttt" style="color:var(--primary-dark); margin:0;">TIC TAC TOE</h2>
+                <h2 data-i18n="ttt" style="color:var(--theme-color); margin:0;">TIC TAC TOE</h2>
             </div>
             <button class="btn btn-outline" data-i18n="history" onclick="openMode('history', 'ttt')" style="padding:5px 10px; border-radius:10px; font-size:0.8rem; height:max-content; width:max-content;">LỊCH SỬ</button>
         </div>
@@ -542,6 +557,7 @@
             <div class="custom-radio-group" id="t-size-group">
                 <div class="custom-radio active" onclick="setOption('tttSize', 3, this, 't-size-group')">3x3</div>
                 <div class="custom-radio" onclick="setOption('tttSize', 9, this, 't-size-group')">9x9</div>
+                <div class="custom-radio" onclick="setOption('tttSize', 21, this, 't-size-group')">21x21</div>
                 <div class="custom-radio" onclick="setOption('tttSize', 25, this, 't-size-group')">25x25</div>
             </div>
 
@@ -549,7 +565,6 @@
             <div class="custom-radio-group" id="t-mode-group">
                 <div class="custom-radio active" data-i18n="pvp" onclick="setOption('tttMode', 'pvp', this, 't-mode-group')">2 Người (PvP)</div>
                 <div class="custom-radio" data-i18n="pve" onclick="setOption('tttMode', 'pve', this, 't-mode-group')">Đấu AI (PvE)</div>
-                <!-- ĐÃ THÊM CHẾ ĐỘ ONLINE VÀO ĐÂY -->
                 <div class="custom-radio" data-i18n="online" onclick="setOption('tttMode', 'online', this, 't-mode-group')">Online (Từ xa)</div>
             </div>
 
@@ -567,25 +582,67 @@
         <button class="btn" data-i18n="start" onclick="initTTT(true)">BẮT ĐẦU</button>
     </div>
 
-    <div id="page-ttt" class="hidden">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <button class="btn-back" onclick="openMode('ttt-menu')">❮</button>
-            <div id="turn-ttt" class="timer">Lượt của X</div>
+    <!-- MÀN HÌNH CHỌN MENU RIÊNG CỦA SUDOKU -->
+    <div id="page-sudoku-menu" class="hidden" style="--theme-color: #2980b9;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px;">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <button class="btn-back" onclick="openMode('menu')">❮</button>
+                <h2 data-i18n="sudoku" style="color:var(--theme-color); margin:0;">SUDOKU</h2>
+            </div>
+            <button class="btn btn-outline" data-i18n="history" onclick="openMode('history', 'sudoku')" style="padding:5px 10px; border-radius:10px; font-size:0.8rem; height:max-content; width:max-content;">LỊCH SỬ</button>
+        </div>
+        <div class="setup-group">
+            <div data-i18n="game_mode" style="font-weight:bold; text-align:left; color:var(--text);">Chế độ chơi:</div>
+            <div class="custom-radio-group" id="s-mode-group">
+                <div class="custom-radio active" data-i18n="solo" onclick="setOption('sudokuMode', 'solo', this, 's-mode-group')">Chơi đơn</div>
+                <div class="custom-radio" data-i18n="online" onclick="setOption('sudokuMode', 'online', this, 's-mode-group')">Online Đấu Tốc Độ</div>
+            </div>
+
+            <div data-i18n="ai_diff" style="font-weight:bold; text-align:left; color:var(--text); margin-top:10px;">Độ khó:</div>
+            <div class="custom-radio-group" id="s-diff-group">
+                <div class="custom-radio" data-i18n="easy" onclick="setOption('sudokuDiff', 30, this, 's-diff-group')">Dễ</div>
+                <div class="custom-radio active" data-i18n="med" onclick="setOption('sudokuDiff', 45, this, 's-diff-group')">TB</div>
+                <div class="custom-radio" data-i18n="hard" onclick="setOption('sudokuDiff', 55, this, 's-diff-group')">Khó</div>
+            </div>
+        </div>
+        <button class="btn" data-i18n="start" onclick="initSudoku(true)">BẮT ĐẦU</button>
+    </div>
+
+    <!-- MÀN HÌNH PHÒNG CHỜ ONLINE RIÊNG BIỆT -->
+    <div id="page-online-lobby" class="hidden" style="--theme-color: #3498db;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <button class="btn-back" onclick="goBackFromLobby()">❮</button>
+            <h2 data-i18n="lobby" style="margin:0; color:var(--theme-color); font-size:1.5rem; font-weight: 900;">PHÒNG CHỜ ONLINE</h2>
             <div style="width:45px;"></div>
         </div>
         
-        <!-- BẢNG ĐIỀU KHIỂN ONLINE (Chỉ hiển thị khi chọn chế độ Online) -->
-        <div id="online-controls" class="hidden" style="background: #f8f9fa; padding: 10px; border-radius: 10px; margin-bottom: 10px; font-size: 0.8rem; border: 1px solid #ddd;">
-            <div style="font-weight: bold; margin-bottom: 5px; color: #27ae60;">CHẾ ĐỘ TỪ XA</div>
+        <div style="background: var(--surface); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-top: 10px; border: 1px solid var(--border);">
+            <div style="margin-bottom: 25px;">
+                <div style="font-size: 0.85rem; color: #7f8c8d; font-weight: bold; text-transform: uppercase;">Mã Phòng Của Bạn</div>
+                <div id="my-peer-id" style="font-size: 2.8rem; font-weight: 900; color: var(--theme-color); letter-spacing: 6px; margin: 10px 0; background: rgba(0,0,0,0.02); padding: 15px; border-radius: 15px; border: 2px dashed var(--theme-color);">...</div>
+                <button class="btn btn-outline" style="width: max-content; padding: 10px 25px; border-radius: 50px; font-size: 0.9rem; margin: 0 auto; display: block;" onclick="copyMyID()">📋 Sao chép mã</button>
+            </div>
+            
+            <div style="display: flex; align-items: center; justify-content: center; margin: 25px 0;">
+                <div style="flex: 1; height: 2px; background: var(--border); opacity: 0.5;"></div>
+                <div style="padding: 0 15px; color: #95a5a6; font-weight: bold; font-size: 0.85rem; letter-spacing: 1px;">HOẶC</div>
+                <div style="flex: 1; height: 2px; background: var(--border); opacity: 0.5;"></div>
+            </div>
+
             <div>
-                Mã của bạn (Host = Quân X): <strong id="my-id" style="color: #e67e22; letter-spacing: 1px;">Đang lấy...</strong>
-                <button onclick="copyMyID()" style="margin-left: 10px; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; background: #95a5a6; color: white; border: none; border-radius: 4px;">Copy</button>
+                <div style="font-size: 0.85rem; color: #7f8c8d; font-weight: bold; text-transform: uppercase; margin-bottom: 10px;">Tham Gia Phòng</div>
+                <input type="text" id="friend-id-input" placeholder="Nhập mã phòng..." style="width: 100%; padding: 15px; font-size: 1.5rem; text-align: center; text-transform: uppercase; border-radius: 15px; border: 2px solid var(--border); box-sizing: border-box; font-weight: bold; letter-spacing: 2px; outline: none; transition: 0.3s; color: var(--text);" onfocus="this.style.borderColor='var(--theme-color)'" onblur="this.style.borderColor='var(--border)'">
+                <button class="btn" style="margin-top: 15px; font-size: 1.1rem; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);" onclick="connectToFriend()">🚀 KẾT NỐI NGAY</button>
             </div>
-            <div style="display: flex; gap: 5px; margin-top: 5px;">
-                <input type="text" id="peer-id-input" placeholder="Dán mã Host vào đây (Bạn = Quân O)" style="flex: 1; padding: 6px; border-radius: 5px; border: 1px solid #ccc; font-family: monospace;">
-                <button onclick="connectToFriend()" style="background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold;">KẾT NỐI</button>
-            </div>
-            <div id="conn-status" style="color: #7f8c8d; margin-top: 5px; font-style: italic;">Chưa kết nối</div>
+            <div id="lobby-status" style="margin-top: 15px; font-weight: bold; color: #e67e22; font-size: 0.95rem; min-height: 20px;"></div>
+        </div>
+    </div>
+
+    <div id="page-ttt" class="hidden" style="--theme-color: #d35400;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <button class="btn-back" onclick="quitOnlineGame('ttt-menu')">❮</button>
+            <div id="turn-ttt" class="timer" style="color:var(--theme-color);">Lượt của X</div>
+            <div style="width:45px;"></div>
         </div>
 
         <div id="ttt-score" class="pvp-scoreboard">
@@ -594,23 +651,21 @@
             <div style="color:#2ecc71;"><span class="score-badge" id="ttt-score-o">0</span> <span id="ttt-p2-name">O (P2)</span></div>
         </div>
 
-        <!-- THÊM THANH CÔNG CỤ ZOOM CHO BÀN CỜ -->
         <div style="display:flex; justify-content:center; gap:10px; margin-bottom: 10px;">
             <button class="btn btn-outline" style="width:auto; padding:4px 12px; margin:0; font-size: 0.85rem;" onclick="zoomTTT(0.2)">Zoom In ➕</button>
             <button class="btn btn-outline" style="width:auto; padding:4px 12px; margin:0; font-size: 0.85rem;" onclick="zoomTTT(-0.2)">Zoom Out ➖</button>
             <button class="btn btn-outline" style="width:auto; padding:4px 12px; margin:0; font-size: 0.85rem;" onclick="zoomTTT(0, true)">Reset</button>
         </div>
 
-        <!-- BỌC BÀN CỜ TRONG KHUNG HỖ TRỢ ZOOM -->
         <div id="ttt-zoom-wrapper">
             <div id="grid-ttt" class="grid-ttt" style="transition: transform 0.2s; transform-origin: top center; margin: 0 auto;"></div>
         </div>
     </div>
 
-    <div id="page-chess" class="hidden">
+    <div id="page-chess" class="hidden" style="--theme-color: #27ae60;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <button class="btn-back" onclick="openMode('board-menu')">❮</button>
-            <div id="turn-chess" class="timer">White's Turn</div>
+            <button class="btn-back" onclick="quitOnlineGame('board-menu')">❮</button>
+            <div id="turn-chess" class="timer" style="color:var(--theme-color);">White's Turn</div>
             <button class="btn btn-outline" id="chess-undo-btn" style="width:auto; padding:5px 10px; margin:0; border-radius:10px;" onclick="undoChess()">Undo (3)</button>
         </div>
         <div id="chess-score" class="pvp-scoreboard">
@@ -619,17 +674,17 @@
             <div style="color:#2c3e50;"><span class="score-badge" id="c-score-b">0</span> <span id="c-p2-name">Đen</span></div>
         </div>
         <div class="score-row" style="margin-top:5px;">
-            <span id="chess-eval-b" style="color:#2c3e50">Black Eval: +0</span>
+            <span id="chess-eval-b" style="color:var(--text)">Black Eval: +0</span>
         </div>
         <div id="board-chess" class="board-chess"></div>
         <div class="score-row">
-            <span id="chess-eval-w" style="color:#27ae60">White Eval: +0</span>
+            <span id="chess-eval-w" style="color:var(--theme-color)">White Eval: +0</span>
         </div>
     </div>
 
-    <div id="page-cchess" class="hidden">
+    <div id="page-cchess" class="hidden" style="--theme-color: #27ae60;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <button class="btn-back" onclick="openMode('board-menu')">❮</button>
+            <button class="btn-back" onclick="quitOnlineGame('board-menu')">❮</button>
             <div id="turn-cchess" class="timer" style="color:#c0392b;">Đỏ đi</div>
             <button class="btn btn-outline" id="cchess-undo-btn" style="width:auto; padding:5px 10px; margin:0; border-radius:10px;" onclick="undoCChess()">Undo (3)</button>
         </div>
@@ -641,35 +696,35 @@
         <div id="board-cchess" class="board-cchess"></div>
     </div>
 
-    <div id="page-sudoku" class="hidden">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-            <button class="btn-back" onclick="openMode('menu')">❮</button>
-            <div style="display:flex; flex-direction:column; align-items:center;">
-                <div class="timer" id="timer-s" style="line-height:1;">00:00</div>
-                <div style="display:flex; justify-content:center; gap:5px; margin-top:5px;" id="s-diff-group">
-                    <div id="opt-e" class="custom-radio" data-i18n="easy" style="padding:4px 10px; font-size:0.8rem; flex:none;" onclick="setOption('sudokuDiff', 30, this, 's-diff-group')">Dễ</div>
-                    <div id="opt-m" class="custom-radio active" data-i18n="med" style="padding:4px 10px; font-size:0.8rem; flex:none;" onclick="setOption('sudokuDiff', 45, this, 's-diff-group')">TB</div>
-                    <div id="opt-h" class="custom-radio" data-i18n="hard" style="padding:4px 10px; font-size:0.8rem; flex:none;" onclick="setOption('sudokuDiff', 55, this, 's-diff-group')">Khó</div>
-                </div>
-            </div>
-            <button class="btn btn-outline" data-i18n="history" onclick="openMode('history', 'sudoku')" style="padding:5px 10px; border-radius:10px; font-size:0.8rem; height:max-content; width:max-content; margin: 0;">LỊCH SỬ</button>
+    <div id="page-sudoku" class="hidden" style="--theme-color: #2980b9;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <button class="btn-back" onclick="quitOnlineGame('sudoku-menu')">❮</button>
+            <div class="timer" id="timer-s" style="line-height:1; color:var(--theme-color); font-size:1.5rem;">00:00</div>
+            <div style="width: 45px;"></div>
         </div>
+        
+        <div id="sudoku-opp-controls" class="hidden" style="display:flex; justify-content:center; margin-bottom: 5px;">
+            <button id="btn-view-opp" class="btn btn-outline" style="width:auto; padding: 6px 15px; margin:0; border-radius:10px;" onclick="toggleOpponentBoard()">👀 Xem bảng đối thủ</button>
+        </div>
+
         <div id="grid-s" class="grid-s"></div>
+        <div id="grid-s-opp" class="grid-s hidden"></div>
+
         <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:6px;">
             <button class="num-btn" onclick="inputS(1)">1</button><button class="num-btn" onclick="inputS(2)">2</button><button class="num-btn" onclick="inputS(3)">3</button><button class="num-btn" onclick="inputS(4)">4</button><button class="num-btn" onclick="inputS(5)">5</button>
             <button class="num-btn" onclick="inputS(6)">6</button><button class="num-btn" onclick="inputS(7)">7</button><button class="num-btn" onclick="inputS(8)">8</button><button class="num-btn" onclick="inputS(9)">9</button><button class="num-btn" onclick="inputS(0)">⌫</button>
         </div>
         <div style="display:flex; gap:10px; margin-top:15px;">
             <button class="btn btn-outline" id="btn-hint" data-i18n="hint" onclick="getHint()" style="margin:0; flex:1;">GỢI Ý (+10s)</button>
-            <button class="btn" style="margin:0; flex:1; background:#34495e;" id="btn-ai" data-i18n="ai_solve" onclick="solveByAI()">AI GIẢI</button>
+            <button class="btn" style="margin:0; flex:1; background:#34495e; border:none;" id="btn-ai" data-i18n="ai_solve" onclick="solveByAI()">AI GIẢI</button>
         </div>
     </div>
 
-    <div id="page-block" class="hidden">
+    <div id="page-block" class="hidden" style="--theme-color: #8e44ad;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <button class="btn-back" onclick="openMode('block-menu')">❮</button>
-            <div style="font-weight:bold; font-size:1.1rem; flex:1; text-align:center;">SCORE: <span id="score-b" style="color:var(--primary-dark); transition: 0.3s;">0</span></div>
-            <div class="timer" id="timer-b" style="width:50px; text-align:right;">00:00</div>
+            <div style="font-weight:bold; font-size:1.1rem; flex:1; text-align:center;">SCORE: <span id="score-b" style="color:var(--theme-color); transition: 0.3s;">0</span></div>
+            <div class="timer" id="timer-b" style="width:50px; text-align:right; color:var(--theme-color);">00:00</div>
         </div>
         
         <div id="target-container" class="hidden" style="background:#e67e22; color:white; padding:8px 15px; border-radius:10px; font-weight:bold; margin-bottom:10px; text-align:center; font-size:1.1rem; box-shadow:0 3px 10px rgba(230,126,34,0.3);">
@@ -693,6 +748,7 @@
 
 <script>
     let isMusicOn = true;
+    let isLiquidTheme = false;
     const bgm = new Audio('https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3');
     bgm.loop = true;
 
@@ -708,6 +764,18 @@
         }
     }
 
+    function toggleTheme() {
+        isLiquidTheme = !isLiquidTheme;
+        let btn = document.getElementById('btn-theme');
+        if (isLiquidTheme) {
+            document.body.classList.add('theme-liquid');
+            btn.innerText = 'Theme: Liquid';
+        } else {
+            document.body.classList.remove('theme-liquid');
+            btn.innerText = 'Theme: Nomal';
+        }
+    }
+
     function startFromSplash() {
         document.getElementById('splash-screen').style.display = 'none';
         if (isMusicOn) {
@@ -720,20 +788,20 @@
         vi: { 
             subtitle: "Created by HeiuNG", lang: "EN",
             sudoku: "SUDOKU", block_blast: "BLOCK BLAST", chess_game: "GAME CỜ", ttt: "TIC TAC TOE",
-            history: "LỊCH SỬ", history_title: "LỊCH SỬ CHƠI", play_again: "CHƠI LẠI", review: "XEM LẠI", menu: "MENU", show_result: "Mở Bảng Kết Quả",
+            history: "LỊCH SỬ", history_title: "LỊCH SỬ CHƠI", play_again: "CHƠI LẠI", review: "XEM LẠI", menu: "MENU", show_result: "Mở Bảng Kết Quả", lobby: "PHÒNG CHỜ ONLINE",
             classic_mode: "CHẾ ĐỘ CỔ ĐIỂN", challenge_mode: "CHẾ ĐỘ THỬ THÁCH", journey_200: "HÀNH TRÌNH 200 MỐC",
-            chess_type: "Loại Cờ:", chess: "Cờ Vua", xiangqi: "Cờ Tướng", game_mode: "Chế độ:", pvp: "2 Người (PvP)", pve: "Đấu AI (PvE)", online: "Online (Từ xa)",
-            ai_diff: "Độ khó AI:", easy: "Dễ", med: "TB", hard: "Khó", extreme: "Cực Khó", super_hard: "Siêu Khó", board_size: "Kích thước Bàn cờ:",
+            chess_type: "Loại Cờ:", chess: "Cờ Vua", xiangqi: "Cờ Tướng", game_mode: "Chế độ:", pvp: "2 Người (PvP)", pve: "Đấu AI (PvE)", online: "Online (Từ xa)", solo: "Chơi đơn",
+            ai_diff: "Độ khó:", easy: "Dễ", med: "TB", hard: "Khó", extreme: "Cực Khó", super_hard: "Siêu Khó", board_size: "Kích thước Bàn cờ:",
             start: "BẮT ĐẦU", hint: "GỢI Ý (+10s)", ai_solve: "AI GIẢI", target_lvl: "MỤC TIÊU MỐC",
             turn_w: "Lượt Trắng", turn_b: "Lượt Đen", turn_r: "Lượt Đỏ", turn_bl: "Lượt Đen", turn_x: "Lượt của X", turn_o: "Lượt của O"
         },
         en: { 
             subtitle: "Created by HeiuNG", lang: "VN",
             sudoku: "SUDOKU", block_blast: "BLOCK BLAST", chess_game: "BOARD GAMES", ttt: "TIC TAC TOE",
-            history: "HISTORY", history_title: "MATCH HISTORY", play_again: "REPLAY", review: "REVIEW", menu: "MENU", show_result: "Show Results",
+            history: "HISTORY", history_title: "MATCH HISTORY", play_again: "REPLAY", review: "REVIEW", menu: "MENU", show_result: "Show Results", lobby: "ONLINE LOBBY",
             classic_mode: "CLASSIC MODE", challenge_mode: "CHALLENGE MODE", journey_200: "200 LEVELS JOURNEY",
-            chess_type: "Game Type:", chess: "Chess", xiangqi: "Xiangqi", game_mode: "Mode:", pvp: "2 Players (PvP)", pve: "vs AI (PvE)", online: "Online (Remote)",
-            ai_diff: "AI Diff:", easy: "Easy", med: "Med", hard: "Hard", extreme: "Expert", super_hard: "Extreme+", board_size: "Board Size:",
+            chess_type: "Game Type:", chess: "Chess", xiangqi: "Xiangqi", game_mode: "Mode:", pvp: "2 Players (PvP)", pve: "vs AI (PvE)", online: "Online (Remote)", solo: "Solo Play",
+            ai_diff: "Difficulty:", easy: "Easy", med: "Med", hard: "Hard", extreme: "Expert", super_hard: "Extreme+", board_size: "Board Size:",
             start: "START", hint: "HINT (+10s)", ai_solve: "AI SOLVE", target_lvl: "TARGET LEVEL",
             turn_w: "White's Turn", turn_b: "Black's Turn", turn_r: "Red's Turn", turn_bl: "Black's Turn", turn_x: "X's Turn", turn_o: "O's Turn"
         }
@@ -764,7 +832,7 @@
         else document.getElementById('turn-cchess').innerText = i18n[currentLang].turn_bl;
     }
 
-    let globalOptions = { boardGameType: 'chess', boardMode: 'pvp', boardAiDiff: 1, tttMode: 'pvp', tttAiDiff: 1, tttSize: 3, sudokuDiff: 45 };
+    let globalOptions = { boardGameType: 'chess', boardMode: 'pvp', boardAiDiff: 1, tttMode: 'pvp', tttAiDiff: 1, tttSize: 3, sudokuMode: 'solo', sudokuDiff: 45 };
     let currentActiveGame = null;
     let matchScores = { ttt_x: 0, ttt_o: 0, chess_w: 0, chess_b: 0, cchess_r: 0, cchess_b: 0 };
     let currentHistoryContext = 'menu';
@@ -775,7 +843,6 @@
         el.classList.add('active');
         if(key === 'boardMode') document.getElementById('board-diff-container').style.display = (val === 'pve') ? 'block' : 'none';
         if(key === 'tttMode') document.getElementById('ttt-diff-container').style.display = (val === 'pve') ? 'block' : 'none';
-        if(key === 'sudokuDiff') { startSudoku(); }
     }
 
     let timerInterval, startTime, penalty = 0;
@@ -789,23 +856,14 @@
         let targetPage = document.getElementById(`page-${mode}`);
         if(targetPage) targetPage.classList.remove('hidden');
         
-        if(mode === 'menu') currentActiveGame = null;
-        if(mode === 'block-menu') currentActiveGame = null;
+        if(mode === 'menu' || mode === 'block-menu' || mode === 'sudoku-menu') currentActiveGame = null;
         if(mode === 'block-journey') { renderJourneyMap(); }
-        if(mode === 'sudoku') { currentActiveGame = 'sudoku'; startSudoku(); }
-        if(mode === 'block') { 
-            currentActiveGame = 'block'; 
-            if(!isJourneyMode) {
-                document.getElementById('target-container').classList.add('hidden');
-                resetBlockBoard();
-                refillPieces(); 
-            }
-        }
+        
         if(mode === 'history') {
             currentHistoryContext = historyContext || 'menu';
             renderHistory(currentHistoryContext);
             document.getElementById('btn-back-history').onclick = () => {
-                if(currentHistoryContext === 'sudoku') openMode('sudoku');
+                if(currentHistoryContext === 'sudoku') openMode('sudoku-menu');
                 else if(currentHistoryContext === 'block') openMode('block-menu');
                 else if(currentHistoryContext === 'chess') openMode('board-menu');
                 else if(currentHistoryContext === 'ttt') openMode('ttt-menu');
@@ -829,7 +887,6 @@
             let p1Label = isTttAi ? (currentLang==='vi'?'Bạn (X)':'You (X)') : 'X (P1)';
             let p2Label = isTttAi ? (currentLang==='vi'?'Máy (O)':'AI (O)') : 'O (P2)';
             
-            // Xử lý label cho online mode
             if (globalOptions.tttMode === 'online') {
                 p1Label = (myOnlineSymbol === 'X') ? 'Bạn (X)' : 'Đối thủ (X)';
                 p2Label = (myOnlineSymbol === 'O') ? 'Bạn (O)' : 'Đối thủ (O)';
@@ -840,13 +897,25 @@
             document.getElementById('ttt-score-x').innerText = matchScores.ttt_x;
             document.getElementById('ttt-score-o').innerText = matchScores.ttt_o;
         } else if (game === 'chess') {
-            document.getElementById('c-p1-name').innerText = isBoardAi ? (currentLang==='vi'?'Bạn (Trắng)':'You (W)') : (currentLang==='vi'?'Trắng (P1)':'White (P1)');
-            document.getElementById('c-p2-name').innerText = isBoardAi ? (currentLang==='vi'?'Máy (Đen)':'AI (B)') : (currentLang==='vi'?'Đen (P2)':'Black (P2)');
+            let p1Label = isBoardAi ? (currentLang==='vi'?'Bạn (Trắng)':'You (W)') : (currentLang==='vi'?'Trắng (P1)':'White (P1)');
+            let p2Label = isBoardAi ? (currentLang==='vi'?'Máy (Đen)':'AI (B)') : (currentLang==='vi'?'Đen (P2)':'Black (P2)');
+            if (globalOptions.boardMode === 'online') {
+                p1Label = (myOnlineSymbol === 'W') ? 'Bạn (Trắng)' : 'Đối thủ (Trắng)';
+                p2Label = (myOnlineSymbol === 'B') ? 'Bạn (Đen)' : 'Đối thủ (Đen)';
+            }
+            document.getElementById('c-p1-name').innerText = p1Label;
+            document.getElementById('c-p2-name').innerText = p2Label;
             document.getElementById('c-score-w').innerText = matchScores.chess_w;
             document.getElementById('c-score-b').innerText = matchScores.chess_b;
         } else if (game === 'cchess') {
-            document.getElementById('cc-p1-name').innerText = isBoardAi ? (currentLang==='vi'?'Bạn (Đỏ)':'You (R)') : (currentLang==='vi'?'Đỏ (P1)':'Red (P1)');
-            document.getElementById('cc-p2-name').innerText = isBoardAi ? (currentLang==='vi'?'Máy (Đen)':'AI (B)') : (currentLang==='vi'?'Đen (P2)':'Black (P2)');
+            let p1Label = isBoardAi ? (currentLang==='vi'?'Bạn (Đỏ)':'You (R)') : (currentLang==='vi'?'Đỏ (P1)':'Red (P1)');
+            let p2Label = isBoardAi ? (currentLang==='vi'?'Máy (Đen)':'AI (B)') : (currentLang==='vi'?'Đen (P2)':'Black (P2)');
+            if (globalOptions.boardMode === 'online') {
+                p1Label = (myOnlineSymbol === 'R') ? 'Bạn (Đỏ)' : 'Đối thủ (Đỏ)';
+                p2Label = (myOnlineSymbol === 'B') ? 'Bạn (Đen)' : 'Đối thủ (Đen)';
+            }
+            document.getElementById('cc-p1-name').innerText = p1Label;
+            document.getElementById('cc-p2-name').innerText = p2Label;
             document.getElementById('cc-score-r').innerText = matchScores.cchess_r;
             document.getElementById('cc-score-b').innerText = matchScores.cchess_b;
         }
@@ -854,41 +923,44 @@
 
     let tttBoard = [], tttTurn = 'X';
     let tttSize = 3, tttWinLen = 3;
-    let tttCurrentZoom = 1; // Biến kiểm soát mức độ zoom
+    let tttCurrentZoom = 1; 
+    let tttLastMove = -1; // Biến lưu nước đi cuối cùng
     
-    // Hàm phóng to/thu nhỏ TicTacToe
     function zoomTTT(step, isReset = false) {
         if (isReset) {
             tttCurrentZoom = 1;
         } else {
             tttCurrentZoom += step;
-            if (tttCurrentZoom < 0.4) tttCurrentZoom = 0.4; // Min zoom
-            if (tttCurrentZoom > 3.0) tttCurrentZoom = 3.0; // Max zoom
+            if (tttCurrentZoom < 0.4) tttCurrentZoom = 0.4;
+            if (tttCurrentZoom > 3.0) tttCurrentZoom = 3.0;
         }
         document.getElementById('grid-ttt').style.transform = `scale(${tttCurrentZoom})`;
     }
     
     function initTTT(isNewMatch = false) {
+        // Đảo lại logic: Khi là ván mới và chế độ online thì hiện Lobby
+        if (globalOptions.tttMode === 'online' && isNewMatch) {
+            initOnlineLobby('ttt');
+            return;
+        }
+        initTTT_Actual(isNewMatch);
+    }
+
+    function initTTT_Actual(isNewMatch = false) {
         if(isNewMatch) { matchScores.ttt_x = 0; matchScores.ttt_o = 0; }
         tttSize = parseInt(globalOptions.tttSize);
         tttWinLen = (tttSize === 3) ? 3 : (tttSize === 9 ? 4 : 5); 
         isTttAi = globalOptions.tttMode === 'pve';
         tttAiDiff = parseInt(globalOptions.tttAiDiff);
         currentActiveGame = 'ttt';
-        
-        // Ẩn/hiện tính năng online
-        if (globalOptions.tttMode === 'online') {
-            document.getElementById('online-controls').classList.remove('hidden');
-        } else {
-            document.getElementById('online-controls').classList.add('hidden');
-        }
+        tttLastMove = -1; // Đặt lại nước đi cuối
         
         updateScoreBoard('ttt');
         openMode('ttt');
         
         tttBoard = Array(tttSize * tttSize).fill(null); 
         tttTurn = 'X';
-        zoomTTT(0, true); // Reset Zoom khi bắt đầu bàn mới
+        zoomTTT(0, true); 
         renderTTT();
     }
     
@@ -897,7 +969,7 @@
         grid.innerHTML = '';
         grid.style.gridTemplateColumns = `repeat(${tttSize}, 1fr)`;
         grid.style.gridTemplateRows = `repeat(${tttSize}, 1fr)`;
-        grid.style.gap = tttSize >= 25 ? '1px' : '4px';
+        grid.style.gap = tttSize >= 21 ? '1px' : '4px';
 
         let fontSize = tttSize === 3 ? '4.5rem' : (tttSize === 9 ? '1.5rem' : '0.6rem');
 
@@ -905,24 +977,23 @@
             let div = document.createElement('div'); div.className = `cell-ttt ${cell ? cell.toLowerCase() : ''}`;
             div.innerText = cell || '';
             div.style.fontSize = fontSize;
+            
+            // Highlight nước đi cuối cùng
+            if (i === tttLastMove) {
+                div.classList.add('last-move');
+            }
+
             div.onclick = () => {
-                // CHẶN NẾU ĐANG CHƠI ONLINE MÀ CHƯA TỚI LƯỢT HOẶC CHƯA KẾT NỐI
                 if (globalOptions.tttMode === 'online') {
-                    if (!conn || !conn.open) {
-                        alert("Đang đợi người chơi kết nối vào phòng!");
-                        return;
-                    }
-                    if (tttTurn !== myOnlineSymbol) {
-                        return; // Chưa tới lượt của bạn, không được bấm
-                    }
+                    if (tttTurn !== myOnlineSymbol) return; 
                 }
 
                 if(!cell && !checkWinCaro(tttBoard, tttSize, tttWinLen)) {
                     tttBoard[i] = tttTurn;
+                    tttLastMove = i; // Lưu vết nước đi cuối
                     
-                    // GỬI NƯỚC ĐI QUA ONLINE NẾU CHẾ ĐỘ ONLINE
                     if (globalOptions.tttMode === 'online') {
-                        sendMoveOnline(i, tttTurn);
+                        sendMoveOnline({ type: 'MOVE_TTT', index: i, symbol: tttTurn });
                     }
 
                     let winner = checkWinCaro(tttBoard, tttSize, tttWinLen);
@@ -932,7 +1003,6 @@
                         updateScoreBoard('ttt');
                         saveHistory('ttt', `Size: ${tttSize}x${tttSize} | Winner: ${winner}`);
                         let gameStatus = (isTttAi && winner === 'O') ? 'lose' : 'win';
-                        // Nếu chơi online, bạn cầm quân gì thì hiện Win/Lose theo đó
                         if (globalOptions.tttMode === 'online') {
                             gameStatus = (winner === myOnlineSymbol) ? 'win' : 'lose';
                         }
@@ -1007,6 +1077,7 @@
         
         if(move !== -1) {
             tttBoard[move] = 'O';
+            tttLastMove = move; // Cập nhật nước đi cuối của AI
             let winner = checkWinCaro(tttBoard, tttSize, tttWinLen);
             if(winner){ 
                 renderTTT(); 
@@ -1022,7 +1093,6 @@
     function getCaroHeuristicMove(b, size, winLen, player) {
         let empty = b.map((v,i) => v===null?i:-1).filter(v=>v!==-1);
         let bestScore = -1; let bestMoves = []; let opp = player === 'X' ? 'O' : 'X';
-        
         let blockMultiplier = (tttAiDiff === 5) ? 2.5 : 1.1;
 
         empty.forEach(idx => {
@@ -1078,8 +1148,18 @@
         return moves[bestMove];
     }
 
+    // ĐIỀU HƯỚNG GAME CỜ
     let boardGameType = 'chess';
     function initBoardGame(isNewMatch = false) {
+        // Đảo lại logic: Khi là ván mới và chế độ online thì hiện Lobby
+        if (globalOptions.boardMode === 'online' && isNewMatch) {
+            initOnlineLobby(globalOptions.boardGameType);
+            return;
+        }
+        initBoardGame_Actual(isNewMatch);
+    }
+
+    function initBoardGame_Actual(isNewMatch = false) {
         if(isNewMatch) { matchScores.chess_w = 0; matchScores.chess_b = 0; matchScores.cchess_r = 0; matchScores.cchess_b = 0; }
         boardGameType = globalOptions.boardGameType;
         isBoardAi = globalOptions.boardMode === 'pve';
@@ -1173,7 +1253,7 @@
         return legal;
     }
 
-    function executeChessMove(from, to, isAI = false) {
+    function executeChessMove(from, to, isAI = false, isNetwork = false) {
         chessHistory.push({ b: [...cBoard], turn: cTurn, castling: JSON.parse(JSON.stringify(castling)), ep: epTarget, lastMove: {...lastMoveC} });
         lastMoveC = {from: from, to: to}; let p = cBoard[from]; let isW = p === p.toUpperCase();
         
@@ -1197,12 +1277,16 @@
         if (p.toLowerCase() === 'p' && Math.abs(to - from) === 16) epTarget = from + (isW ? -8 : 8);
 
         if (p.toLowerCase() === 'p' && (Math.floor(to/8) === 0 || Math.floor(to/8) === 7)) {
-            if(isAI) { cBoard[to] = isW ? 'Q' : 'q'; } 
+            if(isAI || isNetwork) { cBoard[to] = isW ? 'Q' : 'q'; } 
             else {
                 let promo = prompt("Phong cấp (q: Hậu, r: Xe, b: Tượng, n: Mã):", "q");
                 if (!['q','r','b','n'].includes(promo?.toLowerCase())) promo = 'q';
                 cBoard[to] = isW ? promo.toUpperCase() : promo.toLowerCase();
             }
+        }
+
+        if (globalOptions.boardMode === 'online' && !isNetwork) {
+            sendMoveOnline({ type: 'MOVE_CHESS', from: from, to: to });
         }
 
         cTurn = cTurn === 'W' ? 'B' : 'W'; cSel = null; cMoves = []; updateChessScore(); renderChess();
@@ -1220,6 +1304,9 @@
                 updateScoreBoard('chess');
                 saveHistory('chess', `Winner: ${cTurn === 'B' ? 'White' : 'Black'}`);
                 let status = (isBoardAi && cTurn === 'W') ? 'lose' : 'win';
+                if (globalOptions.boardMode === 'online') {
+                    status = (cTurn === 'B' && myOnlineSymbol === 'W') || (cTurn === 'W' && myOnlineSymbol === 'B') ? 'win' : 'lose';
+                }
                 fireWin((cTurn==='W'?'Đen':'Trắng') + (currentLang==='vi'?" THẮNG!":" WINS!"), status);
             } else {
                 saveHistory('chess', 'Draw');
@@ -1231,6 +1318,7 @@
     }
 
     function undoChess() {
+        if (globalOptions.boardMode === 'online') return; // Không cho undo khi chơi online
         if (undosLeft > 0 && chessHistory.length > 0) {
             let last = chessHistory.pop();
             if (isBoardAi && chessHistory.length > 0) { last = chessHistory.pop(); }
@@ -1252,7 +1340,10 @@
             if(p) { sq.innerText = chP[p] + '\uFE0E'; sq.style.color = '#000000'; }
             
             sq.onclick = () => {
-                if(cTurn !== 'W' && isBoardAi) return;
+                if (globalOptions.boardMode === 'online') {
+                    if (cTurn !== myOnlineSymbol) return; 
+                } else if (cTurn !== 'W' && isBoardAi) return;
+
                 if(cSel === null) {
                     if (p && ((cTurn === 'W' && p === p.toUpperCase()) || (cTurn === 'B' && p === p.toLowerCase()))) { 
                         cSel = i; cMoves = getLegalMoves(i, cBoard, castling, epTarget); renderChess(); 
@@ -1267,7 +1358,12 @@
             };
             board.appendChild(sq);
         }
-        document.getElementById('turn-chess').innerText = i18n[currentLang][`turn_${cTurn.toLowerCase()}`];
+        
+        let turnText = i18n[currentLang][`turn_${cTurn.toLowerCase()}`];
+        if (globalOptions.boardMode === 'online') {
+            if (cTurn === myOnlineSymbol) turnText += (currentLang==='vi' ? " (Bạn)" : " (You)");
+        }
+        document.getElementById('turn-chess').innerText = turnText;
     }
 
     const ccPieces = { r:'車', n:'馬', b:'象', a:'士', k:'將', c:'砲', p:'卒', R:'俥', N:'傌', B:'相', A:'仕', K:'帥', C:'炮', P:'兵' };
@@ -1334,7 +1430,7 @@
         return legal;
     }
 
-    function executeCCMove(from, to) {
+    function executeCCMove(from, to, isNetwork = false) {
         ccHistory.push({b: [...ccB], turn: ccTurn, totalM: ccTotalMoves, progM: ccProgressMoves, lastMove: {...lastMoveCC}});
         lastMoveCC = {from: from, to: to};
         let p = ccB[from]; let captured = ccB[to];
@@ -1342,7 +1438,13 @@
         if (captured || p.toLowerCase() === 'p') ccProgressMoves = 0; else ccProgressMoves++;
         ccTotalMoves++;
 
-        ccB[to] = p; ccB[from] = null; ccTurn = (ccTurn === 'R') ? 'B' : 'R';
+        ccB[to] = p; ccB[from] = null; 
+        
+        if (globalOptions.boardMode === 'online' && !isNetwork) {
+            sendMoveOnline({ type: 'MOVE_CCHESS', from: from, to: to });
+        }
+
+        ccTurn = (ccTurn === 'R') ? 'B' : 'R';
         ccSelected = null; ccMoves = []; renderCChess();
 
         let hasMoves = false;
@@ -1361,6 +1463,10 @@
             let winnerText = ccTurn === 'R' ? (currentLang==='vi'?'ĐEN':'BLACK') : (currentLang==='vi'?'ĐỎ':'RED');
             saveHistory('chess', `Winner (Xiangqi): ${winnerText}`);
 
+            if (globalOptions.boardMode === 'online') {
+                status = (ccTurn === 'B' && myOnlineSymbol === 'R') || (ccTurn === 'R' && myOnlineSymbol === 'B') ? 'win' : 'lose';
+            }
+
             if (inCheck) fireWin(`${winnerText} ` + (currentLang==='vi'?"CHIẾU BÍ!":"CHECKMATE!"), status);
             else fireWin(`${winnerText} ` + (currentLang==='vi'?"THẮNG (HẾT NƯỚC ĐI)!":"WINS (STALEMATE)!"), status);
             return;
@@ -1371,6 +1477,7 @@
     }
 
     function undoCChess() {
+        if (globalOptions.boardMode === 'online') return;
         if (undosLeftCC > 0 && ccHistory.length > 0) {
             let last = ccHistory.pop();
             if (isBoardAi && ccHistory.length > 0) last = ccHistory.pop();
@@ -1397,7 +1504,10 @@
             }
             
             sq.onclick = () => {
-                if(ccTurn !== 'R' && isBoardAi) return;
+                if (globalOptions.boardMode === 'online') {
+                    if (ccTurn !== myOnlineSymbol) return; 
+                } else if (ccTurn !== 'R' && isBoardAi) return;
+
                 if (ccSelected === null) {
                     if (p && ((ccTurn === 'R' && p === p.toUpperCase()) || (ccTurn === 'B' && p === p.toLowerCase()))) { 
                         ccSelected = i; ccMoves = getCCLegalMoves(i, ccB); renderCChess(); 
@@ -1413,7 +1523,12 @@
             };
             board.appendChild(sq);
         }
-        document.getElementById('turn-cchess').innerText = i18n[currentLang][`turn_${ccTurn==='R'?'r':'bl'}`];
+        
+        let turnText = i18n[currentLang][`turn_${ccTurn==='R'?'r':'bl'}`];
+        if (globalOptions.boardMode === 'online') {
+            if (ccTurn === myOnlineSymbol) turnText += (currentLang==='vi' ? " (Bạn)" : " (You)");
+        }
+        document.getElementById('turn-cchess').innerText = turnText;
         document.getElementById('cchess-undo-btn').innerText = `Undo (${undosLeftCC})`;
     }
 
@@ -1483,7 +1598,6 @@
                             tempBoard[to] = tempBoard[i];
                             tempBoard[i] = null;
                             let baseScore = evalMoveC(i, to, cBoard);
-                            // Cực kỳ thông minh: Nhìn trước 1 bước xem có bị đối phương ăn lại hay không
                             if (isSquareAttacked(to, true, tempBoard)) {
                                 baseScore -= (pieceValues[tempBoard[to].toLowerCase()] || 1) * 20; 
                             }
@@ -1529,18 +1643,171 @@
         }
     }
 
+    // ==========================================
+    // PHẦN SUDOKU VÀ ONLINE MỚI
+    // ==========================================
     let solutionS = [], selectedIdx = null;
-    function startSudoku() {
-        startTimer('timer-s'); const g = document.getElementById('grid-s'); g.innerHTML = ''; let b = Array.from({length:9},()=>Array(9).fill(0));
-        const solveS = (bd) => { for(let r=0; r<9; r++) { for(let c=0; c<9; c++) { if(bd[r][c]===0) { let ns = [1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5); for(let n of ns) { if(isValidS(bd,r,c,n)) { bd[r][c]=n; if(solveS(bd)) return true; bd[r][c]=0; } } return false; } } } return true; };
-        solveS(b); solutionS = b.map(r=>[...r]); let h = globalOptions.sudokuDiff || 45; while(h>0){ let r=Math.floor(Math.random()*9), c=Math.floor(Math.random()*9); if(b[r][c]!==0){ b[r][c]=0; h--; } }
-        for(let i=0; i<81; i++) { let c = document.createElement('div'); c.className = 'cell-s'; let v = b[Math.floor(i/9)][i%9]; c.innerText = v || ''; if(v) c.classList.add('readonly'); c.onclick = () => { if(!c.classList.contains('readonly')) { document.querySelectorAll('.cell-s').forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); selectedIdx = i; } }; g.appendChild(c); }
+    let isViewingOpponent = false;
+
+    function generateSudokuBoard(diff) {
+        let b = Array.from({length:9},()=>Array(9).fill(0));
+        const solveS = (bd) => { 
+            for(let r=0; r<9; r++) { 
+                for(let c=0; c<9; c++) { 
+                    if(bd[r][c]===0) { 
+                        let ns = [1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5); 
+                        for(let n of ns) { 
+                            if(isValidS(bd,r,c,n)) { 
+                                bd[r][c]=n; 
+                                if(solveS(bd)) return true; 
+                                bd[r][c]=0; 
+                            } 
+                        } 
+                        return false; 
+                    } 
+                } 
+            } 
+            return true; 
+        };
+        solveS(b); 
+        let sol = b.map(r=>[...r]); 
+        let h = diff || 45; 
+        while(h>0){ let r=Math.floor(Math.random()*9), c=Math.floor(Math.random()*9); if(b[r][c]!==0){ b[r][c]=0; h--; } }
+        return { initial: b, solution: sol };
     }
+
+    function initSudoku(isNewMatch = false) {
+        // Đảo lại logic: Khi là ván mới và chế độ online thì hiện Lobby
+        if (globalOptions.sudokuMode === 'online' && isNewMatch) {
+            initOnlineLobby('sudoku');
+            return;
+        }
+        initSudoku_Actual(isNewMatch);
+    }
+
+    function initSudoku_Actual(isNewMatch = false, guestData = null) {
+        currentActiveGame = 'sudoku';
+        openMode('sudoku');
+        
+        if (globalOptions.sudokuMode === 'online') {
+            document.getElementById('sudoku-opp-controls').classList.remove('hidden');
+            document.getElementById('btn-hint').classList.add('hidden');
+            document.getElementById('btn-ai').classList.add('hidden');
+        } else {
+            document.getElementById('sudoku-opp-controls').classList.add('hidden');
+            document.getElementById('btn-hint').classList.remove('hidden');
+            document.getElementById('btn-ai').classList.remove('hidden');
+        }
+
+        startSudoku(guestData);
+    }
+
+    function startSudoku(guestData = null) {
+        startTimer('timer-s'); 
+        const g = document.getElementById('grid-s'); g.innerHTML = ''; 
+        const gOpp = document.getElementById('grid-s-opp'); gOpp.innerHTML = '';
+        
+        selectedIdx = null;
+        isViewingOpponent = false;
+        g.classList.remove('hidden');
+        gOpp.classList.add('hidden');
+        
+        let btnToggle = document.getElementById('btn-view-opp');
+        if(btnToggle) {
+            btnToggle.innerText = '👀 Xem bảng đối thủ';
+            btnToggle.classList.replace('btn', 'btn-outline');
+        }
+
+        let b;
+        if (guestData && guestData.sudokuInitial) {
+            solutionS = guestData.sudokuSolution;
+            b = guestData.sudokuInitial;
+        } else {
+            let puzzle = generateSudokuBoard(globalOptions.sudokuDiff);
+            solutionS = puzzle.solution;
+            b = puzzle.initial;
+        }
+
+        for(let i=0; i<81; i++) { 
+            let r = Math.floor(i/9), col = i%9;
+            let v = b[r][col]; 
+            
+            // My Board
+            let c = document.createElement('div'); c.className = 'cell-s'; 
+            c.innerText = v || ''; 
+            if(v) c.classList.add('readonly'); 
+            c.onclick = () => { 
+                if(!c.classList.contains('readonly') && !isViewingOpponent) { 
+                    document.querySelectorAll('#grid-s .cell-s').forEach(x=>x.classList.remove('selected')); 
+                    c.classList.add('selected'); 
+                    selectedIdx = i; 
+                } 
+            }; 
+            g.appendChild(c); 
+            
+            // Opponent Board
+            if (globalOptions.sudokuMode === 'online') {
+                let cOpp = document.createElement('div'); cOpp.className = 'cell-s readonly'; 
+                cOpp.innerText = v || ''; 
+                if(v) cOpp.style.backgroundColor = '#e0e0e0';
+                gOpp.appendChild(cOpp);
+            }
+        }
+    }
+
     function isValidS(b,r,c,n){ for(let i=0; i<9; i++) if(b[r][i]===n || b[i][c]===n) return false; let sR=Math.floor(r/3)*3, sC=Math.floor(c/3)*3; for(let i=0; i<3; i++) for(let j=0; j<3; j++) if(b[sR+i][sC+j]===n) return false; return true; }
-    function inputS(n){ if(selectedIdx!==null){ document.querySelectorAll('.cell-s')[selectedIdx].innerText = n===0?'':n; checkWinS(); } }
-    function getHint(){ let em=[]; document.querySelectorAll('.cell-s').forEach((c,i)=>{ if(c.innerText==='' && !c.classList.contains('readonly')) em.push(i); }); if(em.length>0){ let idx=em[Math.floor(Math.random()*em.length)]; document.querySelectorAll('.cell-s')[idx].innerText=solutionS[Math.floor(idx/9)][idx%9]; penalty+=10000; checkWinS(); } }
-    function solveByAI(){ document.querySelectorAll('.cell-s').forEach((c,i)=> { if(!c.classList.contains('readonly')) c.innerText=solutionS[Math.floor(i/9)][i%9]; }); saveHistory('sudoku','AI Solved'); clearInterval(timerInterval); }
-    function checkWinS(){ let f=true, cor=true; document.querySelectorAll('.cell-s').forEach((c,i)=>{ let v=parseInt(c.innerText); if(!v) f=false; if(v!==solutionS[Math.floor(i/9)][i%9]) cor=false; }); if(f && cor){ fireWin(currentLang==='vi'?"CHIẾN THẮNG!":"VICTORY!", 'win'); saveHistory('sudoku', "Time: " + document.getElementById('timer-s').innerText); } }
+    
+    function inputS(n){ 
+        if (isViewingOpponent) return;
+        if(selectedIdx!==null){ 
+            document.querySelectorAll('#grid-s .cell-s')[selectedIdx].innerText = n===0?'':n; 
+            if (globalOptions.sudokuMode === 'online') {
+                sendMoveOnline({ type: 'MOVE_SUDOKU', index: selectedIdx, value: n===0?'':n });
+            }
+            checkWinS(); 
+        } 
+    }
+
+    function toggleOpponentBoard() {
+        isViewingOpponent = !isViewingOpponent;
+        const btn = document.getElementById('btn-view-opp');
+        const gridMy = document.getElementById('grid-s');
+        const gridOpp = document.getElementById('grid-s-opp');
+        
+        if (isViewingOpponent) {
+            gridMy.classList.add('hidden');
+            gridOpp.classList.remove('hidden');
+            btn.innerText = '⬅ Quay lại bảng của tôi';
+            btn.classList.replace('btn-outline', 'btn');
+        } else {
+            gridOpp.classList.add('hidden');
+            gridMy.classList.remove('hidden');
+            btn.innerText = '👀 Xem bảng đối thủ';
+            btn.classList.replace('btn', 'btn-outline');
+        }
+    }
+
+    function getHint(){ let em=[]; document.querySelectorAll('#grid-s .cell-s').forEach((c,i)=>{ if(c.innerText==='' && !c.classList.contains('readonly')) em.push(i); }); if(em.length>0){ let idx=em[Math.floor(Math.random()*em.length)]; document.querySelectorAll('#grid-s .cell-s')[idx].innerText=solutionS[Math.floor(idx/9)][idx%9]; penalty+=10000; checkWinS(); } }
+    function solveByAI(){ document.querySelectorAll('#grid-s .cell-s').forEach((c,i)=> { if(!c.classList.contains('readonly')) c.innerText=solutionS[Math.floor(i/9)][i%9]; }); saveHistory('sudoku','AI Solved'); clearInterval(timerInterval); }
+    
+    function checkWinS(){ 
+        let f=true, cor=true; 
+        document.querySelectorAll('#grid-s .cell-s').forEach((c,i)=>{ 
+            let v=parseInt(c.innerText); 
+            if(!v) f=false; 
+            if(v!==solutionS[Math.floor(i/9)][i%9]) cor=false; 
+        }); 
+        if(f && cor){ 
+            if (globalOptions.sudokuMode === 'online') {
+                sendMoveOnline({ type: 'WIN_SUDOKU' });
+                saveHistory('sudoku', "Online Win - Time: " + document.getElementById('timer-s').innerText); 
+                fireWin("BẠN ĐÃ CHIẾN THẮNG!", 'win');
+            } else {
+                saveHistory('sudoku', "Time: " + document.getElementById('timer-s').innerText); 
+                fireWin(currentLang==='vi'?"CHIẾN THẮNG!":"VICTORY!", 'win'); 
+            }
+        } 
+    }
 
     let bState = Array(64).fill(false), bScore = 0, bCombo = 0;
     const bShapes = [ [[0,0]], [[0,0],[0,1]], [[0,0],[1,0]], [[0,0],[0,1],[0,2]], [[0,0],[1,0],[2,0]], [[0,0],[0,1],[0,2],[0,3]], [[0,0],[1,0],[2,0],[3,0]], [[0,0],[0,1],[1,0],[1,1]], [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2],[2,0],[2,1],[2,2]], [[0,0],[1,0],[1,1]], [[0,1],[1,0],[1,1]], [[0,0],[0,1],[1,0]], [[0,0],[0,1],[1,1]], [[0,0],[1,0],[2,0],[2,1],[2,2]], [[2,0],[2,1],[2,2],[1,2],[0,2]], [[0,0],[0,1],[0,2],[1,0],[2,0]], [[0,0],[0,1],[0,2],[1,2],[2,2]], [[0,1],[1,0],[1,1],[1,2]], [[0,0],[0,1],[0,2],[1,1]], [[0,0],[1,0],[2,0],[1,1]], [[1,0],[0,1],[1,1],[2,1]], [[0,0],[0,1],[1,1],[1,2]], [[0,1],[0,2],[1,0],[1,1]] ];
@@ -1593,6 +1860,7 @@
         document.getElementById('target-container').classList.add('hidden');
         resetBlockBoard();
         refillPieces(); 
+        openMode('block'); // Mở view chính xác
     }
 
     function startJourneyLevel(level) {
@@ -1709,7 +1977,10 @@
 
         let firstCellCenterX = currentLeft + (17 * scale); let firstCellCenterY = currentTop + (17 * scale);
         const board = document.getElementById('board-b'); const rect = board.getBoundingClientRect();
-        const cW = 38; const gridStartX = rect.left + 10; const gridStartY = rect.top + 10;
+        
+        // FIX: Cập nhật biến cW tính toán động để khớp chuẩn nhất với kích thước mọi điện thoại
+        const cW = (rect.width - 20) / 8; 
+        const gridStartX = rect.left + 10; const gridStartY = rect.top + 10;
         
         const c = Math.floor((firstCellCenterX - gridStartX) / cW); const r = Math.floor((firstCellCenterY - gridStartY) / cW);
 
@@ -1730,7 +2001,10 @@
         let firstCellCenterX = currentLeft + (17 * scale); let firstCellCenterY = currentTop + (17 * scale);
         
         const board = document.getElementById('board-b'); const rect = board.getBoundingClientRect();
-        const cW = 38; const gridStartX = rect.left + 10; const gridStartY = rect.top + 10;
+        
+        // FIX: Đảm bảo khi thả ra cũng bắt đúng tọa độ ô lưới trên Mobile
+        const cW = (rect.width - 20) / 8; 
+        const gridStartX = rect.left + 10; const gridStartY = rect.top + 10;
         const c = Math.floor((firstCellCenterX - gridStartX) / cW); const r = Math.floor((firstCellCenterY - gridStartY) / cW);
 
         dragP.remove(); dragP = null; clearBPreview();
@@ -1872,19 +2146,25 @@
 
         if (playAgain) {
             if (currentActiveGame === 'ttt') {
-                initTTT(false);
-                // Đồng bộ khởi động lại bàn nếu đang chơi online
-                if (globalOptions.tttMode === 'online' && conn && conn.open) {
-                    conn.send({ type: 'RESTART' });
-                }
+                if (globalOptions.tttMode === 'online' && conn && conn.open) { conn.send({ type: 'RESTART' }); }
+                initTTT_Actual(false);
             } 
-            else if (currentActiveGame === 'chess' || currentActiveGame === 'cchess') initBoardGame(false);
-            else if (currentActiveGame === 'sudoku') startSudoku();
+            else if (currentActiveGame === 'chess' || currentActiveGame === 'cchess') {
+                if (globalOptions.boardMode === 'online' && conn && conn.open) { conn.send({ type: 'RESTART' }); }
+                initBoardGame_Actual(false);
+            }
+            else if (currentActiveGame === 'sudoku') {
+                if (globalOptions.sudokuMode === 'online' && conn && conn.open) { conn.send({ type: 'RESTART' }); }
+                initSudoku_Actual(false);
+            }
             else if (currentActiveGame === 'block') {
                 if(isJourneyMode) startJourneyLevel(currentJourneyLevel);
                 else startBlockBlast();
             }
         } else {
+            if (globalOptions.tttMode === 'online' || globalOptions.boardMode === 'online' || globalOptions.sudokuMode === 'online') {
+                if (conn && conn.open) conn.close();
+            }
             if(currentActiveGame === 'block') {
                 if (isJourneyMode) openMode('block-journey');
                 else openMode('block-menu');
@@ -1894,67 +2174,134 @@
         }
     }
 
-    // --- PHẦN KẾT NỐI TỪ XA QUA PEERJS CHUẨN ---
-    const peer = new Peer(); 
+    // ==========================================
+    // PHẦN KẾT NỐI TỪ XA ONLINE MỚI (LOBBY RIÊNG)
+    // ==========================================
+    let myPeer = null;
     let conn = null;
-    let myOnlineSymbol = null; // Biến lưu trữ ký hiệu khi chơi Online
+    let myOnlineSymbol = null; 
+    let onlineContext = null; // 'ttt', 'chess', 'cchess', 'sudoku'
 
-    // Khi máy của bạn (Host) xin được mã ID từ server
-    peer.on('open', (id) => { 
-        document.getElementById('my-id').innerText = id; 
-        console.log("Peer ID của bạn: " + id);
-    });
+    // Tạo mã code ngẫu nhiên gồm 2 chữ và 6 số
+    function generatePeerID() {
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        let l1 = letters[Math.floor(Math.random() * 26)];
+        let l2 = letters[Math.floor(Math.random() * 26)];
+        let num = Math.floor(100000 + Math.random() * 900000); // 6 số
+        return `${l1}${l2}${num}`;
+    }
 
-    // Khi Host (người tạo mã) nhận được yêu cầu kết nối
-    peer.on('connection', (c) => { 
-        if (globalOptions.tttMode !== 'online') return; // Không cho kết nối nếu không ở chế độ online
-        conn = c; 
-        myOnlineSymbol = 'X'; // Host luôn đánh X
-        setupPeerEvents(); 
-        
-        conn.on('open', () => {
-            // Host sẽ gửi thông số kích thước bàn cờ cho Guest để đồng bộ
-            conn.send({ type: 'CONFIG', size: tttSize });
-        });
-    });
+    function initOnlineLobby(game) {
+        onlineContext = game;
+        document.getElementById('page-online-lobby').style.setProperty('--theme-color', game === 'ttt' ? '#d35400' : (game === 'sudoku' ? '#2980b9' : '#27ae60'));
+        openMode('online-lobby');
+        document.getElementById('lobby-status').innerText = 'Đang khởi tạo mã...';
+        document.getElementById('friend-id-input').value = '';
 
-    // Hàm khi bạn bè (Guest) chủ động kết nối tới Host
+        if (!myPeer || myPeer.destroyed) {
+            const customID = generatePeerID();
+            myPeer = new Peer(customID);
+            
+            myPeer.on('open', (id) => {
+                document.getElementById('my-peer-id').innerText = id;
+                document.getElementById('lobby-status').innerText = 'Đang chờ người chơi kết nối...';
+            });
+            
+            myPeer.on('connection', (incomingConn) => {
+                handleIncomingConnection(incomingConn);
+            });
+            
+            myPeer.on('error', (err) => {
+                console.error('PeerJS error:', err);
+                let statusEl = document.getElementById('lobby-status');
+                if(statusEl) {
+                    statusEl.innerText = 'Lỗi kết nối: ' + (err.type === 'peer-unavailable' ? 'Không tìm thấy phòng!' : err.type);
+                    statusEl.style.color = '#e74c3c';
+                }
+            });
+        } else {
+            document.getElementById('my-peer-id').innerText = myPeer.id;
+            document.getElementById('lobby-status').innerText = 'Đang chờ người chơi kết nối...';
+        }
+    }
+
+    function handleIncomingConnection(incomingConn) {
+        conn = incomingConn;
+        myOnlineSymbol = (onlineContext === 'ttt') ? 'X' : (onlineContext === 'chess' ? 'W' : 'R'); 
+        setupPeerEvents();
+
+        const startHost = () => {
+            let payload = { 
+                type: 'CONFIG_ROOM', 
+                game: onlineContext,
+                tttSize: globalOptions.tttSize,
+                boardType: globalOptions.boardGameType,
+                sudokuDiff: globalOptions.sudokuDiff
+            };
+
+            // Nếu là Sudoku, Host tự sinh bảng mới và đồng bộ cho Guest
+            if (onlineContext === 'sudoku') {
+                let puzzle = generateSudokuBoard(globalOptions.sudokuDiff);
+                payload.sudokuInitial = puzzle.initial;
+                payload.sudokuSolution = puzzle.solution;
+            }
+
+            conn.send(payload);
+            startGameFromLobby(payload);
+        };
+
+        if (conn.open) {
+            startHost();
+        } else {
+            conn.on('open', () => {
+                startHost();
+            });
+        }
+    }
+
     function connectToFriend() {
-        const friendId = document.getElementById('peer-id-input').value;
-        if (!friendId) return alert("Vui lòng dán mã của Host vào đây!");
+        let friendId = document.getElementById('friend-id-input').value.toUpperCase().trim();
+        if (!friendId) return alert("Vui lòng nhập mã phòng!");
+        if (myPeer && friendId === myPeer.id) return alert("Không thể tự kết nối với chính mình!");
         
-        document.getElementById('conn-status').innerText = "Đang kết nối...";
-        conn = peer.connect(friendId);
-        myOnlineSymbol = 'O'; // Guest (người kết nối) luôn đánh O
+        document.getElementById('lobby-status').innerText = 'Đang kết nối...';
+        document.getElementById('lobby-status').style.color = '#e67e22';
+        
+        conn = myPeer.connect(friendId, { reliable: true });
         
         conn.on('open', () => {
+            document.getElementById('lobby-status').innerText = 'Đã kết nối! Đang đồng bộ...';
+            document.getElementById('lobby-status').style.color = '#2ecc71';
             setupPeerEvents();
         });
     }
 
-    // Thiết lập xử lý dữ liệu truyền tải (cho cả 2 máy)
     function setupPeerEvents() {
-        document.getElementById('conn-status').innerText = "Đã kết nối thành công!";
-        document.getElementById('conn-status').style.color = "#2ecc71";
-        updateScoreBoard('ttt'); // Cập nhật lại tên người chơi trên bảng điểm
-        
         conn.on('data', (data) => {
-            if (data.type === 'CONFIG') {
-                // Nhận cấu hình từ Host
-                globalOptions.tttSize = data.size;
-                initTTT(true); 
+            if (data.type === 'CONFIG_ROOM') {
+                onlineContext = data.game;
+                globalOptions.tttSize = data.tttSize;
+                globalOptions.boardGameType = data.boardType;
+                globalOptions.sudokuDiff = data.sudokuDiff;
+                myOnlineSymbol = (onlineContext === 'ttt') ? 'O' : 'B'; 
+                
+                if (onlineContext === 'ttt') globalOptions.tttMode = 'online';
+                else if (onlineContext === 'sudoku') globalOptions.sudokuMode = 'online';
+                else globalOptions.boardMode = 'online';
+                
+                startGameFromLobby(data);
             }
-            if (data.type === 'RESTART') {
-                // Máy kia bấm chơi lại
-                initTTT(false);
+            else if (data.type === 'RESTART') {
+                if (onlineContext === 'ttt') initTTT_Actual(false);
+                else if (onlineContext === 'sudoku') initSudoku_Actual(false);
+                else initBoardGame_Actual(false);
             }
-            if (data.type === 'MOVE') {
-                // Nhận nước đi từ đối thủ và cập nhật bàn cờ
+            else if (data.type === 'MOVE_TTT') {
                 tttBoard[data.index] = data.symbol;
                 tttTurn = (data.symbol === 'X') ? 'O' : 'X';
+                tttLastMove = data.index; // Cập nhật highlight cho khách
                 renderTTT();
                 
-                // Kiểm tra xem đối thủ đi bước đó có thắng hay hòa không
                 let winner = checkWinCaro(tttBoard, tttSize, tttWinLen);
                 if (winner) {
                     if(winner === 'X') matchScores.ttt_x++; else matchScores.ttt_o++;
@@ -1965,39 +2312,80 @@
                     fireWin("HÒA NHAU!", 'draw');
                 }
             }
+            else if (data.type === 'MOVE_CHESS') {
+                executeChessMove(data.from, data.to, false, true);
+            }
+            else if (data.type === 'MOVE_CCHESS') {
+                executeCCMove(data.from, data.to, true);
+            }
+            // NHẬN TÍN HIỆU ĐÁNH TỪ ĐỐI THỦ SUDOKU
+            else if (data.type === 'MOVE_SUDOKU') {
+                const oppCells = document.querySelectorAll('#grid-s-opp .cell-s');
+                if(oppCells[data.index]) {
+                    oppCells[data.index].innerText = data.value;
+                    oppCells[data.index].style.color = '#e74c3c'; // Bôi đỏ số đối thủ giải được
+                }
+            }
+            else if (data.type === 'WIN_SUDOKU') {
+                saveHistory('sudoku', "Online Lose"); 
+                fireWin("ĐỐI THỦ ĐÃ GIẢI XONG TRƯỚC!", 'lose');
+            }
         });
 
         conn.on('close', () => {
-            document.getElementById('conn-status').innerText = "Đối thủ đã ngắt kết nối!";
-            document.getElementById('conn-status').style.color = "#e74c3c";
+            alert("Mất kết nối với đối thủ!");
             conn = null;
+            openMode('menu');
         });
     }
 
-    // Hàm gửi nước đi sang máy đối thủ
-    function sendMoveOnline(idx, sym) {
-        if (conn && conn.open) {
-            conn.send({ type: 'MOVE', index: idx, symbol: sym });
+    function startGameFromLobby(data = null) {
+        if (onlineContext === 'ttt') {
+            initTTT_Actual(true);
+        } else if (onlineContext === 'sudoku') {
+            initSudoku_Actual(true, data);
+        } else {
+            initBoardGame_Actual(true);
         }
     }
 
-    // HÀM COPY MÃ ID VÀO BỘ NHỚ TẠM
+    function sendMoveOnline(dataPayload) {
+        if (conn && conn.open) {
+            conn.send(dataPayload);
+        }
+    }
+
+    function goBackFromLobby() {
+        if (conn) { conn.close(); conn = null; }
+        if (myPeer) { myPeer.destroy(); myPeer = null; }
+        if (onlineContext === 'ttt') openMode('ttt-menu');
+        else if (onlineContext === 'sudoku') openMode('sudoku-menu');
+        else openMode('board-menu');
+    }
+
+    function quitOnlineGame(menuFallback) {
+        if (conn) { conn.close(); conn = null; }
+        if (myPeer) { myPeer.destroy(); myPeer = null; }
+        if (globalOptions.sudokuMode === 'online') globalOptions.sudokuMode = 'solo'; // Trả về mặc định
+        openMode(menuFallback);
+    }
+
     function copyMyID() {
-        const myId = document.getElementById('my-id').innerText;
+        const myId = document.getElementById('my-peer-id').innerText;
         if (myId === "Đang lấy..." || myId === "...") return;
 
         navigator.clipboard.writeText(myId).then(() => {
             const btn = event.target;
             const originalText = btn.innerText;
-            btn.innerText = "Đã chép!";
+            btn.innerText = "✅ Đã chép mã!";
             btn.style.background = "#2ecc71";
+            btn.style.color = "white";
             
             setTimeout(() => {
                 btn.innerText = originalText;
-                btn.style.background = "#95a5a6";
+                btn.style.background = "transparent";
+                btn.style.color = "inherit";
             }, 2000);
-        }).catch(err => {
-            console.error('Lỗi khi copy: ', err);
         });
     }
 
