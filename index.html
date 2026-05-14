@@ -2175,15 +2175,30 @@
     }
 
     // ==========================================
-    // PHẦN KẾT NỐI TỪ XA ONLINE MỚI (LOBBY RIÊNG)
+    // PHẦN KẾT NỐI TỪ XA ONLINE MỚI (LOBBY RIÊNG) - FIX PEERJS
     // ==========================================
     let myPeer = null;
     let conn = null;
     let myOnlineSymbol = null; 
     let onlineContext = null; // 'ttt', 'chess', 'cchess', 'sudoku'
 
-    // Tạo mã code ngẫu nhiên gồm 2 chữ và 6 số
-    function generatePeerID() {
+    // Tiền tố ẩn để tránh trùng lặp ID trên toàn cầu
+    const APP_PREFIX = "HEIUNG_4GAMES_V1_"; 
+
+    // Cấu hình máy chủ STUN của Google để vượt tường lửa (NAT traversal)
+    const peerConfig = {
+        config: {
+            'iceServers': [
+                { url: 'stun:stun.l.google.com:19302' },
+                { url: 'stun:stun1.l.google.com:19302' },
+                { url: 'stun:stun2.l.google.com:19302' }
+            ]
+        },
+        debug: 2
+    };
+
+    // Tạo mã code ngẫu nhiên gồm 2 chữ và 6 số (Hiển thị cho người chơi)
+    function generateDisplayCode() {
         const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         let l1 = letters[Math.floor(Math.random() * 26)];
         let l2 = letters[Math.floor(Math.random() * 26)];
@@ -2199,12 +2214,16 @@
         document.getElementById('friend-id-input').value = '';
 
         if (!myPeer || myPeer.destroyed) {
-            const customID = generatePeerID();
-            myPeer = new Peer(customID);
+            const displayCode = generateDisplayCode();
+            const securePeerID = APP_PREFIX + displayCode;
+            
+            myPeer = new Peer(securePeerID, peerConfig);
             
             myPeer.on('open', (id) => {
-                document.getElementById('my-peer-id').innerText = id;
+                // Chỉ hiển thị phần mã ngắn cho người dùng
+                document.getElementById('my-peer-id').innerText = displayCode;
                 document.getElementById('lobby-status').innerText = 'Đang chờ người chơi kết nối...';
+                document.getElementById('lobby-status').style.color = 'var(--text)';
             });
             
             myPeer.on('connection', (incomingConn) => {
@@ -2215,12 +2234,20 @@
                 console.error('PeerJS error:', err);
                 let statusEl = document.getElementById('lobby-status');
                 if(statusEl) {
-                    statusEl.innerText = 'Lỗi kết nối: ' + (err.type === 'peer-unavailable' ? 'Không tìm thấy phòng!' : err.type);
+                    if (err.type === 'unavailable-id') {
+                        statusEl.innerText = 'Lỗi: Mã phòng bị trùng! Hãy thoát ra tạo lại.';
+                    } else if (err.type === 'peer-unavailable') {
+                        statusEl.innerText = 'Không tìm thấy phòng! Hãy kiểm tra lại mã.';
+                    } else {
+                        statusEl.innerText = 'Lỗi kết nối: ' + err.type;
+                    }
                     statusEl.style.color = '#e74c3c';
                 }
             });
         } else {
-            document.getElementById('my-peer-id').innerText = myPeer.id;
+            // Nếu đã có kết nối, cắt bỏ tiền tố để hiển thị mã cũ
+            const currentCode = myPeer.id.replace(APP_PREFIX, "");
+            document.getElementById('my-peer-id').innerText = currentCode;
             document.getElementById('lobby-status').innerText = 'Đang chờ người chơi kết nối...';
         }
     }
@@ -2239,7 +2266,6 @@
                 sudokuDiff: globalOptions.sudokuDiff
             };
 
-            // Nếu là Sudoku, Host tự sinh bảng mới và đồng bộ cho Guest
             if (onlineContext === 'sudoku') {
                 let puzzle = generateSudokuBoard(globalOptions.sudokuDiff);
                 payload.sudokuInitial = puzzle.initial;
@@ -2260,20 +2286,42 @@
     }
 
     function connectToFriend() {
-        let friendId = document.getElementById('friend-id-input').value.toUpperCase().trim();
-        if (!friendId) return alert("Vui lòng nhập mã phòng!");
-        if (myPeer && friendId === myPeer.id) return alert("Không thể tự kết nối với chính mình!");
+        let displayCode = document.getElementById('friend-id-input').value.toUpperCase().trim();
+        if (!displayCode || displayCode.length < 8) return alert("Vui lòng nhập đúng mã phòng (VD: AB123456)!");
         
-        document.getElementById('lobby-status').innerText = 'Đang kết nối...';
+        let targetPeerID = APP_PREFIX + displayCode;
+        
+        if (myPeer && targetPeerID === myPeer.id) return alert("Không thể tự kết nối với chính mình!");
+        
+        document.getElementById('lobby-status').innerText = 'Đang dò tìm phòng và đục lỗ tường lửa...';
         document.getElementById('lobby-status').style.color = '#e67e22';
         
-        conn = myPeer.connect(friendId, { reliable: true });
-        
-        conn.on('open', () => {
-            document.getElementById('lobby-status').innerText = 'Đã kết nối! Đang đồng bộ...';
-            document.getElementById('lobby-status').style.color = '#2ecc71';
-            setupPeerEvents();
-        });
+        if (!myPeer || myPeer.destroyed) {
+            myPeer = new Peer(peerConfig); // Guest không cần ID cụ thể
+        }
+
+        const doConnect = () => {
+            conn = myPeer.connect(targetPeerID, { reliable: true });
+            
+            conn.on('open', () => {
+                document.getElementById('lobby-status').innerText = 'Đã kết nối! Đang đồng bộ...';
+                document.getElementById('lobby-status').style.color = '#2ecc71';
+                setupPeerEvents();
+            });
+
+            conn.on('error', (err) => {
+                document.getElementById('lobby-status').innerText = 'Lỗi kết nối hoặc sai mã!';
+                document.getElementById('lobby-status').style.color = '#e74c3c';
+            });
+        };
+
+        if (myPeer.open) {
+            doConnect();
+        } else {
+            myPeer.on('open', () => {
+                doConnect();
+            });
+        }
     }
 
     function setupPeerEvents() {
@@ -2299,7 +2347,7 @@
             else if (data.type === 'MOVE_TTT') {
                 tttBoard[data.index] = data.symbol;
                 tttTurn = (data.symbol === 'X') ? 'O' : 'X';
-                tttLastMove = data.index; // Cập nhật highlight cho khách
+                tttLastMove = data.index; 
                 renderTTT();
                 
                 let winner = checkWinCaro(tttBoard, tttSize, tttWinLen);
@@ -2318,12 +2366,11 @@
             else if (data.type === 'MOVE_CCHESS') {
                 executeCCMove(data.from, data.to, true);
             }
-            // NHẬN TÍN HIỆU ĐÁNH TỪ ĐỐI THỦ SUDOKU
             else if (data.type === 'MOVE_SUDOKU') {
                 const oppCells = document.querySelectorAll('#grid-s-opp .cell-s');
                 if(oppCells[data.index]) {
                     oppCells[data.index].innerText = data.value;
-                    oppCells[data.index].style.color = '#e74c3c'; // Bôi đỏ số đối thủ giải được
+                    oppCells[data.index].style.color = '#e74c3c'; 
                 }
             }
             else if (data.type === 'WIN_SUDOKU') {
@@ -2366,7 +2413,7 @@
     function quitOnlineGame(menuFallback) {
         if (conn) { conn.close(); conn = null; }
         if (myPeer) { myPeer.destroy(); myPeer = null; }
-        if (globalOptions.sudokuMode === 'online') globalOptions.sudokuMode = 'solo'; // Trả về mặc định
+        if (globalOptions.sudokuMode === 'online') globalOptions.sudokuMode = 'solo'; 
         openMode(menuFallback);
     }
 
@@ -2378,7 +2425,7 @@
             const btn = event.target;
             const originalText = btn.innerText;
             btn.innerText = "✅ Đã chép mã!";
-            btn.style.background = "#2ecc71";
+            btn.style.background = "var(--theme-color)";
             btn.style.color = "white";
             
             setTimeout(() => {
